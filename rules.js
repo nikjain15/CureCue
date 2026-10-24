@@ -5,7 +5,7 @@
   else root.CureCueRules = factory();
 })(typeof self !== "undefined" ? self : this, function () {
   // The release the desk runs. The eval runner reads it too; CI fails the build when this release misses a gate.
-  const CURRENT_RELEASE = 1;
+  const CURRENT_RELEASE = 2;
 
   // ---------- Plan rules as a graph (one synthetic plan) ----------
   const GRAPH = {
