@@ -13,6 +13,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Check the synthetic data as data
+        run: node eval/check-data.mjs
       - name: Score the current release against the golden set
         run: node eval/run.mjs
       - name: Keep the report
