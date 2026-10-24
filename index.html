@@ -11,7 +11,7 @@
 <style>
 .hero{display:grid;grid-template-columns:1.05fr 1fr;gap:36px;align-items:center;padding:36px 0 28px}
 @media (max-width:900px){.hero{grid-template-columns:1fr}}
-.hero h1{font-size:clamp(34px,5vw,54px);font-weight:800;line-height:1.05;margin:0 0 14px}
+.hero h1{font-size:clamp(34px,4.6vw,50px);font-weight:800;line-height:1.05;margin:0 0 14px}
 .hero h1 em{font-style:normal;color:var(--green)}
 .hero p.lead{font-size:19px;color:var(--muted);max-width:52ch}
 .hero .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
@@ -37,7 +37,7 @@
 .flow b{display:block;font-size:16px;margin-bottom:2px}
 .two{display:grid;gap:14px;grid-template-columns:1.1fr .9fr}
 @media (max-width:900px){.two{grid-template-columns:1fr}}
-.tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));max-width:760px}
 .tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .tile .n{font-size:30px;font-weight:800;line-height:1.1;color:var(--good)}.tile .l{font-size:13px;color:var(--muted)}
 .rules{list-style:none;margin:0;padding:0;display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
@@ -58,76 +58,57 @@
 
 <section class="hero">
   <div>
-    <h1>The assistant that sits <em>beside</em> the advocate, not between them and the member.</h1>
-    <p class="lead">CureCue listens on a live Medicare Advantage call and speaks only when it has something useful: a grievance the member did not name, the plan rule behind a bill, a hard stop when the call turns into a dispute. The advocate stays accountable for every word.</p>
+    <h1>An assistant that sits <em>beside</em> the advocate.</h1>
+    <p class="lead">CureCue listens on a live member call and speaks only when it has something useful. The advocate stays in charge of every word.</p>
     <div class="cta"><a class="btn primary lg" href="app/">Try the demo call</a><a class="btn lg" href="architecture.html">How it is built</a></div>
     <div class="proof" id="proof"></div>
   </div>
-  <a class="shot" href="app/" aria-label="Open the advocate desk"><img src="assets/desk.png" alt="The advocate desk during a call: transcript, Cue's suggestions with sources, and the member record" width="1280" height="900"></a>
+  <a class="shot" href="app/" aria-label="Open the advocate desk"><img src="assets/desk.png" alt="The advocate desk during a call" width="1280" height="860"></a>
 </section>
 
 <section class="band" id="how">
-  <h2>One call, four steps</h2>
-  <p class="lead">The demo follows a single scripted call. Everything on screen is synthetic: no real plan, member, provider or document.</p>
+  <h2>What happens on one call</h2>
   <div class="flow">
-    <div><b>Ready</b>Queue, handled count, one incoming call. Nothing about the member is shown yet.</div>
-    <div><b>Verify</b>Cue shows what it heard next to each identity check; the advocate ticks the box. It reads nothing until then.</div>
-    <div><b>Handle</b>Cue speaks four times at most: a heads-up, a sourced answer, a chain of rules, a stop. Each has a Why.</div>
-    <div><b>Wrap up</b>Note and recap drafted from this call only, with a checklist. The advocate approves and sends.</div>
+    <div><b>Verify</b>Nothing about the member is read until the advocate confirms who is calling.</div>
+    <div><b>Hear</b>"Third time I've called" is flagged as a grievance, even without the word.</div>
+    <div><b>Answer</b>A copay question is answered from the plan's own rules, with the rule shown.</div>
+    <div><b>Stop</b>A dispute about care or coverage halts everything. A supervisor is brought in.</div>
   </div>
+  <p class="small" style="margin-top:12px">Then a note and a recap, drafted from this call only, approved and sent by the advocate.</p>
 </section>
 
 <section class="band" id="agents">
-  <h2>Six small agents, one rule each</h2>
-  <p class="lead">Route first, then reason. Escalation wins every race. Fail closed. Every figure has a source. Nothing changes itself.</p>
+  <h2>Six small agents, one job each</h2>
   <div class="grid">
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg></div><span class="when">on connect</span><h4>Listener</h4><p>Identity first, memory of prior contacts, intent. Routes each turn to one owning agent.</p></div>
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><span class="when">on dissatisfaction</span><h4>Sentinel</h4><p>Hears a grievance without the word. Asks the advocate to log it; both answers are recorded.</p></div>
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div><span class="when">on a benefit question</span><h4>Citer</h4><p>Walks the plan's rules as a graph and drafts an answer where every figure sits on a node of the path.</p></div>
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/><path d="M9 12h6"/></svg></div><span class="when">on dispute or distress</span><h4>Guardian</h4><p>Hard stop. Nothing is drafted, a supervisor is brought in. Runs before anything else on every turn.</p></div>
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div><span class="when">on call end</span><h4>Scribe</h4><p>Drafts the note and the member recap from the turns that happened, with a required-elements checklist.</p></div>
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19h16M7 16V9M12 16V5M17 16v-6"/></svg></div><span class="when">on approval</span><h4>Reporter</h4><p>Turns the call into an eval row. The scorecard is regenerated from the same rules the desk runs.</p></div>
+    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg></div><h4>Listener</h4><p>Confirms identity, remembers prior calls, routes each turn.</p></div>
+    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><h4>Sentinel</h4><p>Hears dissatisfaction and asks the advocate to log it.</p></div>
+    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div><h4>Citer</h4><p>Answers benefit questions from plan rules. Every figure has a source.</p></div>
+    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/><path d="M9 12h6"/></svg></div><h4>Guardian</h4><p>Stops everything near a coverage decision or distress. Runs first.</p></div>
+    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div><h4>Scribe</h4><p>Drafts the note and the recap from what was actually said.</p></div>
+    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19h16M7 16V9M12 16V5M17 16v-6"/></svg></div><h4>Reporter</h4><p>Turns every call into an eval row for the scorecard.</p></div>
   </div>
 </section>
 
 <section class="band" id="evals">
-  <div class="two">
-    <div>
-      <h2>It scores itself the way CI does</h2>
-      <p class="lead">The numbers below are computed on this page by <code>rules.js</code> against the 24 hand-labelled turns in <code>eval/golden.js</code>. The same two files run in GitHub Actions on every push, and a missed gate fails the build. Release 1 shipped a Guardian that missed five of eight escalations; the gate blocked it.</p>
-      <div class="tiles" id="tiles"></div>
-      <p class="small" id="gsum"></p>
-      <ul class="rules">
-        <li><b>Escalation recall 1.00.</b> The one failure that cannot be budgeted.</li>
-        <li><b>Figures off the path: none.</b> A number not in a cited rule is a build failure.</li>
-        <li><b>Citation accuracy 0.95.</b> A wrong clause is a wrong answer with a confident source.</li>
-        <li><b>Three verdicts only.</b> Answer, needs a human, escalate. A coverage decision has no type to be emitted as.</li>
-      </ul>
-    </div>
-    <div class="card tint">
-      <h3>What stays out of reach</h3>
-      <p>Coverage decisions, prior authorization outcomes, length of stay, clinical advice, anything about a denial. A dispute about any of them is a hard stop, by design and by type.</p>
-      <h3 style="margin-top:14px">What a reviewer gets</h3>
-      <p>A scorecard sectioned by four AI principles, generated from a run, with the golden set, the rules and the CI log attached. Results, not promises.</p>
-      <h3 style="margin-top:14px">What the prototype is not</h3>
-      <p style="margin:0">There is no model behind it yet: every decision is a rule, which is what makes the eval exact. The <a href="architecture.html">architecture</a> shows where models, a validated judge and the lakehouse would sit.</p>
-    </div>
-  </div>
+  <h2>It is measured before it ships</h2>
+  <p class="lead">A person labelled 24 member turns. The same rules that run on the desk are scored against them, here and in CI on every change. A missed gate fails the build.</p>
+  <div class="tiles" id="tiles"></div>
+  <p class="small" id="gsum"></p>
 </section>
 
 <section class="band">
-  <div class="cta-band"><div><h2>See the call</h2><p>Four minutes. One synthetic member, one plan, six agents, and a scorecard that would have blocked the previous release.</p></div><a class="btn lg" href="app/">Open the advocate desk</a></div>
+  <div class="cta-band"><div><h2>See the call</h2><p>One member, one plan, four minutes.</p></div><a class="btn lg" href="app/">Open the advocate desk</a></div>
 </section>
 
-<p class="foot">Demonstration material. All members, plans, providers, figures and calls are synthetic. No real health plan, organisation, person or document is represented. The visual language is a design direction, not a brand.</p>
+<p class="foot">Demonstration only. Every member, plan, provider, figure and call is synthetic. No real health plan, organisation, person or document is represented.</p>
 </div>
 <script src="rules.js"></script>
 <script src="eval/golden.js"></script>
 <script>
 (function(){const R=window.CureCueRules,G=window.CureCueGolden;const r=R.score(G,R.CURRENT_RELEASE),r1=R.score(G,1);const f=x=>x.toFixed(2);
  document.getElementById("tiles").innerHTML=[["Escalations caught",f(r.metrics.escalation_recall)],["Right rule cited",f(r.metrics.citation_accuracy)],["Figures off the path",String(Math.round(r.metrics.hallucination_rate*r.metrics.drafted))],["Turns fully right",f(r.metrics.task_success)]].map(([l,v])=>`<div class="tile"><div class="n">${v}</div><div class="l">${l}</div></div>`).join("");
- document.getElementById("gsum").textContent=`Release ${R.CURRENT_RELEASE} passes every gate. Release 1 would be blocked: escalation recall ${f(r1.metrics.escalation_recall)}, ${r1.missed.length} of ${G.filter(x=>x.v==="escalate").length} escalations missed.`;
- document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>labelled turns</span><span><b>${r.gates.length}</b>gates in CI</span><span><b>6</b>agents, one rule each</span><span><b>0</b>figures off the path</span>`;})();
+ document.getElementById("gsum").textContent=`Release ${R.CURRENT_RELEASE} passes every gate. The previous release missed ${r1.missed.length} of ${G.filter(x=>x.v==="escalate").length} escalations and was blocked.`;
+ document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>labelled turns</span><span><b>${r.gates.length}</b>release gates</span><span><b>0</b>figures without a source</span>`;})();
 </script>
 </body>
 </html>

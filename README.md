@@ -14,6 +14,15 @@ ELEVEN_API_KEY=... ./scripts/make-voices.sh
 
 The key is read from the environment only. Clips are gitignored; commit them deliberately if they should ship with the site.
 
+## The desk, day to day
+
+- **Home is Cue's briefing.** Callbacks you promised that fall due today, cases close to their clock, members likely to call back and why, yesterday's QA note, and a log of what Cue computed overnight with the rows it read. Every line traces to `app/data.js`.
+- **In a call:** softphone, transcript, Cue's cues with a Why and a source, a member 360 (plan, claims, cases, contacts, pharmacy) that Cue opens to the right tab as the call moves, and four actions Cue pre-fills and the advocate confirms: open case, schedule callback, send document, transfer.
+- **Ask Cue:** a typed question is answered only from plan rules on file; account questions go to the claim system; disputes stop; anything else is an abstention, said out loud.
+- **After the call:** note and recap from this call only, a checklist, then the call lands in My day with cues accepted, QA sampling and one line of feedback.
+
+`scripts/gen-data.mjs` generates the synthetic book of business deterministically; `eval/check-data.mjs` checks it as data (every reference resolves, every claim adds up, every clock computes) and runs in CI before the eval.
+
 ## What it does on one call
 
 - **Verifies identity before anything.** Cue shows what it heard next to each check; the advocate ticks the box. It reads nothing and suggests nothing until then.
