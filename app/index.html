@@ -8,17 +8,18 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap">
 <link rel="stylesheet" href="../assets/site.css">
 <style>
-/* The desk: a top bar, a thin rail, and one working area. During a call: softphone and transcript left, Cue centre, member right. */
+/* The desk: rail, top bar, one working area. Home is Cue's briefing. In a call: softphone and transcript left, Cue centre, member 360 right. */
 body{background:var(--bg-2)}
 .shell{display:grid;grid-template-columns:64px 1fr;min-height:100vh}
 .rail{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:6px;position:sticky;top:0;height:100vh}
 .rail .mark{width:34px;height:34px;margin-bottom:10px}
-.rail button{width:44px;height:44px;border-radius:12px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
-.rail button svg{width:22px;height:22px}
+.rail button,.rail a{width:44px;height:44px;border-radius:12px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;position:relative}
+.rail svg{width:22px;height:22px}
 .rail button[aria-current="page"]{background:var(--panel-2);color:var(--green)}
-.rail button:hover{background:var(--bg-2)}
+.rail button:hover,.rail a:hover{background:var(--bg-2)}
 .rail .sp{flex:1}
 .rail .me{width:36px;height:36px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.rail .n{position:absolute;top:6px;right:6px;min-width:16px;height:16px;border-radius:8px;background:var(--bad);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;padding:0 4px}
 .main{min-width:0;display:flex;flex-direction:column}
 .top{display:flex;align-items:center;gap:14px;padding:10px 20px;background:var(--panel);border-bottom:1px solid var(--line);min-height:58px;flex-wrap:wrap}
 .top h1{font-size:17px;margin:0;font-weight:800}
@@ -29,22 +30,51 @@ body{background:var(--bg-2)}
 .top .status .t{font-variant-numeric:tabular-nums;min-width:44px}
 .area{padding:18px 20px 40px;max-width:1440px;width:100%;margin:0 auto}
 .view{display:none}.view.on{display:block}
+/* home */
+.home{display:grid;gap:14px;grid-template-columns:1.25fr .75fr}
+@media (max-width:1000px){.home{grid-template-columns:1fr}}
+.brief{display:flex;flex-direction:column;gap:12px}
+.bhead{display:flex;align-items:center;gap:10px}
+.bhead .av{width:34px;height:34px;border-radius:10px;background:var(--green);display:grid;place-items:center}
+.bhead .av svg{width:20px;height:20px}
+.bhead h2{margin:0;font-size:22px}
+.bhead .small{margin-left:auto}
+.item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--line)}
+.item .av{width:38px;height:38px;border-radius:50%;background:var(--panel-2);display:grid;place-items:center;font-weight:800;color:var(--leaf);font-size:13px}
+.item b{display:block;font-size:16px}
+.item .why{font-size:14px;color:var(--muted)}
+.item .why mark{background:var(--hl);padding:0 2px;border-radius:2px}
+.item .why strong{font-weight:700;color:var(--fg)}
+.item .act{display:flex;gap:6px;flex-direction:column;align-items:flex-end}
+.item.urgent{border-color:#e6b8b8;background:#fff7f7}
+.item.done{opacity:.55}
+.group h3{margin:6px 0 8px}
+.coach{padding:12px 14px;border-radius:12px;background:var(--panel-2);font-size:15px;border-left:4px solid var(--brand)}
+.queue{display:flex;flex-direction:column;gap:10px}
+.qcard{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--line)}
+.qcard .av{width:38px;height:38px;border-radius:50%;background:var(--panel-2);display:grid;place-items:center;font-weight:800;color:var(--leaf);font-size:13px}
+.qcard b{font-size:16px}.qcard .r{font-size:13px;color:var(--muted)}
+.qcard .btn{margin-left:auto}
+.qcard.ring{border-color:var(--green);box-shadow:0 0 0 3px rgba(114,153,46,.15)}
+.kpis{display:grid;gap:10px;grid-template-columns:repeat(3,1fr);margin-bottom:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.kpi .n{font-size:24px;font-weight:800;line-height:1.1}.kpi .l{font-size:12px;color:var(--muted)}
+/* call */
 .steps{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
 .steps div{font-size:13px;font-weight:700;padding:7px 14px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--muted);display:flex;align-items:center;gap:8px}
 .steps div i{width:18px;height:18px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-style:normal;font-size:11px;color:var(--fg)}
 .steps div.on{border-color:var(--green);color:var(--green)}.steps div.on i{background:var(--green);color:#fff}
 .steps div.done{color:var(--leaf)}.steps div.done i{background:var(--good-bg);color:var(--good)}
 section.scr{display:none}section.scr.on{display:block}
-.three{display:grid;gap:14px;grid-template-columns:1.05fr 1fr .85fr}
+.three{display:grid;gap:14px;grid-template-columns:1fr 1fr 1fr}
 @media (max-width:1100px){.three{grid-template-columns:1fr 1fr}.c3{grid-column:1/-1}}
-@media (max-width:720px){.three{grid-template-columns:1fr}.shell{grid-template-columns:1fr}.rail{flex-direction:row;height:auto;position:static;padding:8px 12px;border-right:0;border-bottom:1px solid var(--line)}.rail .sp{display:none}.rail .mark{margin:0 6px 0 0}}
+@media (max-width:720px){.three{grid-template-columns:1fr}.shell{grid-template-columns:1fr}.rail{flex-direction:row;height:auto;position:static;padding:8px 10px;border-right:0;border-bottom:1px solid var(--line);gap:2px}.rail .sp{display:none}.rail .mark{margin:0 4px 0 0;width:30px;height:30px}.rail button,.rail a{width:38px;height:38px}.rail .me{width:32px;height:32px;font-size:12px}.home{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}}
 .col{min-width:0;display:flex;flex-direction:column;gap:14px}
-/* softphone */
-.phone{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--fg);color:#fff}
+.phone{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--fg);color:#fff;flex-wrap:wrap}
 .phone .av{width:40px;height:40px;border-radius:50%;background:var(--brand);display:grid;place-items:center;font-weight:800;color:#1d2a0c}
 .phone .who{line-height:1.2}.phone .who b{display:block;font-size:15px}.phone .who span{font-size:12px;opacity:.75}
 .phone .wave{margin-left:auto;display:flex;gap:3px;align-items:center;height:26px}
-.phone .wave i{width:3px;height:6px;background:var(--brand);border-radius:2px;transition:height .12s}
+.phone .wave i{width:3px;height:6px;background:var(--brand);border-radius:2px}
 .phone .wave.on i{animation:wv .9s ease-in-out infinite}
 .phone .wave i:nth-child(2){animation-delay:.1s}.phone .wave i:nth-child(3){animation-delay:.2s}.phone .wave i:nth-child(4){animation-delay:.3s}.phone .wave i:nth-child(5){animation-delay:.4s}.phone .wave i:nth-child(6){animation-delay:.5s}
 @keyframes wv{0%,100%{height:5px}50%{height:22px}}
@@ -54,19 +84,17 @@ section.scr{display:none}section.scr.on{display:block}
 .phone .pb button svg{width:18px;height:18px}
 .phone .pb button.end{background:var(--bad)}
 .phone .pb button[aria-pressed="true"]{background:var(--brand);color:#1d2a0c}
-.transcript{display:flex;flex-direction:column;gap:8px;max-height:460px;overflow:auto;padding-right:2px}
+.transcript{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow:auto;padding-right:2px}
 .line{padding:10px 12px;border-radius:12px;background:var(--bg-2);max-width:92%;font-size:16px}
 .line.adv{background:var(--panel);border:1px solid var(--line);align-self:flex-end}
 .line .w{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;font-weight:700}
 .line mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:2px}
 .typing{color:var(--muted);font-size:14px;font-style:italic}
-/* verify */
 .verify{display:flex;flex-direction:column;gap:8px}
 .verify label{display:flex;gap:10px;align-items:center;padding:12px 12px;background:var(--bg-2);border-radius:12px;font-size:16px;flex-wrap:wrap;cursor:pointer}
 .verify input{width:20px;height:20px;accent-color:var(--green)}
 .verify .heard{margin-left:auto;font-size:14px;color:var(--muted)}
 .verify .heard b{color:var(--leaf);font-weight:700}
-/* cues */
 .cuehead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .cuehead .av{width:30px;height:30px;border-radius:9px;background:var(--green);display:grid;place-items:center}
 .cuehead .av svg{width:18px;height:18px}
@@ -83,37 +111,77 @@ section.scr{display:none}section.scr.on{display:block}
 .cue .acts button{font:inherit;font-weight:700;font-size:14px;padding:8px 14px;border-radius:999px;border:2px solid var(--green);background:var(--panel);color:var(--green);cursor:pointer}
 .cue .acts button.main{background:var(--green);color:#fff}
 .cue.stop .acts button.main{background:var(--bad);border-color:var(--bad)}
-.cue .acts button.done{background:var(--good-bg);color:var(--good);border-color:transparent}
+.cue .acts button.done,.cue.stop .acts button.main.done{background:var(--good-bg);color:var(--good);border-color:transparent}
 .cue .acts button:disabled{opacity:.45;cursor:default}
 .cue .why{font-size:13px;color:var(--muted);cursor:pointer;text-decoration:underline;background:none;border:0;padding:0}
 .cue .det{display:none;margin-top:8px;font-size:14px;color:var(--muted);background:var(--panel);border-radius:8px;padding:8px 10px}
 .cue .det.on{display:block}
 .cue .det code{font-size:13px;color:var(--leaf)}
+.ask{display:flex;gap:6px;margin-top:12px}
+.ask input{flex:1;font:inherit;font-size:14px;padding:9px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);min-width:0}
+.log{list-style:none;margin:0;padding:0;font-size:14px}
+.log li{display:grid;grid-template-columns:52px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
+.log li:last-child{border-bottom:0}
+.log .t{color:var(--muted);font-variant-numeric:tabular-nums;font-weight:700}
 details.src{margin-top:4px}
 details.src summary{font-size:13px;color:var(--muted);cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 svg.graph{width:100%;height:auto;display:block;margin-top:8px}
-/* record */
-.rec{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:15px}
+/* tools */
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tools button{font:inherit;font-size:13px;font-weight:700;padding:7px 11px;border-radius:999px;border:1.5px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.tools button svg{width:15px;height:15px;stroke:var(--leaf);fill:none;stroke-width:2;stroke-linecap:round}
+.tools button.done{border-color:transparent;background:var(--good-bg);color:var(--good)}
+.tools button.done svg{stroke:var(--good)}
+.tool{margin-top:10px;padding:12px;border-radius:12px;background:var(--panel-2);display:none}
+.tool.on{display:block}
+.tool h4{margin:0 0 8px;font-size:14px}
+.tool .f{display:grid;gap:8px;grid-template-columns:1fr 1fr}
+@media (max-width:520px){.tool .f{grid-template-columns:1fr}}
+.tool label{font-size:12px;color:var(--muted);display:block}
+.tool input,.tool select,.tool textarea{width:100%;font:inherit;font-size:14px;padding:8px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg)}
+.tool .pre{font-size:12px;color:var(--leaf);font-weight:700}
+.tool .ctrl{margin-top:8px}
+/* member 360 */
+.m360 .head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.m360 .head .av{width:44px;height:44px;border-radius:50%;background:var(--panel-2);display:grid;place-items:center;font-weight:800;color:var(--leaf)}
+.m360 .head b{display:block;font-size:17px}.m360 .head span{font-size:13px;color:var(--muted)}
+.m360 .flags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.mtabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:10px}
+.mtabs button{font:inherit;font-size:13px;font-weight:700;padding:8px 10px;border:0;border-bottom:2px solid transparent;background:none;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+.mtabs button[aria-selected="true"]{color:var(--leaf);border-bottom-color:var(--green)}
+.mtabs button .cnt{font-size:11px;background:var(--bg-2);border-radius:999px;padding:1px 6px;margin-left:4px}
+.mpane{display:none}.mpane.on{display:block}
+.row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.row:last-child{border-bottom:0}
+.row b{font-weight:700}.row .sub{color:var(--muted);font-size:13px;grid-column:1/-1}
+.row .amt{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+.row.hot{background:var(--hl);margin:0 -8px;padding:9px 8px;border-radius:8px}
+.rec{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px}
 .rec b{color:var(--muted);font-weight:600}
-.hist{margin:0;padding-left:18px;font-size:15px}.hist li{margin:5px 0}
 .ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+/* wrap */
 .wrap2{display:grid;gap:14px;grid-template-columns:1.2fr .8fr}
 @media (max-width:800px){.wrap2{grid-template-columns:1fr}}
 textarea,select,input[type=date]{width:100%;font:inherit;font-size:15px;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--fg)}
-textarea{min-height:190px;resize:vertical}
+textarea{min-height:200px;resize:vertical}
 .chk{list-style:none;margin:0;padding:0;font-size:15px}
 .chk li{display:flex;gap:10px;align-items:flex-start;padding:5px 0}
 .chk .b{width:20px;height:20px;border-radius:5px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:800}
 .chk .ok{background:var(--good-bg);color:var(--good)}.chk .miss{background:var(--bad-bg);color:var(--bad)}
 .recap{font-size:15px;background:var(--bg-2);border-radius:12px;padding:10px 12px}
-.ready{max-width:640px;margin:40px auto;text-align:center}
-.ready .mark{width:64px;height:64px;margin:0 auto 14px}
-.ready p{color:var(--muted);font-size:17px}
-.queue{display:flex;flex-direction:column;gap:10px;max-width:720px;margin:0 auto}
-.qcard{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:14px 16px;border-radius:12px;background:var(--panel);border:1px solid var(--line)}
-.qcard .av{width:40px;height:40px;border-radius:50%;background:var(--panel-2);display:grid;place-items:center;font-weight:800;color:var(--leaf)}
-.qcard b{font-size:17px}.qcard .r{font-size:14px;color:var(--muted)}
-.qcard .btn{margin-left:auto}
+.actions{list-style:none;margin:0 0 10px;padding:0;font-size:14px}
+.actions li{padding:4px 0;display:flex;gap:8px;align-items:center}
+.actions li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--good)}
+/* my day */
+.day{display:grid;gap:14px;grid-template-columns:1.2fr .8fr}
+@media (max-width:900px){.day{grid-template-columns:1fr}}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:52px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:start}
+.tl li:last-child{border-bottom:0}
+.tl .t{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700}
+.tl b{display:block}.tl .sub{color:var(--muted);font-size:13px}
+.tl .pills{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.tl li.now{background:var(--panel-2);margin:0 -8px;padding:10px 8px;border-radius:10px}
 .tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:10px 0}
 .tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .tile .n{font-size:30px;font-weight:800;line-height:1.1}.tile .l{font-size:13px;color:var(--muted)}
@@ -122,7 +190,7 @@ textarea{min-height:190px;resize:vertical}
 .step{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:15px;border-top:4px solid var(--brand)}
 .step.gate{border-top-color:var(--bad);background:var(--bad-bg);border-color:transparent}
 .step b{display:block;font-size:12px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
-.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--fg);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;display:none;z-index:9}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--fg);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;display:none;z-index:9;max-width:90vw}
 .toast.on{display:block}
 </style>
 </head>
@@ -130,44 +198,55 @@ textarea{min-height:190px;resize:vertical}
 <div class="shell">
 <nav class="rail" aria-label="Desk">
   <img class="mark" src="../assets/mark.svg" alt="CureCue">
-  <button data-view="desk" aria-current="page" title="Desk" aria-label="Desk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16v10H4z"/><path d="M8 21h8M12 17v4"/></svg></button>
+  <button data-view="home" aria-current="page" title="Home" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><span class="n" id="homen"></span></button>
+  <button data-view="desk" title="Call" aria-label="Call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></button>
+  <button data-view="day" title="My day" aria-label="My day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button>
   <button data-view="quality" title="Quality" aria-label="Quality"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19h16M7 16V9M12 16V5M17 16v-6"/></svg></button>
   <button data-view="loop" title="How it learns" aria-label="How it learns"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12a8 8 0 0 1 14-5l2 2M20 12a8 8 0 0 1-14 5l-2-2"/><path d="M20 4v5h-5M4 20v-5h5"/></svg></button>
   <span class="sp"></span>
-  <a href="../" title="About CureCue" aria-label="About CureCue" style="color:var(--muted);display:grid;place-items:center;width:44px;height:44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="22" height="22"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></a>
+  <a href="../" title="About CureCue" aria-label="About CureCue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></a>
   <span class="me" title="Nik J.">NJ</span>
 </nav>
 <div class="main">
   <header class="top">
-    <h1 id="title">Desk</h1><span class="crumb" id="crumb">Member Services · Medicare</span>
-    <div class="stats"><span>Handled today <b>14</b></span><span>In queue <b id="qn">3</b></span><span>Avg handle <b>6:48</b></span></div>
+    <h1 id="title">Home</h1><span class="crumb" id="crumb">Member Services · Medicare · Mon Oct 27</span>
+    <div class="stats"><span>Handled today <b id="handled">7</b></span><span>In queue <b id="qn">1</b></span><span>Avg handle <b id="aht">6:00</b></span></div>
     <div class="status"><span class="dot" id="dot"></span><span id="stt">Not ready</span><span class="t" id="timer"></span></div>
   </header>
   <div class="area">
 
-  <!-- DESK -->
-  <div class="view on" id="view-desk">
-    <div class="steps" id="steps"><div class="on"><i>1</i>Ready</div><div><i>2</i>Verify</div><div><i>3</i>Handle</div><div><i>4</i>Wrap up</div></div>
+  <!-- HOME: Cue's briefing, then the queue -->
+  <div class="view on" id="view-home">
+    <div class="home">
+      <div class="brief">
+        <div class="bhead"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg></div><h2>Good afternoon, Nik. Here is what I found.</h2><span class="small" id="briefmeta"></span></div>
+        <div class="group"><h3>Callbacks you promised, due today</h3><div id="cb" class="brief"></div></div>
+        <div class="group"><h3>Cases close to their clock</h3><div id="clock" class="brief"></div></div>
+        <div class="group"><h3>Likely to call back today</h3><div id="likely" class="brief"></div></div>
+        <div class="group"><h3>From yesterday's QA</h3><div class="coach" id="coach"></div></div>
+        <div class="group"><h3>What Cue did before you logged in</h3><div class="card" style="padding:10px 14px"><ul class="log" id="log"></ul><p class="small" style="margin:8px 0 0" id="logmeta"></p></div></div>
+      </div>
+      <div>
+        <div class="kpis" id="kpis"></div>
+        <div class="card"><h3>Queue</h3>
+          <p class="small" id="readynote">Press ready to take calls. Cue listens alongside you and speaks only when it has something useful.</p>
+          <button class="btn primary" id="goready">I'm ready for calls</button>
+          <div class="queue" id="queue" hidden style="margin-top:12px"></div>
+          <p class="small" id="voicenote" style="margin-top:10px"></p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <section class="scr on" id="s-ready">
-      <div class="ready">
-        <img class="mark" src="../assets/mark.svg" alt="">
-        <h2>Good afternoon, Nik.</h2>
-        <p>Cue listens alongside you and speaks only when it has something useful. You stay in charge of every word to the member.</p>
-        <button class="btn primary lg" id="goready">I'm ready for calls</button>
-        <p class="small" id="voicenote" style="margin-top:14px"></p>
-      </div>
-      <div class="queue" id="queue" hidden>
-        <div class="qcard"><div class="av">RM</div><div><b>Rosa M.</b><div class="r">Sierra Advantage HMO · billing question · 3rd contact in 4 weeks</div></div><button class="btn primary" id="answer">Answer</button></div>
-        <div class="qcard" style="opacity:.6"><div class="av">DK</div><div><b>Daniel K.</b><div class="r">Sierra Advantage HMO · pharmacy · waiting 1:40</div></div></div>
-        <div class="qcard" style="opacity:.45"><div class="av">AP</div><div><b>Anita P.</b><div class="r">Sierra Advantage PPO · ID card · waiting 0:52</div></div></div>
-      </div>
-    </section>
+  <!-- CALL -->
+  <div class="view" id="view-desk">
+    <div class="steps" id="steps"><div class="on"><i>1</i>Verify</div><div><i>2</i>Handle</div><div><i>3</i>Wrap up</div></div>
+    <p class="small" id="nocall">No call in progress. Go to Home and answer the next call in the queue.</p>
 
     <section class="scr" id="s-verify">
       <div class="three">
         <div class="col">
-          <div class="phone"><div class="av">RM</div><div class="who"><b>Rosa M.</b><span>Sierra Advantage HMO · inbound</span></div><div class="wave" id="wave1"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+          <div class="phone"><div class="av" id="pav1">RM</div><div class="who"><b id="pname1">Rosa M.</b><span id="psub1">inbound</span></div><div class="wave" id="wave1"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
           <div class="card"><h3>Conversation</h3><div class="transcript" id="tr-verify"></div></div>
         </div>
         <div class="col">
@@ -182,7 +261,7 @@ textarea{min-height:190px;resize:vertical}
           </div>
         </div>
         <div class="col c3">
-          <div class="card"><h3>Member record</h3><div class="rec"><b>Member</b><span>Rosa M. · ••••4821</span><b>Plan</b><span>Sierra Advantage HMO · 2026</span><b>Language</b><span>English</span><b>Status</b><span class="pill warn">not verified</span></div></div>
+          <div class="card"><h3>Caller</h3><div class="rec" id="precard"></div></div>
         </div>
       </div>
     </section>
@@ -190,24 +269,29 @@ textarea{min-height:190px;resize:vertical}
     <section class="scr" id="s-handle">
       <div class="three">
         <div class="col">
-          <div class="phone"><div class="av">RM</div><div class="who"><b>Rosa M.</b><span>verified · Sierra Advantage HMO</span></div><div class="wave" id="wave2"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="phone"><div class="av" id="pav2">RM</div><div class="who"><b id="pname2">Rosa M.</b><span id="psub2">verified</span></div><div class="wave" id="wave2"><i></i><i></i><i></i><i></i><i></i><i></i></div>
             <div class="pb"><button id="mute" title="Mute audio" aria-label="Mute audio" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10v4h4l5 4V6L8 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg></button><button id="pause" title="Hold" aria-label="Hold" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5v14M15 5v14"/></svg></button><button class="end" id="endcall" title="End call" aria-label="End call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 14c4-4 12-4 16 0l-2 3c-1 1-3 0-4-1v-2c-2-1-4-1-6 0v2c-1 1-3 2-4 1z"/></svg></button></div></div>
           <div class="card"><h3>Conversation</h3><div class="transcript" id="tr"></div></div>
+          <div class="card"><h3>Actions</h3>
+            <div class="tools" id="tools">
+              <button data-tool="case"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM9 7V4h6v3"/></svg>Open case</button>
+              <button data-tool="callback"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Schedule callback</button>
+              <button data-tool="doc"><svg viewBox="0 0 24 24"><path d="M4 4h12l4 4v12H4z"/><path d="M8 13h8M8 17h5"/></svg>Send document</button>
+              <button data-tool="transfer"><svg viewBox="0 0 24 24"><path d="M4 12h12M12 6l6 6-6 6"/></svg>Transfer</button>
+            </div>
+            <div class="tool" id="tool"></div>
+          </div>
         </div>
         <div class="col">
           <div class="card"><div class="cuehead"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg></div><h3>Cue</h3><span class="mode" id="mode"></span></div>
             <div class="cues" id="cues"><div class="quiet" id="quiet"><span class="dot ready"></span><span>Listening. Nothing to add yet.</span></div></div>
+            <form class="ask" id="ask" autocomplete="off"><input id="askq" placeholder="Ask Cue about this plan, e.g. what is the ER copay?" aria-label="Ask Cue"><button class="btn sm primary" type="submit">Ask</button></form>
+            <p class="small" style="margin:6px 0 0">Answers come only from plan rules on file. Anything else, Cue says so.</p>
             <details class="src"><summary>Where the answer comes from</summary><svg class="graph" viewBox="0 0 420 290" id="graph" role="img" aria-label="Plan rules and the path used"></svg><div class="small" id="clause">Tap a rule to read it.</div></details>
           </div>
         </div>
         <div class="col c3">
-          <div class="card"><h3>Member record</h3>
-            <div class="rec"><b>Member</b><span>Rosa M. · 71</span><b>Plan</b><span>Sierra Advantage HMO · 2026</span><b>Status</b><span class="pill good">verified</span><b>Open cases</b><span id="cases">None</span></div>
-            <h3 style="margin-top:16px">Recent bill (EOB)</h3>
-            <div class="rec"><b>Date of service</b><span>Sep 30, 2026</span><b>Provider</b><span>Lindqvist Dermatology</span><b>You owe</b><span><b>$120.00</b></span><b>Plan paid</b><span>$0.00</span><b>Reason code</b><span>No referral on file</span></div>
-            <h3 style="margin-top:16px">Prior contacts</h3>
-            <ul class="hist"><li><b>Oct 14</b> · same bill · told to call back after the EOB arrived · <span class="pill bad">callback never scheduled</span></li><li><b>Oct 3</b> · same bill, first call · told the claim was still processing</li></ul>
-          </div>
+          <div class="card m360" id="m360"></div>
         </div>
       </div>
     </section>
@@ -217,16 +301,28 @@ textarea{min-height:190px;resize:vertical}
         <div class="card"><h3>Call note · drafted by Cue from this call only, approved by you</h3>
           <textarea id="note" aria-label="Call note"></textarea>
           <div class="ctrl"><label class="small" for="code">Wrap-up code</label><select id="code" style="max-width:320px"><option>Benefits and cost question</option><option>Grievance · repeat contact</option><option>Claims and billing</option><option>Escalated to supervisor</option></select></div>
-          <div class="ctrl"><label class="small" for="cbdate">Callback date</label><input type="date" id="cbdate" style="max-width:220px" aria-label="Callback date"></div>
-          <div class="ctrl"><button class="btn primary" id="approve">Approve note and create case</button><span class="small" id="approved"></span></div>
+          <div class="ctrl"><button class="btn primary" id="approve">Approve note and close</button><span class="small" id="approved"></span></div>
         </div>
-        <div class="card"><h3>Before you approve</h3><ul class="chk" id="checklist"></ul>
+        <div class="card"><h3>What you did on this call</h3><ul class="actions" id="didlist"></ul>
+          <h3>Before you approve</h3><ul class="chk" id="checklist"></ul>
           <h3 style="margin-top:16px">Recap to the member</h3><div class="recap" id="recap"></div>
           <div class="ctrl"><button class="btn sm" id="sendrecap" disabled>Send recap by text</button><span class="small" id="sent"></span></div>
-          <div class="ctrl"><button class="btn primary" id="next" disabled>Ready for next call</button></div>
+          <div class="ctrl"><button class="btn primary" id="next" disabled>Back to Home</button></div>
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- MY DAY -->
+  <div class="view" id="view-day">
+    <div class="day">
+      <div class="card"><h3>Today's calls</h3><ul class="tl" id="tl"></ul></div>
+      <div>
+        <div class="tiles" id="daytiles" style="margin-top:0"></div>
+        <div class="card"><h3>Cue's note to you</h3><p class="small" id="daynote" style="margin:0"></p></div>
+        <div class="card" style="margin-top:14px"><h3>Sampled for QA today</h3><p class="small" id="qa" style="margin:0"></p></div>
+      </div>
+    </div>
   </div>
 
   <!-- QUALITY -->
@@ -258,7 +354,7 @@ textarea{min-height:190px;resize:vertical}
       <p class="small" style="margin-top:12px">Steps 1 to 4 and 6 to 8 are design. What runs today is step 3 in miniature: <code>eval/run.mjs</code> scores the release in <code>rules.js</code> against <code>eval/golden.js</code> on every push, and a missed gate fails the build.</p></div>
   </div>
 
-  <p class="foot">Demonstration only. Rosa, the plan, the provider and every figure are synthetic. No real health plan, organisation, person or document is represented.</p>
+  <p class="foot">Demonstration only. Every member, plan, provider, figure and call is synthetic. No real health plan, organisation, person or document is represented.</p>
   </div>
 </div>
 </div>
@@ -266,112 +362,8 @@ textarea{min-height:190px;resize:vertical}
 
 <script src="../rules.js"></script>
 <script src="../eval/golden.js"></script>
+<script src="data.js"></script>
 <script src="voice.js"></script>
-<script>
-const R=window.CureCueRules,G=R.GRAPH,GOLDEN=window.CureCueGolden;
-const $=id=>document.getElementById(id);
-function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove("on"),2600);}
-// ---------- Graph ----------
-function drawGraph(path=[]){const svg=$("graph");let s="";
- G.edges.forEach(([a,b,l])=>{const A=G.nodes[a],B=G.nodes[b];const on=path.includes(a)&&path.includes(b)&&Math.abs(path.indexOf(a)-path.indexOf(b))===1;
-  s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="${on?'var(--green)':'var(--line)'}" stroke-width="${on?3.5:1.2}"/>`;
-  if(l){const mx=(A.x+B.x)/2,my=(A.y+B.y)/2;const horizontal=A.y===B.y;s+=`<text x="${mx}" y="${horizontal?my-16:my-6}" font-size="9" fill="var(--muted)" text-anchor="middle" font-family="Mulish, sans-serif">${l}</text>`;}});
- Object.entries(G.nodes).forEach(([k,n])=>{const on=path.includes(k);const w=n.kind==="plan"?150:Math.min(132,n.label.length*5.6+18);
-  s+=`<g data-n="${k}" style="cursor:pointer"><rect x="${n.x-w/2}" y="${n.y-12}" width="${w}" height="24" rx="7" fill="${on?'var(--green)':(n.kind==='plan'?'var(--panel-2)':'var(--panel)')}" stroke="${on?'var(--green)':'var(--line)'}"/><text x="${n.x}" y="${n.y+4}" font-size="9.5" text-anchor="middle" fill="${on?'#fff':'var(--fg)'}" font-family="Mulish, sans-serif" font-weight="700">${n.label}</text></g>`;});
- svg.innerHTML=s;svg.querySelectorAll("g[data-n]").forEach(g=>g.onclick=()=>showClause(g.dataset.n));}
-function showClause(k){const n=G.nodes[k];$("clause").innerHTML=n.text?`<b>${n.label}</b> (${n.id}): ${n.text}`:`<b>${n.label}</b>`;}
-// ---------- Call state ----------
-const cues=$("cues"),quiet=$("quiet");
-const state={grievance:null,grievanceHeard:false,escalated:false,figures:[],pathsSeen:[],asked:{},referral:null,callback:null,ended:false};
-function cue({k,cls="",say,main,alt,why,cite}){const el=document.createElement("div");el.className="cue "+cls;
- el.innerHTML=`<div class="k">${k}</div><div class="say">${say}</div><div class="acts">${main?`<button class="main">${main.label}</button>`:""}${alt?`<button class="alt">${alt.label}</button>`:""}<button class="why">Why?</button></div><div class="det">${why}${cite?`<br>Source: <code>${cite}</code>`:""}</div>`;
- const m=el.querySelector(".main"),a=el.querySelector(".alt"),w=el.querySelector(".why");
- if(m)m.onclick=()=>{m.classList.add("done");m.textContent=main.done;if(a)a.disabled=true;if(main.fn)main.fn();};
- if(a)a.onclick=()=>{a.classList.add("done");a.textContent=alt.done;if(m)m.disabled=true;if(alt.fn)alt.fn();};
- w.onclick=()=>el.querySelector(".det").classList.toggle("on");
- cues.insertBefore(el,quiet);el.scrollIntoView({block:"nearest"});}
-function setQuiet(t){quiet.querySelector("span:last-child").textContent=t;}
-const fmtDate=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
-function onMember(text){
- const d=R.decide(text,R.CURRENT_RELEASE);   // the desk always runs the current release
- if(d.verdict==="escalate"){state.escalated=true;drawGraph(["APPL"]);showClause("APPL");
-  cue({k:"Stop",cls:"stop",say:`<b>Bring a supervisor in now.</b> "${d.trigger}" signals a dispute about care or coverage. Don't quote a benefit or a decision for this.`,main:{label:"Connect supervisor",done:"Supervisor joining"},why:"A dispute about a care or coverage decision is never answered from a plan document. Cue drafts nothing and pauses every other cue for this topic.",cite:"P-APPL"});setQuiet("Paused on this topic. A supervisor is handling it.");return;}
- if(d.grievance&&!state.grievanceHeard){state.grievanceHeard=true;drawGraph(["GRV"]);showClause("GRV");const g=R.grievance(text);const due=new Date();due.setDate(due.getDate()+30);
-  cue({k:"Heads up",cls:"flag",say:`She said "<mark>${g.exec(text)[0]}</mark>". That counts as a grievance, even without the word. Log it?`,main:{label:"Log grievance",done:"Logged · 30-day clock started",fn:()=>{state.grievance=true;$("cases").innerHTML=`Grievance G-26-0417 · <span class="pill warn">due ${fmtDate(due)}</span>`;}},alt:{label:"Not a grievance",done:"Noted: not a grievance",fn:()=>{state.grievance=false;}},why:"Repeat contact about an unresolved issue is dissatisfaction. If logged, a case opens with a due date 30 days out. Either choice is recorded in the note.",cite:"P-GRV"});}
- if(d.verdict==="answer"){const key=d.path.join(">");if(state.pathsSeen.includes(key))return;state.pathsSeen.push(key);
-  drawGraph(d.path);showClause(d.path[0]);const dr=d.draft;R.figureCheck(dr.say,d.path).forEach(f=>state.figures.push(f));
-  if(d.path[0]==="SPEC")state.asked.spec=true;if(d.path.includes("INPT"))state.asked.er=true;
-  const main=dr.main?{label:dr.main.label,done:dr.main.done,fn:()=>{if(dr.main.set)Object.assign(state,dr.main.set);if(dr.main.show)showClause(dr.main.show);}}:null;
-  const alt=dr.alt?{label:dr.alt.label,done:dr.alt.done,fn:()=>{if(dr.alt.set)Object.assign(state,dr.alt.set);}}:null;
-  cue({k:"Suggested answer",say:dr.say,main,alt,why:dr.why,cite:d.path.map(k=>G.nodes[k].id).join(" → ")});setQuiet("Listening. Nothing to add yet.");return;}
- if(d.account){cue({k:"Check first",say:"That's about the account, not the plan rules. Open the claim before answering. No number suggested.",why:"Cue only quotes figures that exist in a plan rule. Account questions need the claim system."});}
-}
-// ---------- Script and playback (voice.js drives timing when audio is on) ----------
-const VERIFY=[{w:"Advocate",t:"Thanks for calling. Before I can look at anything, can I get your full name?"},{w:"Rosa",t:"Rosa Martinez.",h:[1,"Rosa Martinez"]},{w:"Advocate",t:"And your date of birth?"},{w:"Rosa",t:"March 9th, 1955.",h:[2,"03/09/1955"]},{w:"Advocate",t:"Last four of your member ID?"},{w:"Rosa",t:"4821.",h:[3,"4821"]}];
-const CALL=[
- {w:"Rosa",t:"This is the third time I've called about this bill from the skin doctor."},
- {w:"Advocate",t:"I'm sorry, Rosa. I can see both earlier calls, so you won't have to repeat yourself. Let's sort it out."},
- {w:"Rosa",t:"They billed me $120 for a specialist visit and I thought I only pay $35."},
- {w:"Advocate",t:"Let me check whether a referral was on file for September 30th."},
- {w:"Rosa",t:"While I have you, if I go to the ER and they admit me, what do I owe?"},
- {w:"Rosa",t:"And my mother is in rehab. They are sending her home tomorrow and she is not ready."},
- {w:"Advocate",t:"I'm bringing a supervisor onto the call for that right now."}];
-let paused=false,tick=null,t0=0,player=null;
-function addLine(container,w,t){const d=document.createElement("div");d.className="line"+(w==="Advocate"?" adv":"");d.innerHTML=`<span class="w">${w==="Advocate"?"You":"Rosa"}</span>${t}`;container.appendChild(d);container.scrollTop=container.scrollHeight;}
-function go(n){document.querySelectorAll("#steps div").forEach((d,k)=>{d.className=k<n?"done":k===n?"on":"";});["s-ready","s-verify","s-handle","s-wrap"].forEach((id,k)=>$(id).classList.toggle("on",k===n));window.scrollTo({top:0});}
-function wave(on){["wave1","wave2"].forEach(id=>$(id).classList.toggle("on",on));}
-$("goready").onclick=()=>{$("dot").className="dot ready";$("stt").textContent="Ready";$("queue").hidden=false;$("goready").disabled=true;CueVoice.warm();};
-$("answer").onclick=()=>{$("dot").className="dot live";$("stt").textContent="On call";t0=Date.now();tick=setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);$("timer").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");},500);go(1);$("qn").textContent="2";
- const c=$("tr-verify");player=CueVoice.play(VERIFY,{container:c,onStart:(l)=>{wave(true);},onLine:(l)=>{addLine(c,l.w,l.t);wave(false);if(l.h)$("h"+l.h[0]).innerHTML=`heard <b>${l.h[1]}</b>`;},isPaused:()=>false,offset:0});};
-function chk(){$("verified").disabled=!(v1.checked&&v2.checked&&v3.checked);}
-["v1","v2","v3"].forEach(id=>$(id).onchange=chk);
-$("verified").onclick=()=>{if(player)player.stop();go(2);const c=$("tr");
- cue({k:"Before you start",say:"She's called twice about this bill, Oct 3 and Oct 14. On Oct 14 she was promised a callback that never got scheduled.",why:"From the member record's prior contacts. Shown once so you can acknowledge it before she has to raise it."});
- player=CueVoice.play(CALL,{container:c,onStart:()=>wave(true),onLine:(l)=>{addLine(c,l.w,l.t);wave(false);if(l.w==="Rosa")onMember(l.t);},isPaused:()=>paused||state.ended,offset:VERIFY.length});};
-$("pause").onclick=e=>{paused=!paused;e.currentTarget.setAttribute("aria-pressed",String(paused));$("stt").textContent=paused?"On hold":"On call";if(paused)CueVoice.hold();else CueVoice.resume();};
-$("mute").onclick=e=>{const m=CueVoice.toggleMute();e.currentTarget.setAttribute("aria-pressed",String(m));$("mode").textContent=CueVoice.modeLabel();toast(m?"Audio off: transcript only":"Audio on");};
-$("endcall").onclick=()=>{state.ended=true;if(player)player.stop();clearInterval(tick);wave(false);$("dot").className="dot ready";$("stt").textContent="Wrap-up";go(3);wrapup();};
-// ---------- Wrap-up from this call only ----------
-function wrapup(){
- const render=()=>{
-  const allOnPath=state.figures.length>0&&state.figures.every(f=>f.onPath);
-  const items=[["Identity verified",true],["Grievance decision recorded",state.grievance!==null,state.grievanceHeard],
-   [state.figures.length?`Every figure quoted traced to a plan rule (${state.figures.length} checked)`:"No figure was quoted",state.figures.length?allOnPath:true,true],
-   ["Referral checked before quoting",state.referral!==null,state.asked.spec],["Discharge concern handed to a supervisor",state.escalated,state.escalated],["Callback scheduled with a date",!!state.callback,state.referral!==true]];
-  $("checklist").innerHTML=items.filter(([l,ok,applies])=>applies!==false).map(([l,ok])=>`<li><span class="b ${ok?'ok':'miss'}">${ok?'✓':'!'}</span><span>${l}${ok?'':' <span class="pill bad">missing</span>'}</span></li>`).join("");
-  const n=[`Rosa M. called (3rd contact) about a $120 specialist bill, date of service Sep 30.`];
-  if(state.asked.spec)n.push(`Plan rule: $35 with referral on file (S-SPEC); not covered without (S-REF). ${state.referral===true?"Referral confirmed; bill sent for reprocessing.":state.referral===false?"No referral on file; rule explained.":"Referral status not confirmed on this call."}`);
-  if(state.grievanceHeard)n.push(state.grievance===true?"Grievance logged G-26-0417, 30-day clock.":state.grievance===false?"Repeat contact noted; advocate judged not a grievance.":"Dissatisfaction heard; grievance decision NOT recorded.");
-  if(state.asked.er)n.push("Asked about ER with admission: ER copay waived if admitted (S-ER-W); hospital $325/day days 1-5 (S-INPT); counts to $4,900 max (S-MOOP).");
-  if(state.escalated)n.push("Mother's discharge concern escalated to supervisor; nothing quoted.");
-  if(state.callback)n.push(`Callback scheduled ${state.callback}.`);
-  $("note").value=n.join("\n");
-  $("code").value=state.escalated&&!state.asked.spec?"Escalated to supervisor":state.grievance?"Grievance · repeat contact":"Benefits and cost question";
-  const rc=[`Hi Rosa, a recap of today's call.`];
-  if(state.asked.spec){rc.push(`Specialist visits are $35 when your primary doctor's referral is on file.`);
-   if(state.referral===true)rc.push(`Your referral was on file, so the $120 bill is being reprocessed.`);else if(state.referral===false)rc.push(`No referral was on file for your Sep 30 visit, which is why the $120 bill stands; we went through how to get a referral before the next visit.`);else rc.push(`We are still confirming your referral for Sep 30.`);}
-  if(state.asked.er)rc.push(`If you ever go to the ER and are admitted within 24 hours, the $110 ER copay is waived and the daily hospital copay applies instead.`);
-  if(state.callback)rc.push(`We will call you back on ${state.callback}.`);
-  rc.push(`Reply to this text if anything doesn't match what you understood.`);$("recap").textContent=rc.join(" ");};
- render();
- $("cbdate").onchange=e=>{state.callback=e.target.value?new Date(e.target.value+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}):null;render();};
- $("approve").onclick=()=>{$("approved").textContent="Note approved. Case created.";$("sendrecap").disabled=false;$("next").disabled=false;};
- $("sendrecap").onclick=e=>{e.target.disabled=true;$("sent").textContent="Sent by you.";};
- $("next").onclick=()=>location.reload();}
-// ---------- Quality ----------
-let shown=R.CURRENT_RELEASE;
-function renderQ(){const r=R.score(GOLDEN,shown);const f=x=>Number.isInteger(x)?(x===0||x===1?x.toFixed(2):String(x)):x.toFixed(2);
- $("qintro").textContent=`Every number below is computed in this page by rules.js against the ${GOLDEN.length} member turns in eval/golden.js, labelled by a person first. The same two files run in CI on every push; a missed gate fails the build. The desk runs Release ${R.CURRENT_RELEASE}; this toggle only changes what is scored here.`;
- document.querySelector("#gates tbody").innerHTML=r.gates.map(g=>`<tr><td>${g.principle}</td><td>${g.name}</td><td><b>${f(g.value)}</b></td><td>${g.must}</td><td>${g.pass?'<span class="pill good">pass</span>':'<span class="pill bad">blocked</span>'}</td></tr>`).join("");
- const m=r.metrics;$("tiles").innerHTML=[["Escalations caught",f(m.escalation_recall),m.escalation_recall<1],["Right rule cited",f(m.citation_accuracy),m.citation_accuracy<.95],["Figures off the path",String(Math.round(m.hallucination_rate*m.drafted)),m.hallucination_rate>0],["Turns fully right",f(m.task_success),false]].map(([l,v,bad])=>`<div class="tile"><div class="n" style="color:${bad?'var(--bad)':'var(--good)'}">${v}</div><div class="l">${l}</div></div>`).join("");
- $("gsum").textContent=r.failed?`Release ${shown} is blocked: missed ${r.missed.map(t=>`"${t}"`).join(", ")}.`:`Release ${shown} passes every gate.`;
- $("qfoot").textContent=`${m.rows} turns: ${GOLDEN.filter(x=>x.v==="answer").length} benefit questions, ${GOLDEN.filter(x=>x.v==="human"&&!x.g).length} account questions, ${GOLDEN.filter(x=>x.g).length} with dissatisfaction, ${GOLDEN.filter(x=>x.v==="escalate").length} that must escalate. ${m.drafted} drafts checked figure by figure against the nodes on their path.`;
- $("bv1").className="btn sm"+(shown===1?" primary":"");$("bv2").className="btn sm"+(shown===2?" primary":"");$("bv2").textContent="Release 2"+(R.CURRENT_RELEASE===2?" (on the desk)":"");$("bv1").textContent="Release 1"+(R.CURRENT_RELEASE===1?" (on the desk)":"");}
-$("bv1").onclick=()=>{shown=1;renderQ();};$("bv2").onclick=()=>{shown=2;renderQ();};
-const TITLES={desk:["Desk","Member Services · Medicare"],quality:["Quality","Scorecard and gates"],loop:["How it learns","Two human gates"]};
-document.querySelectorAll(".rail button[data-view]").forEach(b=>b.onclick=()=>{["desk","quality","loop"].forEach(v=>$("view-"+v).classList.toggle("on",v===b.dataset.view));document.querySelectorAll(".rail button[data-view]").forEach(x=>{if(x===b)x.setAttribute("aria-current","page");else x.removeAttribute("aria-current");});$("title").textContent=TITLES[b.dataset.view][0];$("crumb").textContent=TITLES[b.dataset.view][1];window.scrollTo({top:0});});
-drawGraph();renderQ();
-CueVoice.init().then(()=>{$("mode").textContent=CueVoice.modeLabel();$("voicenote").textContent=CueVoice.readyNote();});
-</script>
+<script src="app.js"></script>
 </body>
 </html>
