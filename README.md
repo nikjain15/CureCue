@@ -2,7 +2,17 @@
 
 An ambient assistant for member-service advocates at a Medicare Advantage plan. The assistant, **Cue**, listens alongside the advocate on a live call, speaks only when it has something useful, and never speaks to the member. The advocate stays accountable for every word.
 
-**Advocate desktop:** `index.html`. **How it is built and why:** `architecture.html`. **The rules both run on:** `rules.js`. **The eval:** `eval/`.
+**Site:** `index.html` (what it is). **Advocate desk:** `app/` (the demo call, with voice). **How it is built and why:** `architecture.html`. **The rules both run on:** `rules.js`. **The eval:** `eval/`.
+
+## Voice
+
+The call plays with recorded clips when `app/audio/manifest.json` exists, otherwise with the browser's own voices (Web Speech API), otherwise as a streaming transcript. To generate the clips with ElevenLabs on your own machine:
+
+```
+ELEVEN_API_KEY=... ./scripts/make-voices.sh
+```
+
+The key is read from the environment only. Clips are gitignored; commit them deliberately if they should ship with the site.
 
 ## What it does on one call
 
