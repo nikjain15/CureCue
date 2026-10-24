@@ -12,8 +12,8 @@ window.CueVoice = (function () {
       const en = list.filter(v => /^en/i.test(v.lang));
       if (en.length) {
         const pick = (names) => en.find(v => names.some(n => v.name.includes(n)));
-        voices.Rosa = pick(["Samantha", "Karen", "Moira", "Tessa", "Google US English", "Zira", "Aria"]) || en[0];
-        voices.Advocate = pick(["Daniel", "Alex", "Fred", "Google UK English Male", "David", "Guy"]) || en.find(v => v !== voices.Rosa) || en[0];
+        voices.Rosa = pick(["Samantha (Enhanced)", "Samantha", "Ava", "Allison", "Karen", "Moira", "Google US English", "Aria", "Zira"]) || en[0];
+        voices.Advocate = pick(["Tom", "Daniel", "Alex", "Evan", "Nathan", "Google UK English Male", "Guy", "David"]) || en.find(v => v !== voices.Rosa) || en[0];
         mode = "speech";
       }
     }
@@ -44,7 +44,7 @@ window.CueVoice = (function () {
       }
       if (!muted && mode === "speech") {
         const u = new SpeechSynthesisUtterance(l.t.replace(/\$(\d[\d,]*)/g, "$1 dollars").replace(/\bER\b/g, "E R"));
-        u.voice = voices[l.w === "Rosa" ? "Rosa" : "Advocate"]; u.rate = 1.0; u.pitch = l.w === "Rosa" ? 1.05 : 0.95;
+        u.voice = voices[l.w === "Rosa" ? "Rosa" : "Advocate"]; u.rate = 0.92; u.volume = 0.55; u.pitch = l.w === "Rosa" ? 1.0 : 0.9;
         let ended = false; const fin = () => { if (ended) return; ended = true; done(); };
         u.onend = fin; u.onerror = fin; speechSynthesis.speak(u);
         timer = setTimeout(fin, timerFor(l.t) * 3 + 1500); // safety: some browsers never fire onend
