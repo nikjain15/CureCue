@@ -4,17 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>CureCue Architecture</title>
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/site.css">
 <style>
 /* Layout: light page. A layered diagram you click; each layer opens its "why". Tabs for use cases, graph, evals, safety, governance, Q&A. */
 :root{ --bg:#ffffff; --panel:#f0f5e6; --card:#ffffff; --fg:#2b2b2b; --muted:#5f5f5f; --line:#e3e3e3;
   --green:#72992e; --brand:#8fbd38; --ink:#ffffff; --good:#2e7d4f; --warn:#a86a00; --bad:#b23a3a; --good-bg:#e4f2e8; --warn-bg:#fbefd9; --bad-bg:#f8e1e1;
   --body:"Mulish","Helvetica Neue",Arial,sans-serif; color-scheme:light }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
-.wrap{max-width:1200px;margin:0 auto}
-.bar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.bar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;border-bottom:1px solid var(--line);margin-bottom:14px}
 .bar .name{font-weight:800;color:var(--brand);font-size:24px}
 .bar .sub{font-size:14px;color:var(--muted)}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
@@ -59,7 +58,20 @@ ul.t{margin:6px 0 0 18px;padding:0}ul.t li{margin:4px 0}
 </head>
 <body>
 <div class="wrap">
-<div class="bar"><div><div class="name">CureCue</div><div class="sub">How it is built, and why · companion to the advocate desktop prototype, whose assistant is Cue</div></div>
+<nav class="nav">
+  <a class="logo" href="./"><img src="assets/mark.svg" alt="">CureCue</a>
+  <div class="links"><a href="./#how">How it works</a><a href="./#agents">Agents</a><a href="./#evals">Evals</a><a href="architecture.html" aria-current="page">Architecture</a><a class="btn primary sm" href="app/">Open the desk</a></div>
+</nav>
+<div class="bar" style="padding:6px 0 10px"><div class="sub">How it is built, and why. Companion to the advocate desk, whose assistant is Cue.</div>
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-v="where">Where CureCue sits</button>
+    <button role="tab" aria-selected="false" data-v="arch">Architecture</button>
+    <button role="tab" aria-selected="false" data-v="graph">Why a graph</button>
+    <button role="tab" aria-selected="false" data-v="evals">Evals</button>
+    <button role="tab" aria-selected="false" data-v="safety">Safety</button>
+    <button role="tab" aria-selected="false" data-v="gov">Governance and loop</button>
+    <button role="tab" aria-selected="false" data-v="qa">Questions</button>
+  </div></div>
   <div class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-v="where">Where CureCue sits</button>
     <button role="tab" aria-selected="false" data-v="arch">Architecture</button>
