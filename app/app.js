@@ -24,6 +24,7 @@ const likely = D.members.filter(m => { const same = D.contacts.filter(c => c.mem
 const briefState = { cbDone: new Set() };
 function item(m, why, acts, cls = "") { return `<div class="item ${cls}" data-m="${m.id}"><div class="av">${initials(m.name)}</div><div><b>${m.short} · ${m.plan}</b><div class="why">${why}</div></div><div class="act">${acts}</div></div>`; }
 function renderHome() {
+  const hr = new Date().getHours(); $("greet").textContent = `Good ${hr < 12 ? "morning" : hr < 17 ? "afternoon" : "evening"}, Nik. Here is what I found.`;
   $("briefmeta").textContent = `${cbDue.length} callbacks · ${nearClock.length} clocks · ${likely.length} likely repeat`;
   $("homen").textContent = cbDue.length + nearClock.length;
   $("cb").innerHTML = cbDue.map(c => { const m = member(c.member); const done = briefState.cbDone.has(c.member); return item(m, `Promised ${relDay(c.day)} about <mark>${c.reason.toLowerCase()}</mark>: ${c.note}.`, done ? `<span class="pill good">called</span>` : `<button class="btn sm primary" data-cb="${c.member}">Call now</button><span class="small">reason pre-filled</span>`, done ? "done" : ""); }).join("") || `<p class="small">None due today.</p>`;
@@ -192,20 +193,20 @@ function wrapup() {
   if (state.asked.er) rc.push(`If you ever go to the ER and are admitted within 24 hours, the $110 ER copay is waived and the daily hospital copay applies instead.`);
   if (state.callback) rc.push(`We will call you back ${state.callback}.`); if (state.docSent) rc.push(`The plan rules we discussed are on their way to you.`);
   rc.push(`Reply to this text if anything doesn't match what you understood.`); $("recap").textContent = rc.join(" ");
-  $("approve").onclick = () => { $("approved").textContent = "Note approved. Call closed and added to today's timeline."; $("sendrecap").disabled = false; $("next").disabled = false; state.closed = true; };
+  $("approve").onclick = () => { $("approved").textContent = "Note approved. Call closed and added to today's timeline."; $("sendrecap").disabled = false; $("next").disabled = false; state.closed = true; state.closedAt = new Date(); $("dot").className = "dot ready"; $("stt").textContent = "Ready"; $("timer").textContent = ""; };
   $("sendrecap").onclick = e => { e.target.disabled = true; $("sent").textContent = "Sent by you."; };
   $("next").onclick = () => show("day"); }
 
 // ---------- My day ----------
 function renderDay() {
   const calls = D.shift.map(s => ({ ...s, now: false }));
-  if (state.closed) { const secs = Math.floor((Date.now() - t0) / 1000); calls.push({ time: "10:31", member: "M-001", reason: $("code").value, minutes: Math.max(1, Math.round(secs / 60)), cues: { accepted: state.accepted, declined: state.declined }, qa: !!state.grievance, now: true, note: "complete" }); }
+  if (state.closed) { const secs = Math.floor((Date.now() - t0) / 1000); calls.push({ time: state.closedAt.toTimeString().slice(0, 5), member: "M-001", reason: $("code").value, minutes: Math.max(1, Math.round(secs / 60)), cues: { accepted: state.accepted, declined: state.declined }, qa: !!state.grievance, now: true, note: "complete" }); }
   $("tl").innerHTML = calls.map(c => { const m = member(c.member); return `<li class="${c.now ? "now" : ""}"><span class="t">${c.time}</span><div><b>${m.short} · ${c.reason}</b><span class="sub">${c.minutes} min · ${c.cues.accepted} cue${c.cues.accepted === 1 ? "" : "s"} accepted${c.cues.declined ? `, ${c.cues.declined} declined` : ""}${c.now ? " · just now" : ""}</span></div><div class="pills">${c.qa ? `<span class="pill warn">QA sample</span>` : ""}<span class="pill good">note complete</span></div></li>`; }).join("");
   const mins = calls.reduce((a, s) => a + s.minutes, 0), acc = calls.reduce((a, s) => a + s.cues.accepted, 0), dec = calls.reduce((a, s) => a + s.cues.declined, 0);
   $("daytiles").innerHTML = [[calls.length, "calls today"], [`${Math.floor(mins / calls.length)}:${String(Math.round((mins / calls.length % 1) * 60)).padStart(2, "0")}`, "avg handle"], [`${Math.round(acc / Math.max(1, acc + dec) * 100)}%`, "cues accepted"], [calls.filter(c => c.qa).length, "in QA sample"]].map(([n, l]) => `<div class="tile"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
   $("daynote").textContent = state.closed ? (state.callback ? "Rosa's call: you scheduled the callback with a date, which is the element yesterday's sample missed. The grievance clock starts today." : "Rosa's call: a callback was promised on Oct 14 and is still not scheduled. Open Schedule callback next time; Cue pre-fills it.") : D.coaching;
   $("qa").textContent = `${calls.filter(c => c.qa).length} of ${calls.length} calls today are in the daily 200-turn sample two advocates re-check. ${state.closed && state.grievance ? "Rosa's call was sampled because a grievance was logged." : "Calls with a grievance or an escalation are always sampled."}`;
-  $("handled").textContent = calls.length;
+  $("handled").textContent = calls.length; $("aht").textContent = `${Math.floor(mins / calls.length)}:${String(Math.round((mins / calls.length % 1) * 60)).padStart(2, "0")}`;
 }
 
 CueVoice.init().then(() => { $("mode").textContent = CueVoice.modeLabel(); $("voicenote").textContent = CueVoice.readyNote(); });
