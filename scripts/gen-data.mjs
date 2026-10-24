@@ -77,7 +77,7 @@ const contacts = [
 // fill to 30 with routine contacts
 const routine = ["Benefits and cost question", "ID card", "Provider lookup", "Transportation", "Pharmacy"];
 while (contacts.length < 30) {
-  const m = pick(members).id; const day = -Math.floor(rnd() * 85 + 3); const reason = pick(routine);
+  let m = pick(members).id; if (m === "M-001") m = "M-005"; const day = -Math.floor(rnd() * 85 + 3); const reason = pick(routine);
   contacts.push({ member: m, day, reason, note: ({ "Benefits and cost question": "Copay question answered from the plan", "ID card": "Card mailed", "Provider lookup": "Two in-network options given", "Transportation": "Ride booked", "Pharmacy": "Refill status given" })[reason], callback: null, by: pick(["Nik J.", "T. Brooks", "J. Alvarez", "R. Chen"]) });
 }
 contacts.sort((a, b) => a.day - b.day);
