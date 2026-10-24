@@ -1,16 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>CureCue Architecture</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/site.css">
 <style>
 /* Layout: light page. A layered diagram you click; each layer opens its "why". Tabs for use cases, graph, evals, safety, governance, Q&A. */
 :root{ --bg:#ffffff; --panel:#f0f5e6; --card:#ffffff; --fg:#2b2b2b; --muted:#5f5f5f; --line:#e3e3e3;
   --green:#72992e; --brand:#8fbd38; --ink:#ffffff; --good:#2e7d4f; --warn:#a86a00; --bad:#b23a3a; --good-bg:#e4f2e8; --warn-bg:#fbefd9; --bad-bg:#f8e1e1;
   --body:"Mulish","Helvetica Neue",Arial,sans-serif; color-scheme:light }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
-.wrap{max-width:1200px;margin:0 auto}
-.bar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.bar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;border-bottom:1px solid var(--line);margin-bottom:14px}
 .bar .name{font-weight:800;color:var(--brand);font-size:24px}
 .bar .sub{font-size:14px;color:var(--muted)}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
@@ -52,9 +55,23 @@ svg{width:100%;height:auto;display:block}
 ul.t{margin:6px 0 0 18px;padding:0}ul.t li{margin:4px 0}
 .foot{margin-top:18px;font-size:13px;color:var(--muted);border-top:4px solid var(--brand);padding-top:10px}
 </style>
-
+</head>
+<body>
 <div class="wrap">
-<div class="bar"><div><div class="name">CureCue</div><div class="sub">How it is built, and why · companion to the advocate desktop prototype</div></div>
+<nav class="nav">
+  <a class="logo" href="./"><img src="assets/mark.svg" alt="">CureCue</a>
+  <div class="links"><a href="./#how">How it works</a><a href="./#agents">Agents</a><a href="./#evals">Evals</a><a href="architecture.html" aria-current="page">Architecture</a><a class="btn primary sm" href="app/">Open the desk</a></div>
+</nav>
+<div class="bar" style="padding:6px 0 10px"><div class="sub">How it is built, and why. Companion to the advocate desk, whose assistant is Cue.</div>
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-v="where">Where CureCue sits</button>
+    <button role="tab" aria-selected="false" data-v="arch">Architecture</button>
+    <button role="tab" aria-selected="false" data-v="graph">Why a graph</button>
+    <button role="tab" aria-selected="false" data-v="evals">Evals</button>
+    <button role="tab" aria-selected="false" data-v="safety">Safety</button>
+    <button role="tab" aria-selected="false" data-v="gov">Governance and loop</button>
+    <button role="tab" aria-selected="false" data-v="qa">Questions</button>
+  </div></div>
   <div class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-v="where">Where CureCue sits</button>
     <button role="tab" aria-selected="false" data-v="arch">Architecture</button>
@@ -98,17 +115,20 @@ ul.t{margin:6px 0 0 18px;padding:0}ul.t li{margin:4px 0}
       <p><b>"If the ER admits me, what do I owe?"</b></p>
       <p><span class="pill bad">chunk retrieval</span> returns the ER paragraph and stops. Answer: "$110." Confidently wrong for an admitted member.</p>
       <p><span class="pill good">graph walk</span> ER copay → <i>unless</i> admitted → <i>then</i> hospital copay → <i>counts to</i> yearly max. Answer cites four rules in order, and the path is the citation.</p>
-      <svg viewBox="0 0 340 120" role="img" aria-label="Graph walk across four rules">
+      <svg viewBox="0 0 340 80" role="img" aria-label="Graph walk across four rules">
         <g font-family="Mulish, sans-serif" font-size="10" font-weight="700">
-          <rect x="4" y="40" width="74" height="30" rx="8" fill="#72992e"/><text x="41" y="59" text-anchor="middle" fill="#fff">ER $110</text>
-          <line x1="78" y1="55" x2="92" y2="55" stroke="#72992e" stroke-width="3"/><text x="85" y="48" text-anchor="middle" fill="#5f5f5f" font-weight="400">unless</text>
-          <rect x="92" y="40" width="80" height="30" rx="8" fill="#72992e"/><text x="132" y="59" text-anchor="middle" fill="#fff">admitted</text>
-          <line x1="172" y1="55" x2="186" y2="55" stroke="#72992e" stroke-width="3"/><text x="179" y="48" text-anchor="middle" fill="#5f5f5f" font-weight="400">then</text>
-          <rect x="186" y="40" width="74" height="30" rx="8" fill="#72992e"/><text x="223" y="59" text-anchor="middle" fill="#fff">$325/day</text>
-          <line x1="260" y1="55" x2="274" y2="55" stroke="#72992e" stroke-width="3"/><text x="267" y="48" text-anchor="middle" fill="#5f5f5f" font-weight="400">counts to</text>
-          <rect x="274" y="40" width="62" height="30" rx="8" fill="#72992e"/><text x="305" y="59" text-anchor="middle" fill="#fff">$4,900 max</text>
-          <text x="170" y="100" text-anchor="middle" fill="#5f5f5f" font-weight="400">every figure in the draft must sit on a node of this path, or the draft is rejected</text>
+          <text x="85" y="24" text-anchor="middle" fill="#5f5f5f" font-weight="400">unless</text>
+          <text x="179" y="24" text-anchor="middle" fill="#5f5f5f" font-weight="400">then</text>
+          <text x="267" y="24" text-anchor="middle" fill="#5f5f5f" font-weight="400">counts to</text>
+          <rect x="0" y="34" width="78" height="30" rx="8" fill="#72992e"/><text x="39" y="53" text-anchor="middle" fill="#fff">ER $110</text>
+          <line x1="78" y1="49" x2="92" y2="49" stroke="#72992e" stroke-width="3"/>
+          <rect x="92" y="34" width="80" height="30" rx="8" fill="#72992e"/><text x="132" y="53" text-anchor="middle" fill="#fff">admitted</text>
+          <line x1="172" y1="49" x2="186" y2="49" stroke="#72992e" stroke-width="3"/>
+          <rect x="186" y="34" width="74" height="30" rx="8" fill="#72992e"/><text x="223" y="53" text-anchor="middle" fill="#fff">$325/day</text>
+          <line x1="260" y1="49" x2="274" y2="49" stroke="#72992e" stroke-width="3"/>
+          <rect x="274" y="34" width="62" height="30" rx="8" fill="#72992e"/><text x="305" y="53" text-anchor="middle" fill="#fff">$4,900 max</text>
         </g></svg>
+      <p class="small">Every figure in the draft must sit on a node of this path, or the draft is rejected. In the prototype this check is <code>figureCheck</code> in <code>rules.js</code>, scored in CI.</p>
     </div>
     <div class="card">
       <h3>What the graph is</h3>
@@ -142,9 +162,9 @@ ul.t{margin:6px 0 0 18px;padding:0}ul.t li{margin:4px 0}
     <div class="card">
       <h3>Ground truth</h3><p>Hand-labelled per turn: verdict, clauses on the path, grievance flag, note elements. Written without the engine. Stratified by register, language path, plan type and plan year.</p>
       <h3>Corpus check first</h3><p>Test data is scored for internal consistency before the engine runs. Generated data reads as real until someone computes a ratio over it.</p>
-      <h3>Judge, validated or refused</h3><p>Agreement with people on a held-out slice decides whether a judge may feed a gate (0.85). Refusals are shown on the scorecard. A judge is used only where it has been validated.</p>
+      <h3>Judge, validated or refused</h3><p>Agreement with people on a held-out slice decides whether a judge may feed a gate (0.85). Refusals are shown on the scorecard. The prototype has no model and no judge yet; every decision in it is a rule, which is why the scorecard says so rather than showing a judge row.</p>
       <h3>Live</h3><p>Daily 200-turn sample relabelled by two advocates. Recall by day, plan, language. A pause rule stops drafting for a topic that slips, and tells the advocate.</p>
-      <h3>Error budgets and CI</h3><p>Each metric has a budget and a named owner. The eval runs on every change to a skill or context file. A failed gate fails the build. No override flag exists.</p>
+      <h3>Error budgets and CI</h3><p>Each metric has a budget and a named owner. The eval runs on every change to a skill or context file. A failed gate fails the build. No override flag exists. Running today: <code>eval/run.mjs</code> scores <code>rules.js</code> against <code>eval/golden.js</code> on every push.</p>
     </div>
   </div>
 </section>
@@ -173,7 +193,7 @@ ul.t{margin:6px 0 0 18px;padding:0}ul.t li{margin:4px 0}
   <div class="two">
     <div class="card"><h3>Stage gates</h3><p>The scorecard is generated from a run id and sectioned by four typical published AI principles: <b>Responsible in Application</b> (what CureCue will not do, enforced in code), <b>Fair and Inclusive</b> (recall gaps by language path and plan), <b>Reliable and Safe</b> (hallucination, citation, abstention, live monitoring), <b>Accountable</b> (advocate confirms every figure, two human gates, kill-switch owners). The checklist is generated from the same run. Model card and data lineage attached. A reviewer reads results, not promises.</p></div>
     <div class="card white"><h3>The loop</h3>
-      <ol style="margin:0;padding-left:20px"><li>Capture every call, cue and click</li><li>Label: 200 calls a day re-checked by two advocates</li><li>Measure nightly; scorecard rebuilt</li><li>Optimizer proposes one change with the calls that motivated it</li><li><b>A person decides</b></li><li>5% canary, three days, against control</li><li><b>A person signs</b> the generated checklist</li><li>Watch; pause a topic that slips</li></ol>
+      <ol style="margin:0;padding-left:20px"><li>Capture every call, cue and click</li><li>Label: 200 turns a day re-checked by two advocates</li><li>Measure nightly; scorecard rebuilt</li><li>Optimizer proposes one change with the calls that motivated it</li><li><b>A person decides</b></li><li>5% canary, three days, against control</li><li><b>A person signs</b> the generated checklist</li><li>Watch; pause a topic that slips</li></ol>
       <p class="small" style="margin-top:8px">Before every promotion an adversarial audit agent attacks the system with strange phrasings, contradictory EOBs, stale directory entries and code-switched sentences. Every finding becomes a golden row.</p></div>
   </div>
 </section>
@@ -186,7 +206,7 @@ ul.t{margin:6px 0 0 18px;padding:0}ul.t li{margin:4px 0}
     <details><summary>How do you know the evals are right?</summary><p>The expected side is written without the engine and the test data is checked for consistency before the engine runs. The judge is validated against people on a held-out slice and refused where it disagrees. The scorecard is the output of a run, not a document someone wrote.</p></details>
     <details><summary>What stops it from giving medical or coverage advice?</summary><p>The verdict type has three values and none is a decision. Hard-stop topics run before routing. The advocate confirms every figure. Three independent layers.</p></details>
     <details><summary>How does it handle PHI?</summary><p>Redacted at the edge before any model call; identity gate before any suggestion; member memory read-only; no per-member inference; traces carry run ids, not identifiers.</p></details>
-    <details><summary>What happens when the plan year changes?</summary><p>The graph is versioned by plan year. The Steward diffs the ANOC against last year's nodes and lists exactly which golden rows are invalidated and which need relabelling. The golden set has an owner.</p></details>
+    <details><summary>What happens when the plan year changes?</summary><p>The graph is versioned by plan year. A plan-year diff job compares the ANOC against last year's nodes and lists exactly which golden rows are invalidated and which need relabelling. The golden set has an owner.</p></details>
     <details><summary>What is the business case?</summary><p>Advocate minutes per benefit lookup across a very large call volume, grievances logged that would have been missed (a regulated clock and a Stars input), repeat calls avoided because the note was complete. A model with its assumptions visible, never a borrowed figure.</p></details>
     <details><summary>How would you roll it out?</summary><p>Shadow mode on live calls with no advocate seeing it; 5% canary; promotion on a signed checklist; pause rule per topic; kill switch per skill with a named owner.</p></details>
     <details><summary>Which model?</summary><p>Whatever the enterprise gateway approves; skills are model-agnostic. Small model for classify and extract, larger for compose. Routing is a product decision about cost and risk.</p></details>
@@ -202,7 +222,7 @@ ul.t{margin:6px 0 0 18px;padding:0}ul.t li{margin:4px 0}
 const LAYERS=[
  ["Channels","Advocate desktop (softphone, member record), member app and text, IVR, letters","<b>Why</b> The advocate's screen is the only new surface; everything else is a channel CureCue already respects. The recap reaches the member app only after an advocate approves it."],
  ["Edge","Speech-to-text, PHI redaction, identity state. Nothing flows until identity is verified","<b>Why</b> HIPAA-shaped verification is a real step on every call. CureCue reads nothing and suggests nothing until the advocate confirms identity. The model never needs identifiers, so it never sees them."],
- ["Harness","Router (Listener) picks the owning skill. Guardian runs first on every turn. Skills are versioned files. Context is assembled per turn. Four narrow tools","<b>Why</b> Routing with a small model means one skill's context per turn: cheaper, fewer ways to be wrong, and routing accuracy is itself gated. Guardian runs before routing because a discharge dispute can arrive mid-copay-question and escalation must win every race. Tools never send or decide."],
+ ["Harness","Guardian runs first on every turn. Then the Router (Listener) picks the owning skill. Skills are versioned files. Context is assembled per turn. Four narrow tools","<b>Why</b> Routing with a small model means one skill's context per turn: cheaper, fewer ways to be wrong, and routing accuracy is itself gated. Guardian runs before routing because a discharge dispute can arrive mid-copay-question and escalation must win every race. Tools never send or decide."],
  ["Context","The smallest context that answers the question: clauses on the retrieval path for this plan year, the last two contacts, the one policy that applies. Long calls compact to a state object","<b>Why</b> Stuffing the whole Evidence of Coverage into a prompt is slower, costlier and less accurate than walking to the three rules that matter."],
  ["Knowledge","Plan knowledge graph from EOC, ANOC and SOB documents; provider directory; policies. Hybrid retrieval: vector to find the entry node, graph walk from there","<b>Why</b> Benefit rules are relational with exceptions. See the 'Why a graph' tab. The path is the citation, the update is localised, explainability is by construction."],
  ["Models","Routed by difficulty: small model for classify and extract, large for multi-clause compose and the optimizer. Behind the enterprise gateway. Skills are model-agnostic","<b>Why</b> Cost per call stays predictable and the gateway's approved models are the only path. A model swap is a config change plus an eval run, not a rewrite."],
@@ -217,3 +237,5 @@ LAYERS.forEach((l,i)=>{const b=document.createElement("button");b.className="lay
  el.appendChild(b);el.appendChild(w);if(i<LAYERS.length-1){const a=document.createElement("div");a.className="arrow";a.textContent="▼";el.appendChild(a);}});
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));document.querySelectorAll("section.v").forEach(s=>s.classList.toggle("on",s.id==="v-"+b.dataset.v));window.scrollTo({top:0});});
 </script>
+</body>
+</html>
