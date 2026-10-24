@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CureCue · Product approach</title>
+<meta name="description" content="How CureCue was designed: the member advocate's day, stage by stage, what the assistant does at each stage, what it never does, and how each stage is measured.">
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.hero{padding:28px 0 18px;max-width:78ch}
+.hero h1{font-size:clamp(30px,4vw,44px);font-weight:800;line-height:1.08;margin:0 0 12px}
+.hero p.lead{font-size:18px;color:var(--muted)}
+.band{padding:28px 0;border-top:1px solid var(--line)}
+.band h2{margin-bottom:4px}
+.band p.lead{color:var(--muted);max-width:70ch;margin-bottom:16px}
+.toc{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0}
+.toc a{font-size:13px;font-weight:700;color:var(--leaf);text-decoration:none;background:var(--panel-2);padding:6px 11px;border-radius:999px}
+.grid3{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.who{padding:16px 18px}
+.who h4{margin:0 0 4px;font-size:17px}
+.who p{font-size:15px;color:var(--muted);margin:0}
+.who .tag{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--leaf);font-weight:800;display:block;margin-bottom:4px}
+/* journey */
+.stage{display:grid;grid-template-columns:56px 1fr;gap:16px;padding:20px 0;border-bottom:1px solid var(--line)}
+.stage:last-child{border-bottom:0}
+.stage .n{width:40px;height:40px;border-radius:50%;background:var(--green);color:#fff;font-weight:800;display:grid;place-items:center;font-size:16px}
+.stage h3{font-size:19px;text-transform:none;letter-spacing:0;color:var(--fg);margin:6px 0 2px}
+.stage .when{font-size:13px;color:var(--muted);margin-bottom:10px}
+.cols{display:grid;gap:10px;grid-template-columns:repeat(4,1fr)}
+@media (max-width:1000px){.cols{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.cols{grid-template-columns:1fr}.stage{grid-template-columns:1fr}.stage .n{width:32px;height:32px;font-size:14px}}
+.cols div{padding:12px 14px;border-radius:12px;background:var(--bg-2);font-size:14.5px}
+.cols div b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+.cols div.today{background:var(--panel-2)}
+.cols div.never{background:var(--bad-bg)}
+.cols div.never b{color:var(--bad)}
+.cols div.measure{background:var(--panel);border:1px solid var(--line)}
+.cols div code{font-size:12.5px}
+.principles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.principles div{padding:14px 16px;border-radius:12px;background:var(--panel);border:1px solid var(--line);font-size:15px}
+.principles div b{display:block;font-size:16px;margin-bottom:3px}
+.decisions{width:100%}
+.decisions td:first-child{font-weight:700;width:28%}
+.decisions td:nth-child(2){width:32%;color:var(--muted)}
+.src{list-style:none;margin:0;padding:0;display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.src li{padding:10px 12px;border-radius:10px;background:var(--bg-2);font-size:14.5px}
+.src li b{color:var(--leaf)}
+.cta-band{background:var(--fg);color:#fff;border-radius:18px;padding:24px 28px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.cta-band h2{color:#fff;margin:0}.cta-band p{color:rgba(255,255,255,.75);margin:4px 0 0}
+.cta-band .btn{margin-left:auto;border-color:var(--brand);background:var(--brand);color:#1d2a0c}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="nav">
+  <a class="logo" href="./"><img src="assets/mark.svg" alt="">CureCue</a>
+  <div class="links"><a href="approach.html" aria-current="page">Approach</a><a href="evals.html">Evals</a><a href="architecture.html">Architecture</a><a class="btn primary sm" href="app/">Open the desk</a></div>
+</nav>
+
+<section class="hero">
+  <h1>The approach: design the advocate's day, then put the assistant where the day breaks.</h1>
+  <p class="lead">CureCue started from a study of one job, the member-service advocate at a Medicare Advantage plan, across a whole shift. Every stage below names what the advocate does today, what Cue adds, what Cue must never do, and how that stage is measured. The desk is the result; this page is the reasoning.</p>
+  <div class="toc"><a href="#who">Who it is for</a><a href="#study">What was studied</a><a href="#journey">The journey, twelve stages</a><a href="#principles">Design principles</a><a href="#decisions">Decisions and trade-offs</a><a href="#next">What comes next</a></div>
+</section>
+
+<section class="band" id="who">
+  <h2>Who it is for</h2>
+  <p class="lead">One primary user, three people who depend on what the primary user produces. The desk is built for the first; the others get surfaces only where the first user's work creates them.</p>
+  <div class="grid3">
+    <div class="card who"><span class="tag">primary user</span><h4>The member advocate</h4><p>Takes 40 to 60 calls a shift from members who are 65 or older, often anxious, often calling for the second or third time. Verifies identity, answers from plan documents, logs cases, promises callbacks, writes a note after every call. Judged on handle time, QA note quality, and the member's survey score.</p></div>
+    <div class="card who"><span class="tag">depends on the note</span><h4>The QA lead</h4><p>Samples calls, checks required note elements, scores grievance handling. Cannot read every call. Needs the sample to be the right calls, not random ones.</p></div>
+    <div class="card who"><span class="tag">depends on the stop</span><h4>The supervisor and the appeals team</h4><p>Take the escalations. Need the handoff note to say what was heard and what was not quoted, so the member does not repeat themselves and nothing an advocate said becomes a coverage promise.</p></div>
+    <div class="card who"><span class="tag">depends on the scorecard</span><h4>The product owner and the review board</h4><p>Sign the release. Need numbers from a run, sectioned the way their gates are written, with the golden set and the data lineage attached.</p></div>
+  </div>
+</section>
+
+<section class="band" id="study">
+  <h2>What was studied before anything was drawn</h2>
+  <p class="lead">All public sources. No real plan, member, provider or document is represented anywhere in the product.</p>
+  <ul class="src">
+    <li><b>Why members call.</b> Published call-reason mixes for Medicare Advantage service lines: benefit and cost questions, claims and explanations of benefits, provider lookup, prescriptions, premium and billing, ID cards and enrollment, grievances and appeals, care coordination. The data behind the desk uses that mix.</li>
+    <li><b>The documents an answer must trace to.</b> Evidence of Coverage, Annual Notice of Change, Summary of Benefits, provider directory, formulary. Benefit rules cross-reference each other with exceptions, which is why retrieval is a walk over rules rather than a search over paragraphs.</li>
+    <li><b>The regulated clocks.</b> Grievances and appeals are defined and timed by the Medicare rules; a grievance counts when dissatisfaction is expressed, with or without the word. Call-center measures and member survey questions feed star ratings, so a missed grievance is a compliance event and a rating event.</li>
+    <li><b>The line the product must not cross.</b> Coverage decisions, prior authorization outcomes, length of stay and clinical advice. The industry's litigation over post-acute algorithms, and payers' own published principles that clinicians keep decision authority, set this before a single screen was drawn.</li>
+    <li><b>How assistants are already used on these desks.</b> Real-time summaries, surfacing benefit details, after-call notes, with the advocate accountable for every interaction. CureCue keeps that posture and adds the three things a reviewer asks: when it stops, where its numbers come from, how it is measured.</li>
+    <li><b>How advocates are measured.</b> Handle time, note completeness in QA, first-call resolution, repeat contacts, survey scores. Each stage below names which of these it moves and how the product proves it.</li>
+  </ul>
+</section>
+
+<section class="band" id="journey">
+  <h2>The journey, twelve stages</h2>
+  <p class="lead">Read left to right on each stage: the advocate today, what Cue adds, the line Cue never crosses, and the measure. Stages 1 to 10 are built and on the desk. Stages 11 and 12 are designed; the page says so.</p>
+
+  <div class="stage"><div class="n">1</div><div><h3>Before the shift</h3><div class="when">05:40, nobody logged in</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>Logs in to a queue. Promised callbacks live in memory, a spreadsheet, or a case note nobody re-reads. Clocks are tracked by the case team, not the person who promised.</div><div><b>Cue adds</b>An overnight run over the book of business: every open case clock re-checked, every promised callback found, members likely to call back flagged by a stated rule. Each line prints the rows it read and a run id.</div><div class="never"><b>Never</b>Drafts nothing for any member. Sends nothing. Infers nothing about a member's health; the "likely to call back" rule is contact history only.</div><div class="measure"><b>Measured by</b>Precision of the likely-repeat flag against who actually called; promised callbacks kept, by advocate and by day.</div></div></div></div>
+
+  <div class="stage"><div class="n">2</div><div><h3>Between calls: the briefing</h3><div class="when">Most of the shift</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>A dashboard of counts. The work that matters (a callback due at 2pm, a grievance three days from breach) is not on it.</div><div><b>Cue adds</b>Home is Cue's briefing: callbacks due today with the reason pre-filled, cases close to their clock, the likely repeat caller and what to acknowledge first, yesterday's QA note. The screen only makes sense because the agents ran.</div><div class="never"><b>Never</b>Places the call. The advocate dials; Cue has the reason and the last note ready when the member picks up.</div><div class="measure"><b>Measured by</b>Callbacks made on the promised day; clock breaches; time from login to first outbound.</div></div></div></div>
+
+  <div class="stage"><div class="n">3</div><div><h3>Incoming call</h3><div class="when">The ring</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>Caller ID, maybe a reason code from the IVR. The record opens before identity is checked, which is a privacy finding waiting to happen.</div><div><b>Cue adds</b>Caller ID, the likely member, the stated reason, and nothing else. The queue card shows how many times this number has called in 30 days.</div><div class="never"><b>Never</b>Shows plan, claims, cases or contacts before identity is verified.</div><div class="measure"><b>Measured by</b>Zero member data rendered pre-verification, asserted by a test, not a policy.</div></div></div></div>
+
+  <div class="stage"><div class="n">4</div><div><h3>Verify identity</h3><div class="when">First 60 to 90 seconds of every call</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>Asks name, date of birth, member ID. Types while listening. Mis-keys are the commonest early-call error and the costliest.</div><div><b>Cue adds</b>Shows what it heard next to each check. The advocate ticks the box. Continue is disabled until all three are ticked.</div><div class="never"><b>Never</b>Ticks a box itself. Identity is a human decision; the system only reports what it heard.</div><div class="measure"><b>Measured by</b>Verification time; mismatch rate between what Cue heard and what the advocate confirmed (a transcription metric, reported to the model owner).</div></div></div></div>
+
+  <div class="stage"><div class="n">5</div><div><h3>Listen, and remember</h3><div class="when">The first thing the member says</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>Scrolls prior contacts while the member talks, or asks them to repeat the history.</div><div><b>Cue adds</b>One cue before the member starts: the prior calls on this issue and the promise that was not kept. Then silence until it has something useful. Cue speaks at most a handful of times on a call.</div><div class="never"><b>Never</b>Narrates the call. Interrupts. Repeats itself: one cue per path, enforced.</div><div class="measure"><b>Measured by</b>Cues per call; cues accepted versus declined; advocate-reported interruptions.</div></div></div></div>
+
+  <div class="stage"><div class="n">6</div><div><h3>Hear dissatisfaction</h3><div class="when">"This is the third time I've called"</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>Must recognise a grievance without the word, log it, and start the clock, while handling the actual question. Missed grievances are found by QA weeks later, if at all.</div><div><b>Cue adds</b>Highlights the sentence it heard, says it counts as a grievance even without the word, and asks: log it? Either answer is recorded in the note. Logging opens the case with its clock and the member record opens to Cases.</div><div class="never"><b>Never</b>Logs the grievance itself. The advocate decides; both outcomes are labelled so the rule learns from disagreement.</div><div class="measure"><b>Measured by</b>Grievance recall by register (plain, implicit, angry), gate 0.90 each; advocate agreement with Cue's flag.</div></div></div></div>
+
+  <div class="stage"><div class="n">7</div><div><h3>Answer from the plan's own rules</h3><div class="when">"They billed me $120, I thought I pay $35"</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>Searches a benefit document. Finds the specialist copay. Misses that it depends on a referral, which depends on primary care. Quotes a number that is right in isolation and wrong for this member.</div><div><b>Cue adds</b>Walks the rules as a graph: specialist copay needs a referral, which comes from primary care. Drafts an answer where every figure sits on a node of that path. Opens the member record to the claim in question. Says "check the referral before you quote either way."</div><div class="never"><b>Never</b>Quotes a figure that is not in a rule on the path. Her bill amount comes from the claim and is shown on the claim, not spoken as a rule. Never answers an account question (claim status, premium) from plan rules: that goes to the claim system.</div><div class="measure"><b>Measured by</b>Citation accuracy, gate 0.95; figures off the path, gate zero, checked in CI on every change; abstention rate reported with a band.</div></div></div></div>
+
+  <div class="stage"><div class="n">8</div><div><h3>Act: case, callback, document, transfer</h3><div class="when">Whenever the call needs a thing done</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>Four systems, four forms, retyped from memory after the call. The callback with no date is the commonest QA miss.</div><div><b>Cue adds</b>Four actions, each pre-filled from the call: the case subject and clock, the callback date and reason, the document the rules used, the transfer handoff note. The advocate confirms. Outcomes stay on screen.</div><div class="never"><b>Never</b>Sends, opens or transfers without the confirm. Never pre-fills from inference: only from what was said or what is on the record.</div><div class="measure"><b>Measured by</b>Note omission rate, gate 0.05; actions confirmed versus edited (a measure of pre-fill quality); time in wrap-up.</div></div></div></div>
+
+  <div class="stage"><div class="n">9</div><div><h3>Stop</h3><div class="when">"They're sending my mother home tomorrow and she's not ready"</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>May try to help with a benefit answer. Anything said here can become a coverage promise or a clinical opinion.</div><div><b>Cue adds</b>A hard stop that runs before anything else on every turn: discharge, denial, prior authorization, length of stay, distress. One button: connect a supervisor. Every other cue pauses for this topic. The handoff note says what was heard and what was not quoted.</div><div class="never"><b>Never</b>Drafts a word on these topics. There are three verdicts, answer, needs a person, escalate, and a coverage decision has no type to be emitted as.</div><div class="measure"><b>Measured by</b>Escalation recall, gate 1.00, the one failure that cannot be budgeted; escalation precision 0.80, budgeted, because over-escalation costs supervisor time.</div></div></div></div>
+
+  <div class="stage"><div class="n">10</div><div><h3>Ask Cue</h3><div class="when">Any time the advocate wants a rule</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>Searches, or asks a colleague on chat, or guesses.</div><div><b>Cue adds</b>A typed question answered only from plan rules on file, with the path shown. An account question is sent to the claim system. A dispute stops. Anything outside the plan is an abstention, said out loud and counted.</div><div class="never"><b>Never</b>Answers from general knowledge. "Not in the plan rules on file" is a feature.</div><div class="measure"><b>Measured by</b>The same gates as stage 7, plus abstention rate: too low means guessing, too high means useless.</div></div></div></div>
+
+  <div class="stage"><div class="n">11</div><div><h3>Wrap-up and the rest of the day</h3><div class="when">After every call; end of shift</div>
+    <div class="cols"><div class="today"><b>Advocate today</b>Writes the note from memory under a handle-time clock. QA samples at random. Feedback arrives weeks later as a score.</div><div><b>Cue adds</b>A note built only from the turns that happened, a required-elements checklist, a recap the advocate sends. The call lands in My day with cues accepted, whether it was QA-sampled and why, and one line of feedback tied to yesterday's miss.</div><div class="never"><b>Never</b>Sends the recap. Approves the note. Writes anything into the note that was not said or done on the call.</div><div class="measure"><b>Measured by</b>Note faithfulness (every sentence traceable to a turn or an action); QA sample hit rate on calls with a grievance or an escalation (100% by rule).</div></div></div></div>
+
+  <div class="stage"><div class="n">12</div><div><h3>The week: how it gets better</h3><div class="when">Designed, not yet running</div>
+    <div class="cols"><div class="today"><b>Today</b>Model changes ship on a vendor's schedule. Nobody can say which calls motivated a change or what it did to recall.</div><div><b>Cue adds</b>Capture every cue and click; 200 turns a day relabelled by two advocates; nightly scorecard; an optimizer proposes one change with the rows that motivated it; a person decides; 5% canary for three days; a person signs the generated checklist; a pause rule per topic.</div><div class="never"><b>Never</b>Changes a skill or a context file itself. Two named human gates, both logged.</div><div class="measure"><b>Measured by</b>The scorecard, release over release; judge agreement with people on a held-out slice (0.85 to feed a gate; escalation stays people-only).</div></div></div></div>
+</section>
+
+<section class="band" id="principles">
+  <h2>Design principles, each visible on the desk</h2>
+  <div class="principles">
+    <div><b>The agent speaks first, then the decisions, then the tables.</b> Home is what Cue found. The member record is third. If a screen would make sense without the agents, it is not agent-first.</div>
+    <div><b>An action never vanishes.</b> It opens, the advocate confirms, and the outcome stays on screen and in the note.</div>
+    <div><b>Route first, reason second.</b> One owning rule per turn; the stop runs before routing on every turn.</div>
+    <div><b>Deterministic first.</b> Clocks, identity steps and allowance arithmetic are rules. A model handles language, and only where the eval says it may.</div>
+    <div><b>Every figure has a source.</b> A number not on the retrieval path cannot appear in a draft. Enforced in code, scored in CI.</div>
+    <div><b>Fail closed.</b> Error, timeout or low confidence produces "needs a person", never a guess. Abstention is counted, not hidden.</div>
+    <div><b>Context is engineered, not stuffed.</b> The clauses on the path, the last two contacts, the one policy that applies. Not the whole document.</div>
+    <div><b>Nothing changes itself.</b> Two named human gates in the loop. A council can sign that.</div>
+  </div>
+</section>
+
+<section class="band" id="decisions">
+  <h2>Decisions and trade-offs</h2>
+  <div class="tscroll card"><table class="decisions">
+    <thead><tr><th>Decision</th><th>Alternative considered</th><th>Why this way</th></tr></thead><tbody>
+    <tr><td>Advocate-side first, not member-facing</td><td>A member chat in the app</td><td>Highest leverage and lowest risk: a person stays between the model and the member on every turn. The same skills can later sit behind the app's chat with a reading-level gate.</td></tr>
+    <tr><td>Rules first, no model in the prototype</td><td>A model call per turn from day one</td><td>Rules make the eval exact and the stop provable. The harness, the gates and the data are the durable part; the model is a config change plus an eval run.</td></tr>
+    <tr><td>Rules as a graph, not chunks</td><td>Vector search over the benefit document</td><td>Benefit rules cross-reference each other with exceptions. A chunk returns the ER paragraph and stops; the graph walks to the admission exception. The path is the citation.</td></tr>
+    <tr><td>Three verdicts, enforced by type</td><td>A confidence threshold on a free-text answer</td><td>A coverage decision cannot be emitted because the type does not exist. Thresholds drift; types do not.</td></tr>
+    <tr><td>The advocate ticks identity</td><td>Auto-verify from speech</td><td>Identity is a human decision in this industry. The system reports what it heard; a person confirms.</td></tr>
+    <tr><td>Synthetic book of business, generated and checked</td><td>Hand-typed placeholder data</td><td>Generated data reads as real until someone computes a ratio over it. A checker runs before the eval, in CI, so every number on the home screen traces to a row.</td></tr>
+    <tr><td>One scripted call, deep</td><td>Several shallow scripts</td><td>One call that exercises grievance, multi-rule answer, action and stop shows the harness; three thin ones show the script.</td></tr>
+    <tr><td>Honest edges on the page</td><td>Hide what is not built</td><td>A reviewer who finds the edge themselves stops trusting the rest. Naming it first is a product judgment, not a weakness.</td></tr>
+  </tbody></table></div>
+</section>
+
+<section class="band" id="next">
+  <h2>What comes next, in order</h2>
+  <div class="principles">
+    <div><b>1. A model behind the Citer, behind the enterprise gateway.</b> Small model for classify and extract, larger for multi-clause compose. Skills stay model-agnostic; the eval decides if it ships.</div>
+    <div><b>2. Golden set to scale.</b> Stratified by register, language path, plan type and plan year; two labellers with adjudication; the adversarial set as golden rows.</div>
+    <div><b>3. Coverage clarity, member-facing.</b> The same graph, a reading-level gate, the recap channel already built.</div>
+    <div><b>4. Network navigation.</b> Needs the directory's freshness problem solved first; the graph already reserves the edge types.</div>
+    <div><b>5. Primary care, last.</b> It touches clinical judgment and needs a clinical eval before a single draft exists.</div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="cta-band"><div><h2>See it on the desk</h2><p>Stages 1 to 11, one member, one plan.</p></div><a class="btn lg" href="app/">Open the advocate desk</a></div>
+</section>
+
+<p class="foot">Demonstration only. Every member, plan, provider, figure and call is synthetic. No real health plan, organisation, person or document is represented.</p>
+</div>
+</body>
+</html>
