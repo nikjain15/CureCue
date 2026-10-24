@@ -53,14 +53,14 @@
 <div class="wrap">
 <nav class="nav">
   <a class="logo" href="./"><img src="assets/mark.svg" alt="">CureCue</a>
-  <div class="links"><a href="#how">How it works</a><a href="#agents">Agents</a><a href="#evals">Evals</a><a href="architecture.html">Architecture</a><a class="btn primary sm" href="app/">Open the desk</a></div>
+  <div class="links"><a href="approach.html">Approach</a><a href="evals.html">Evals</a><a href="architecture.html">Architecture</a><a class="btn primary sm" href="app/">Open the desk</a></div>
 </nav>
 
 <section class="hero">
   <div>
     <h1>An assistant that sits <em>beside</em> the advocate.</h1>
     <p class="lead">CureCue listens on a live member call and speaks only when it has something useful. The advocate stays in charge of every word.</p>
-    <div class="cta"><a class="btn primary lg" href="app/">Try the demo call</a><a class="btn lg" href="architecture.html">How it is built</a></div>
+    <div class="cta"><a class="btn primary lg" href="app/">Try the demo call</a><a class="btn lg" href="approach.html">Read the approach</a></div>
     <div class="proof" id="proof"></div>
   </div>
   <a class="shot" href="app/" aria-label="Open the advocate desk"><img src="assets/desk.png" alt="The advocate desk during a call" width="1280" height="860"></a>
@@ -78,7 +78,8 @@
 </section>
 
 <section class="band" id="agents">
-  <h2>Six small agents, one job each</h2>
+  <h2>One assistant, six responsibilities</h2>
+  <p class="lead">Cue is organised the way a compliance review reads a call: who is speaking, is the member dissatisfied, where does the answer come from, must this stop, what goes in the note, what did we learn. Each responsibility is a separate skill with its own gate. In this prototype each is a rule in one shared file; the <a href="architecture.html">architecture</a> shows where a model sits behind each.</p>
   <div class="grid">
     <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg></div><h4>Listener</h4><p>Confirms identity, remembers prior calls, routes each turn.</p></div>
     <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><h4>Sentinel</h4><p>Hears dissatisfaction and asks the advocate to log it.</p></div>
@@ -90,10 +91,17 @@
 </section>
 
 <section class="band" id="evals">
-  <h2>It is measured before it ships</h2>
-  <p class="lead">A person labelled 24 member turns. The same rules that run on the desk are scored against them, here and in CI on every change. A missed gate fails the build.</p>
+  <h2>Evaluated like a regulated product</h2>
+  <p class="lead">Gates that fail the build, error budgets with owners, a judge that is refused where people disagree with it, a live sample that can pause a topic. The expected side is written by a person who never ran the rules, and the data is checked before the engine reads it. The numbers below are computed on this page from the same two files CI runs.</p>
   <div class="tiles" id="tiles"></div>
   <p class="small" id="gsum"></p>
+  <ul class="rules">
+    <li><b>Escalation recall 1.00.</b> The one failure that cannot be budgeted. Never judged by a model.</li>
+    <li><b>Figures off the cited path: none.</b> A number not in a rule on the path is a build failure.</li>
+    <li><b>Three verdicts, by type.</b> Answer, needs a person, escalate. A coverage decision has no type to be emitted as.</li>
+    <li><b>Release 1 was blocked.</b> Its stop rule missed five of eight escalations. The repository's own history shows the red check and the fix.</li>
+  </ul>
+  <p style="margin-top:14px"><a class="btn" href="evals.html">The full evaluation framework</a></p>
 </section>
 
 <section class="band">
