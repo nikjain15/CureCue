@@ -13,7 +13,7 @@ const relDay = off => off === 0 ? "today" : off === 1 ? "tomorrow" : off === -1 
 function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on"); clearTimeout(toast.h); toast.h = setTimeout(() => e.classList.remove("on"), 2800); }
 
 // ---------- Views ----------
-const TITLES = { home: ["Home", "Member Services · Medicare · Mon Oct 27"], desk: ["Call", "Rosa M. · Sierra Advantage HMO"], day: ["My day", "Mon Oct 27"], quality: ["Quality", "Scorecard and gates"], loop: ["How it learns", "Two human gates"] };
+const TITLES = { home: ["Home", "Member Services · Medicare · Mon Oct 27"], desk: ["Call", "Rosa M. · Sierra Advantage HMO"], day: ["My day", "Mon Oct 27"], quality: ["Evals", "Runs, gates, slices, failures, dataset, judge"], loop: ["How it learns", "Two human gates"] };
 function show(v) { ["home", "desk", "day", "quality", "loop"].forEach(x => $("view-" + x).classList.toggle("on", x === v)); document.querySelectorAll(".rail button[data-view]").forEach(b => { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }); $("title").textContent = TITLES[v][0]; $("crumb").textContent = TITLES[v][1]; window.scrollTo({ top: 0 }); if (v === "day") renderDay(); }
 document.querySelectorAll(".rail button[data-view]").forEach(b => b.onclick = () => show(b.dataset.view));
 
@@ -208,17 +208,8 @@ function renderDay() {
   $("handled").textContent = calls.length;
 }
 
-// ---------- Quality ----------
-let shown = R.CURRENT_RELEASE;
-function renderQ() { const r = R.score(GOLDEN, shown); const f = x => Number.isInteger(x) ? (x === 0 || x === 1 ? x.toFixed(2) : String(x)) : x.toFixed(2);
-  $("qintro").textContent = `Every number below is computed in this page by rules.js against the ${GOLDEN.length} member turns in eval/golden.js, labelled by a person first. The same two files run in CI on every push; a missed gate fails the build. The desk runs Release ${R.CURRENT_RELEASE}; this toggle only changes what is scored here.`;
-  document.querySelector("#gates tbody").innerHTML = r.gates.map(g => `<tr><td>${g.principle}</td><td>${g.name}</td><td><b>${f(g.value)}</b></td><td>${g.must}</td><td>${g.pass ? '<span class="pill good">pass</span>' : '<span class="pill bad">blocked</span>'}</td></tr>`).join("");
-  const m = r.metrics; $("tiles").innerHTML = [["Escalations caught", f(m.escalation_recall), m.escalation_recall < 1], ["Right rule cited", f(m.citation_accuracy), m.citation_accuracy < .95], ["Figures off the path", String(Math.round(m.hallucination_rate * m.drafted)), m.hallucination_rate > 0], ["Turns fully right", f(m.task_success), false]].map(([l, v, bad]) => `<div class="tile"><div class="n" style="color:${bad ? 'var(--bad)' : 'var(--good)'}">${v}</div><div class="l">${l}</div></div>`).join("");
-  $("gsum").textContent = r.failed ? `Release ${shown} is blocked: missed ${r.missed.map(t => `"${t}"`).join(", ")}.` : `Release ${shown} passes every gate.`;
-  $("qfoot").textContent = `${m.rows} turns: ${GOLDEN.filter(x => x.v === "answer").length} benefit questions, ${GOLDEN.filter(x => x.v === "human" && !x.g).length} account questions, ${GOLDEN.filter(x => x.g).length} with dissatisfaction, ${GOLDEN.filter(x => x.v === "escalate").length} that must escalate. ${m.drafted} drafts checked figure by figure against the nodes on their path.`;
-  $("bv1").className = "btn sm" + (shown === 1 ? " primary" : ""); $("bv2").className = "btn sm" + (shown === 2 ? " primary" : ""); $("bv2").textContent = "Release 2" + (R.CURRENT_RELEASE === 2 ? " (on the desk)" : ""); $("bv1").textContent = "Release 1" + (R.CURRENT_RELEASE === 1 ? " (on the desk)" : ""); }
-$("bv1").onclick = () => { shown = 1; renderQ(); }; $("bv2").onclick = () => { shown = 2; renderQ(); };
-renderQ();
 CueVoice.init().then(() => { $("mode").textContent = CueVoice.modeLabel(); $("voicenote").textContent = CueVoice.readyNote(); });
+if (location.hash === "#evals") show("quality");
+window.addEventListener("hashchange", () => { if (location.hash === "#evals") show("quality"); });
 window.CureCueDesk = { state, show, onMember, answer };
 })();

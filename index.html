@@ -99,9 +99,9 @@
     <li><b>Escalation recall 1.00.</b> The one failure that cannot be budgeted. Never judged by a model.</li>
     <li><b>Figures off the cited path: none.</b> A number not in a rule on the path is a build failure.</li>
     <li><b>Three verdicts, by type.</b> Answer, needs a person, escalate. A coverage decision has no type to be emitted as.</li>
-    <li><b>Release 1 was blocked.</b> Its stop rule missed five of eight escalations. The repository's own history shows the red check and the fix.</li>
+    <li><b>Two releases were blocked</b> before the one on the desk: the first missed most escalations; the second missed every Spanish-language one, which only a per-slice view shows. Both runs are in the repository's history.</li>
   </ul>
-  <p style="margin-top:14px"><a class="btn" href="evals.html">The full evaluation framework</a></p>
+  <p style="margin-top:14px"><a class="btn primary" href="app/#evals">Open the evaluation console</a> <a class="btn" href="evals.html">The framework and why</a></p>
 </section>
 
 <section class="band">
@@ -115,8 +115,8 @@
 <script>
 (function(){const R=window.CureCueRules,G=window.CureCueGolden;const r=R.score(G,R.CURRENT_RELEASE),r1=R.score(G,1);const f=x=>x.toFixed(2);
  document.getElementById("tiles").innerHTML=[["Escalations caught",f(r.metrics.escalation_recall)],["Right rule cited",f(r.metrics.citation_accuracy)],["Figures off the path",String(Math.round(r.metrics.hallucination_rate*r.metrics.drafted))],["Turns fully right",f(r.metrics.task_success)]].map(([l,v])=>`<div class="tile"><div class="n">${v}</div><div class="l">${l}</div></div>`).join("");
- document.getElementById("gsum").textContent=`Release ${R.CURRENT_RELEASE} passes every gate. The previous release missed ${r1.missed.length} of ${G.filter(x=>x.v==="escalate").length} escalations and was blocked.`;
- document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>labelled turns</span><span><b>${r.gates.length}</b>release gates</span><span><b>0</b>figures without a source</span>`;})();
+ document.getElementById("gsum").textContent=`Release ${R.CURRENT_RELEASE} passes every gate over ${G.length} labelled turns across ${Object.keys(R.score(G,R.CURRENT_RELEASE).slices.lang).length} language paths and ${Object.keys(R.score(G,R.CURRENT_RELEASE).slices.register).length} registers. Release 1 caught ${Math.round(r1.metrics.escalation_recall*100)}% of escalations and was blocked.`;
+ document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>labelled turns</span><span><b>${r.gates.length}</b>release gates</span><span><b>${Object.keys(r.slices.lang).length}</b>language paths</span><span><b>0</b>figures without a source</span>`;})();
 </script>
 </body>
 </html>
