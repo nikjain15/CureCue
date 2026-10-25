@@ -1,2 +1,9 @@
 eval/out/
 app/audio/*.mp3
+
+# Local tooling files, kept out of the repository
+AGENTS.md
+CLAUDE.md
+.claude/
+.cursor/
+.cursorrules
