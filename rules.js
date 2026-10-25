@@ -9,10 +9,11 @@
 
   // ---------- Where the plan rules come from: public documents for one real 2026 Medicare Advantage HMO-POS plan ----------
   // Every node below cites the document and PDF page it was read from. Members, calls and records in this prototype are fictional.
+  // file: the copy kept in this repository (sources/), so every citation can be checked offline; url: the original.
   const SOURCES = {
-    SB: { title: "2026 Summary of Benefits", code: "H6622026000SB26", pages: 25, url: "https://assets.humana.com/is/content/humana/H6622026000SB26pdf" },
-    EOC: { title: "2026 Evidence of Coverage", code: "H6622026000EOC26", pages: 185, url: "https://assets.humana.com/is/content/humana/H6622026000EOC26pdf" },
-    CFR: { title: "42 CFR § 422.561, Medicare Advantage definitions", code: "42 CFR 422.561", url: "https://www.law.cornell.edu/cfr/text/42/422.561" }
+    SB: { title: "2026 Summary of Benefits", code: "H6622026000SB26", pages: 24, file: "sources/2026-summary-of-benefits-H6622-026.pdf", url: "https://assets.humana.com/is/content/humana/H6622026000SB26pdf", sha256: "56c9882f3fb7bab379cdb18711ccffce4c9c8767ada6151bd887c3a3f69e3df6", retrieved: "2026-10-25" },
+    EOC: { title: "2026 Evidence of Coverage", code: "H6622026000EOC26", pages: 184, file: "sources/2026-evidence-of-coverage-H6622-026.pdf", url: "https://assets.humana.com/is/content/humana/H6622026000EOC26pdf", sha256: "94b582a35121399a8902e7584f5bbdefa0661959f3ae9fdb79bef9c92d08b9bb", retrieved: "2026-10-25" },
+    CFR: { title: "42 CFR § 422.561, Medicare Advantage definitions", code: "42 CFR 422.561", file: "sources/42-cfr-422-561-grievance.md", url: "https://www.law.cornell.edu/cfr/text/42/422.561", retrieved: "2026-10-25" }
   };
 
   // ---------- Plan rules as a graph ----------

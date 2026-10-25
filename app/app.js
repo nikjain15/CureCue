@@ -18,22 +18,24 @@ function show(v) { ["home", "desk", "day", "quality", "loop"].forEach(x => $("vi
 document.querySelectorAll(".rail button[data-view]").forEach(b => b.onclick = () => show(b.dataset.view));
 
 // ---------- Home: Cue's briefing, computed from the data ----------
-const cbDue = D.contacts.filter(c => c.callback && c.callback.scheduled && c.callback.day === 0);
-const nearClock = D.cases.filter(k => k.status === "open" && k.opened + k.days <= 7).sort((a, b) => (a.opened + a.days) - (b.opened + b.days));
+let cbDue, nearClock, outcomes = null; // outcomes: what the last call left behind, shown on Home
+function brief() { cbDue = D.contacts.filter(c => c.callback && c.callback.scheduled && c.callback.day === 0); nearClock = D.cases.filter(k => k.status === "open" && k.opened + k.days <= 7).sort((a, b) => (a.opened + a.days) - (b.opened + b.days)); }
+brief();
 const likely = D.members.filter(m => { const same = D.contacts.filter(c => c.member === m.id && c.day >= -30); const byReason = {}; same.forEach(c => { byReason[c.reason] = (byReason[c.reason] || 0) + 1; }); return Object.values(byReason).some(n => n >= 2) && same.some(c => c.callback && c.callback.promised && !c.callback.scheduled); });
 const briefState = { cbDone: new Set() };
 function item(m, why, acts, cls = "") { return `<div class="item ${cls}" data-m="${m.id}"><div class="av">${initials(m.name)}</div><div><b>${m.short} · ${m.plan}</b><div class="why">${why}</div></div><div class="act">${acts}</div></div>`; }
 function renderHome() {
+  brief(); renderLastCall();
   const hr = new Date().getHours(); $("greet").textContent = `Good ${hr < 12 ? "morning" : hr < 17 ? "afternoon" : "evening"}, Nik. Here is what I found.`;
   $("briefmeta").textContent = `${cbDue.length} callbacks · ${nearClock.length} clocks · ${likely.length} likely repeat`;
   $("homen").textContent = cbDue.length + nearClock.length;
   $("cb").innerHTML = cbDue.map(c => { const m = member(c.member); const done = briefState.cbDone.has(c.member); return item(m, `Promised ${relDay(c.day)} about <mark>${c.reason.toLowerCase()}</mark>: ${c.note}.`, done ? `<span class="pill good">called</span>` : `<button class="btn sm primary" data-cb="${c.member}">Call now</button><span class="small">reason pre-filled</span>`, done ? "done" : ""); }).join("") || `<p class="small">None due today.</p>`;
-  $("clock").innerHTML = nearClock.map(k => { const m = member(k.member); const left = k.opened + k.days; return item(m, `${k.type === "grievance" ? "Grievance" : "Appeal"} <strong>${k.id}</strong>: ${k.subject}. Opened ${relDay(k.opened)}, due <mark>${relDay(left)}</mark>. Owner: ${k.owner}.`, `<span class="pill ${left <= 5 ? "bad" : "warn"}">${left} days left</span>`, left <= 5 ? "urgent" : ""); }).join("");
+  $("clock").innerHTML = nearClock.map(k => { const m = member(k.member); const left = k.opened + k.days; return item(m, `${k.type === "grievance" ? "Grievance" : "Appeal"} <strong>${k.id}</strong>: ${k.subject}. Opened ${relDay(k.opened)}, due <mark>${relDay(left)}</mark>. Owner: ${k.owner}.`, `<span class="pill ${left <= 5 ? "bad" : "warn"}">${left} day${left === 1 ? "" : "s"} left</span>`, left <= 5 ? "urgent" : ""); }).join("");
   $("likely").innerHTML = likely.map(m => { const cs = D.contacts.filter(c => c.member === m.id && c.day >= -30); const promised = cs.find(c => c.callback && c.callback.promised && !c.callback.scheduled); const byReason = {}; cs.forEach(c => { byReason[c.reason] = (byReason[c.reason] || 0) + 1; }); const [reason, times] = Object.entries(byReason).sort((a, b) => b[1] - a[1])[0]; return item(m, `Called ${times} times in 30 days about ${reason.toLowerCase()}. On ${fmtOff(promised.day)} a callback was promised and <mark>never scheduled</mark>. If she calls, acknowledge both calls first.`, `<span class="pill warn">watch</span>`); }).join("") || `<p class="small">Nobody flagged.</p>`;
   $("coach").textContent = D.coaching;
   const mins = D.shift.reduce((a, s) => a + s.minutes, 0), acc = D.shift.reduce((a, s) => a + s.cues.accepted, 0), dec = D.shift.reduce((a, s) => a + s.cues.declined, 0);
   $("kpis").innerHTML = [[D.shift.length, "calls so far"], [`${Math.floor(mins / D.shift.length)}:${String(Math.round((mins / D.shift.length % 1) * 60)).padStart(2, "0")}`, "avg handle"], [`${acc}/${acc + dec}`, "cues accepted"]].map(([n, l]) => `<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
-  $("handled").textContent = D.shift.length; $("aht").textContent = `${Math.floor(mins / D.shift.length)}:${String(Math.round((mins / D.shift.length % 1) * 60)).padStart(2, "0")}`;
+  $("handled").textContent = D.shift.length + (outcomes ? 1 : 0); $("aht").textContent = `${Math.floor(mins / D.shift.length)}:${String(Math.round((mins / D.shift.length % 1) * 60)).padStart(2, "0")}`;
   document.querySelectorAll("[data-cb]").forEach(b => b.onclick = () => { briefState.cbDone.add(b.dataset.cb); toast(`Dialling ${member(b.dataset.cb).short}. Reason and last note are on screen when they pick up. (Demo: outbound calls are not scripted.)`); renderHome(); });
 }
 renderHome();
@@ -53,6 +55,7 @@ renderHome();
 // ---------- Queue ----------
 const QUEUE = [{ id: "M-001", reason: "billing question", wait: "0:04", ring: true }, { id: "M-002", reason: "appeal status", wait: "1:40" }, { id: "M-003", reason: "ID card", wait: "0:52" }];
 function renderQueue() { $("queue").innerHTML = QUEUE.map((q, i) => { const m = member(q.id); const flags = D.contacts.filter(c => c.member === q.id && c.day >= -30).length; return `<div class="qcard ${q.ring ? "ring" : ""}" style="${i ? "opacity:.6" : ""}"><div class="av">${initials(m.name)}</div><div><b>${m.short}</b><div class="r">${m.plan} · ${q.reason} · ${flags ? flags + " contact" + (flags > 1 ? "s" : "") + " in 30 days" : "first contact"} · waiting ${q.wait}</div></div>${q.ring ? `<button class="btn primary" id="answer">Answer</button>` : ""}</div>`; }).join(""); $("qn").textContent = QUEUE.length; const a = $("answer"); if (a) a.onclick = answer; }
+$("autoplay").onclick = () => { $("autoplay").disabled = true; auto.start(); };
 $("goready").onclick = () => { $("dot").className = "dot ready"; $("stt").textContent = "Ready"; $("queue").hidden = false; $("goready").disabled = true; $("readynote").textContent = "Ready. Rosa M. is ringing."; renderQueue(); CueVoice.warm(); };
 
 // ---------- Graph ----------
@@ -65,7 +68,8 @@ function drawGraph(path = []) { const svg = $("graph"); let s = "";
   svg.innerHTML = s; svg.querySelectorAll("g[data-n]").forEach(g => g.onclick = () => showClause(g.dataset.n)); }
 function showClause(k) { const n = G.nodes[k]; $("clause").innerHTML = n.text ? `<b>${n.label}</b> (${n.id}): ${n.text}${n.src ? `<br><span class="small">Source: ${srcLinks(n)}</span>` : ""}` : `<b>${n.label}</b>`; }
 // Links to the public document and PDF page each plan rule was read from
-function srcLinks(n) { return (n.src || []).map(x => { const S = R.SOURCES[x.doc]; return `<a href="${S.url}${x.page ? "#page=" + x.page : ""}" target="_blank" rel="noopener">${S.title}${x.page ? ", p. " + x.page : ""}</a>`; }).join(" · "); }
+function srcHref(S, page) { return /\.pdf$/.test(S.file) ? `../${S.file}${page ? "#page=" + page : ""}` : S.url; }
+function srcLinks(n) { return (n.src || []).map(x => { const S = R.SOURCES[x.doc]; return `<a href="${srcHref(S, x.page)}" target="_blank" rel="noopener">${S.title}${x.page ? ", p. " + x.page : ""}</a>`; }).join(" · "); }
 
 // ---------- Member 360 ----------
 const M = member("M-001");
@@ -98,12 +102,13 @@ function cue({ k, cls = "", say, main, alt, why, cite }) { const el = document.c
   if (m) m.onclick = () => { m.classList.add("done"); m.textContent = main.done; if (a) a.disabled = true; state.accepted++; if (main.fn) main.fn(); };
   if (a) a.onclick = () => { a.classList.add("done"); a.textContent = alt.done; if (m) m.disabled = true; state.declined++; if (alt.fn) alt.fn(); };
   w.onclick = () => el.querySelector(".det").classList.toggle("on");
-  cues().insertBefore(el, quiet()); el.scrollIntoView({ block: "nearest" }); }
+  cues().insertBefore(el, quiet()); el.scrollIntoView({ block: "nearest" });
+  if (state.auto && (main || alt)) { const pickAlt = alt && auto.preferAlt(k, say); const b = pickAlt ? a : m; setTimeout(() => { if (b && !b.disabled && !b.classList.contains("done")) { b.classList.add("pressed"); b.click(); } }, auto.beat); } }
 function setQuiet(t) { quiet().querySelector("span:last-child").textContent = t; }
 function onMember(text) {
   const d = R.decide(text, R.CURRENT_RELEASE);   // the desk always runs the current release
   if (d.verdict === "escalate") { state.escalated = true; drawGraph(["APPL"]); showClause("APPL"); openTab("cases");
-    cue({ k: "Stop", cls: "stop", say: `<b>Bring a supervisor in now.</b> "${d.trigger}" signals a dispute about care or coverage. Don't quote a benefit or a decision for this.`, main: { label: "Connect supervisor", done: "Supervisor joining", fn: () => { state.transferred = "Supervisor, discharge dispute"; markTool("transfer", "Supervisor joining"); } }, why: "A dispute about a care or coverage decision is never answered from a plan document. Cue drafts nothing and pauses every other cue for this topic.", cite: "P-APPL" }); setQuiet("Paused on this topic. A supervisor is handling it."); return; }
+    cue({ k: "Stop", cls: "stop", say: `<b>Bring a supervisor in now.</b> "${d.trigger}" signals a dispute about care or coverage. Don't quote a benefit or a decision for this.`, main: { label: "Connect supervisor", done: "Supervisor joining", fn: () => { state.transferred = "Supervisor (Dana), discharge dispute"; markTool("transfer", "Supervisor joined"); if (state.callDone) playSupervisor(); } }, why: "A dispute about a care or coverage decision is never answered from a plan document. Cue drafts nothing and pauses every other cue for this topic.", cite: "P-APPL" }); setQuiet("Paused on this topic. A supervisor is handling it."); return; }
   if (d.grievance && !state.grievanceHeard) { state.grievanceHeard = true; drawGraph(["GRV"]); showClause("GRV"); openTab("contacts", "contacts"); const g = R.grievance(text);
     cue({ k: "Heads up", cls: "flag", say: `She said "<mark>${g.exec(text)[0]}</mark>". That counts as a grievance, even without the word. Log it?`, main: { label: "Log grievance", done: "Logged · 30-day clock started", fn: () => { state.grievance = true; state.caseOpened = "G-26-0417"; markTool("case", "G-26-0417 opened"); openTab("cases"); } }, alt: { label: "Not a grievance", done: "Noted: not a grievance", fn: () => { state.grievance = false; } }, why: "Repeat contact about an unresolved issue is dissatisfaction. If logged, a case opens with a due date 30 days out. Either choice is recorded in the note.", cite: "P-GRV" }); }
   if (d.verdict === "answer") { const key = d.path.join(">"); if (state.pathsSeen.includes(key)) return; state.pathsSeen.push(key);
@@ -140,29 +145,37 @@ function renderTool(t) { const T = TOOLS[t](); openTool = t; const box = $("tool
 document.querySelectorAll("#tools [data-tool]").forEach(b => b.onclick = () => renderTool(b.dataset.tool));
 
 // ---------- Script and playback ----------
-const VERIFY = [{ w: "Advocate", t: "Thanks for calling. Before I can look at anything, can I get your full name?" }, { w: "Rosa", t: "Rosa Martinez.", h: [1, "Rosa Martinez"] }, { w: "Advocate", t: "And your date of birth?" }, { w: "Rosa", t: "March 9th, 1955.", h: [2, "03/09/1955"] }, { w: "Advocate", t: "Last four of your member ID?" }, { w: "Rosa", t: "4821.", h: [3, "4821"] }];
-const CALL = [
-  { w: "Rosa", t: "This is the third time I've called about this bill from the skin doctor." },
-  { w: "Advocate", t: "I'm sorry, Rosa. I can see both earlier calls, so you won't have to repeat yourself. Let's sort it out." },
-  { w: "Rosa", t: "They billed me $120 for the skin doctor and I thought I only pay $25." },
-  { w: "Advocate", t: "Let me check where the biopsy on September 30th was done." },
-  { w: "Rosa", t: "While I have you, if I go to the ER and they admit me, what do I owe?" },
-  { w: "Rosa", t: "And my mother is in rehab. They are sending her home tomorrow and she is not ready." },
-  { w: "Advocate", t: "I'm bringing a supervisor onto the call for that right now." }];
+const SCRIPT = window.CureCueScript, VERIFY = SCRIPT.VERIFY, CALL = SCRIPT.CALL;
 let paused = false, tick = null, t0 = 0, player = null;
-function addLine(container, w, t) { const d = document.createElement("div"); d.className = "line" + (w === "Advocate" ? " adv" : ""); d.innerHTML = `<span class="w">${w === "Advocate" ? "You" : "Rosa"}</span>${t}`; container.appendChild(d); container.scrollTop = container.scrollHeight; }
+const WHO = { Rosa: "Rosa", Advocate: "You", Supervisor: "Dana · supervisor" };
+function addLine(container, w, t) { const d = document.createElement("div"); d.className = "line" + (w === "Advocate" ? " adv" : w === "Supervisor" ? " sup" : ""); d.innerHTML = `<span class="w">${WHO[w] || w}</span>${t}`; container.appendChild(d); container.scrollTop = container.scrollHeight; }
 function go(n) { document.querySelectorAll("#steps div").forEach((d, k) => { d.className = k < n ? "done" : k === n ? "on" : ""; }); ["s-verify", "s-handle", "s-wrap"].forEach((id, k) => $(id).classList.toggle("on", k === n)); $("nocall").hidden = true; window.scrollTo({ top: 0 }); }
 function wave(on) { ["wave1", "wave2"].forEach(id => $(id).classList.toggle("on", on)); }
 function answer() {
   QUEUE.shift(); renderQueue(); $("dot").className = "dot live"; $("stt").textContent = "On call"; t0 = Date.now(); tick = setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); $("timer").textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }, 500);
   $("precard").innerHTML = `<b>Caller ID</b><span>number on file ending 0188</span><b>Likely member</b><span>Rosa M. · ••••4821 · not yet verified</span><b>Reason given</b><span>billing question</span><b>Before verification</b><span class="small">Cue shows nothing else.</span>`;
   show("desk"); go(0);
-  const c = $("tr-verify"); player = CueVoice.play(VERIFY, { container: c, onStart: () => wave(true), onLine: (l) => { addLine(c, l.w, l.t); wave(false); if (l.h) $("h" + l.h[0]).innerHTML = `heard <b>${l.h[1]}</b>`; }, isPaused: () => false, offset: 0 }); }
+  const c = $("tr-verify"); player = CueVoice.play(VERIFY, { container: c, onStart: () => wave(true), onLine: (l) => { addLine(c, l.w, l.t); wave(false); if (l.h) $("h" + l.h[0]).innerHTML = `heard <b>${l.h[1]}</b>`; }, isPaused: () => false, onDone: () => { if (state.auto) auto.verify(); } }); }
 function chk() { $("verified").disabled = !(v1.checked && v2.checked && v3.checked); }
 ["v1", "v2", "v3"].forEach(id => $(id).onchange = chk);
 $("verified").onclick = () => { if (player) player.stop(); go(1); renderM360(); drawGraph(); const c = $("tr");
   cue({ k: "Before you start", say: "She's called twice about this bill, Oct 3 and Oct 14. On Oct 14 she was promised a callback that never got scheduled.", why: "From the member record's prior contacts. Shown once so you can acknowledge it before she has to raise it." });
-  player = CueVoice.play(CALL, { container: c, onStart: () => wave(true), onLine: (l) => { addLine(c, l.w, l.t); wave(false); if (l.w === "Rosa") onMember(l.t); }, isPaused: () => paused || state.ended, offset: VERIFY.length }); };
+  player = CueVoice.play(CALL, { container: c, onStart: () => wave(true), onLine: (l) => { addLine(c, l.w, l.t); wave(false); if (l.w === "Rosa") onMember(l.t); }, isPaused: () => paused || state.ended, onDone: () => { state.callDone = true; if (state.transferred) playSupervisor(); } }); };
+
+// ---------- The supervisor's part, then the advocate's close. Guidance follows the plan's EOC, Chapter 9, Section 8. ----------
+const EOC = R.SOURCES.EOC, eocLink = (p, t) => `<a href="../${EOC.file}#page=${p}" target="_blank" rel="noopener">${t}</a>`;
+function playSupervisor() { if (state.supStarted || state.ended) return; state.supStarted = true; const c = $("tr");
+  setQuiet("Supervisor on the call. Cue shows process facts only.");
+  cue({ k: "For the supervisor · from the plan's documents", say: `Rehab is covered skilled nursing care. A <b>Notice of Medicare Non-Coverage</b> comes at least 2 days ahead; signing it is not agreeing. For a <b>fast-track appeal</b>, contact the Quality Improvement Organization by <b>noon the day before coverage ends</b>. It decides within one full day of having the information.`, why: `Process facts, not a coverage decision. Source: ${eocLink(146, "EOC p. 146")} · ${eocLink(147, "p. 147")} · ${eocLink(148, "p. 148")}.` });
+  toast("Elena Martinez's record opened: Rosa M. is her authorized representative.");
+  player = CueVoice.play(SCRIPT.SUPERVISOR, { container: c, onStart: () => wave(true), onLine: l => { addLine(c, l.w, l.t); wave(false); }, isPaused: () => paused || state.ended, onDone: offerAppealCase }); }
+function offerAppealCase() { if (state.ended) return;
+  cue({ k: "Pre-filled for you", say: `<b>Appeal support case for Elena Martinez</b>: fast-track appeal filed with the Quality Improvement Organization on this call; skilled nursing coverage set to end ${fmtOff(2)}; decision within one full day of the reviewers having her information. <b>Callback to Rosa</b> ${fmtOff(2)}, morning.`, main: { label: "Open case and schedule callback", done: `A-26-0418 opened · callback ${fmtOff(2)}, morning`, fn: () => { state.appealCase = "A-26-0418"; if (!state.callback) { state.callback = fmtOff(2) + ", morning"; markTool("callback", "Callback " + state.callback); } playClose(); } }, why: "Cue fills it from what the supervisor and the Quality Improvement Organization confirmed. You confirm it; nothing is filed until you do." }); }
+function playClose() { if (state.closeStarted || state.ended) return; state.closeStarted = true; const C = SCRIPT.CLOSE, c = $("tr");
+  const lines = [{ w: "Advocate", t: C.bill[state.site || "unknown"] }];
+  if (state.grievance === true) { lines.push({ w: "Advocate", t: C.grievance.logged }); state.grievanceAnswered = true; } else if (state.grievance === false) lines.push({ w: "Advocate", t: C.grievance.declined });
+  lines.push({ w: "Advocate", t: C.wrap }, { w: "Rosa", t: C.thanks });
+  player = CueVoice.play(lines, { container: c, onStart: () => wave(true), onLine: l => { addLine(c, l.w, l.t); wave(false); }, isPaused: () => paused || state.ended, onDone: () => { if (!state.ended) setTimeout(() => $("endcall").click(), 900); } }); }
 $("pause").onclick = e => { paused = !paused; e.currentTarget.setAttribute("aria-pressed", String(paused)); $("stt").textContent = paused ? "On hold" : "On call"; if (paused) CueVoice.hold(); else CueVoice.resume(); };
 $("mute").onclick = e => { const m = CueVoice.toggleMute(); e.currentTarget.setAttribute("aria-pressed", String(m)); $("mode").textContent = CueVoice.modeLabel(); toast(m ? "Audio off: transcript only" : "Audio on"); };
 $("endcall").onclick = () => { state.ended = true; if (player) player.stop(); clearInterval(tick); wave(false); $("dot").className = "dot ready"; $("stt").textContent = "Wrap-up"; go(2); wrapup(); };
@@ -176,28 +189,60 @@ function wrapup() {
   if (state.callback) did.push(`Scheduled callback ${state.callback}`);
   if (state.docSent) did.push(`Sent ${state.docSent}`);
   if (state.transferred) did.push(`Brought in ${state.transferred}`);
+  if (state.appealCase) did.push(`Supervisor filed a fast-track appeal for Elena Martinez with the Quality Improvement Organization; opened ${state.appealCase}`);
+  if (state.grievanceAnswered) did.push("Answered the complaint on the call; G-26-0417 resolved");
   $("didlist").innerHTML = did.map(d => `<li>${d}</li>`).join("") || `<li style="color:var(--muted)">No actions recorded.</li>`;
   const allOnPath = state.figures.length > 0 && state.figures.every(f => f.onPath);
   const items = [["Identity verified", true], ["Grievance decision recorded", state.grievance !== null, state.grievanceHeard],
     [state.figures.length ? `Every figure quoted traced to a plan rule (${state.figures.length} checked)` : "No figure was quoted", state.figures.length ? allOnPath : true, true],
-    ["Place of service checked before quoting", state.site !== null, state.asked.spec], ["Discharge concern handed to a supervisor", state.escalated && !!state.transferred, state.escalated], ["Callback scheduled with a date", !!state.callback, state.site !== "office"]];
+    ["Place of service checked before quoting", state.site !== null, state.asked.spec], ["Discharge concern handed to a supervisor", state.escalated && !!state.transferred, state.escalated], ["Appeal deadline stated and appeal filed", !!state.appealCase, state.escalated], ["Callback scheduled with a date", !!state.callback, state.site !== "office"]];
   $("checklist").innerHTML = items.filter(([l, ok, applies]) => applies !== false).map(([l, ok]) => `<li><span class="b ${ok ? 'ok' : 'miss'}">${ok ? '✓' : '!'}</span><span>${l}${ok ? '' : ' <span class="pill bad">missing</span>'}</span></li>`).join("");
   const n = [`Rosa M. called (3rd contact) about a $120 bill from a dermatology visit with a biopsy, date of service Sep 30 (C-26-5519).`];
   if (state.asked.spec) n.push(`Plan rules: specialist office $25 (S-SPEC); diagnostic procedure at an outpatient hospital $120 (S-DIAG); no referral needed (S-REF). ${state.site === "office" ? "Done in the office; bill sent for reprocessing." : state.site === "hospital" ? "Done at a hospital outpatient department; $120 copay explained." : "Place of service not confirmed on this call."}`);
   if (state.grievanceHeard) n.push(state.grievance === true ? `Grievance logged G-26-0417, 30-day clock, due ${fmtOff(30)}.` : state.grievance === false ? "Repeat contact noted; advocate judged not a grievance." : "Dissatisfaction heard; grievance decision NOT recorded.");
   if (state.asked.er) n.push("Asked about ER with admission: $0 for the ER visit if admitted within 24 hours (S-ER-W); hospital $375/day days 1-7 (S-INPT); counts to $9,250 max (S-MOOP).");
-  if (state.escalated) n.push(state.transferred ? "Mother's discharge concern: supervisor brought onto the call; nothing quoted." : "Mother's discharge concern raised; supervisor NOT yet brought in.");
+  if (state.escalated) n.push(!state.transferred ? "Mother's discharge concern raised; supervisor NOT yet brought in." : state.appealCase ? `Mother (Elena Martinez; Rosa is authorized representative) has skilled nursing coverage ending ${fmtOff(2)}. Supervisor Dana explained the Notice of Medicare Non-Coverage and conferenced the Quality Improvement Organization; fast-track appeal filed before the noon ${fmtOff(1)} deadline. Case ${state.appealCase}. No benefit or decision quoted.` : "Mother's discharge concern: supervisor brought onto the call; nothing quoted.");
+  if (state.grievanceAnswered) n.push("Complaint G-26-0417 answered on the call with the place-of-service explanation; resolved.");
   if (state.callback) n.push(`Callback scheduled ${state.callback}.`); if (state.docSent) n.push(`Document sent: ${state.docSent}.`);
   $("note").value = n.join("\n");
   $("code").value = state.escalated && !state.asked.spec ? "Escalated to supervisor" : state.grievance ? "Grievance · repeat contact" : "Benefits and cost question";
   const rc = [`Hi Rosa, a recap of today's call.`];
   if (state.asked.spec) { rc.push(`Specialist visits are $25, and you don't need a referral. A procedure done at a hospital outpatient department has a $120 copay.`); if (state.site === "office") rc.push(`Your Sep 30 biopsy was done in the office, so the $120 bill is being reprocessed at $25.`); else if (state.site === "hospital") rc.push(`Your Sep 30 biopsy was done at the hospital's outpatient department, which is why the bill is $120.`); else rc.push(`We are still confirming where your Sep 30 biopsy was done.`); }
   if (state.asked.er) rc.push(`If you ever go to the ER and are admitted to the same hospital within 24 hours, you pay $0 for the ER visit instead of $115, and the daily hospital copay applies instead.`);
+  if (state.appealCase) rc.push(`Your mother's fast-track appeal is filed with the Quality Improvement Organization. They decide within one full day of having her information.`);
   if (state.callback) rc.push(`We will call you back ${state.callback}.`); if (state.docSent) rc.push(`The plan rules we discussed are on their way to you.`);
   rc.push(`Reply to this text if anything doesn't match what you understood.`); $("recap").textContent = rc.join(" ");
-  $("approve").onclick = () => { $("approved").textContent = "Note approved. Call closed and added to today's timeline."; $("sendrecap").disabled = false; $("next").disabled = false; state.closed = true; state.closedAt = new Date(); $("dot").className = "dot ready"; $("stt").textContent = "Ready"; $("timer").textContent = ""; };
-  $("sendrecap").onclick = e => { e.target.disabled = true; $("sent").textContent = "Sent by you."; };
-  $("next").onclick = () => show("day"); }
+  $("approve").onclick = () => { recordOutcomes(); $("approved").textContent = "Note approved. Call closed; its cases and callback are on Home and in My day."; $("sendrecap").disabled = false; $("next").disabled = false; state.closed = true; state.closedAt = new Date(); $("dot").className = "dot ready"; $("stt").textContent = "Ready"; $("timer").textContent = ""; };
+  $("sendrecap").onclick = e => { e.target.disabled = true; $("sent").textContent = "Sent by you."; if (outcomes) { outcomes.recap = true; renderHome(); } };
+  $("next").onclick = () => show("day");
+  if (state.auto) auto.finish(); }
+
+// ---------- What the call leaves behind: cases, a contact, a callback. Home and the member record read these. ----------
+function recordOutcomes() { if (state.recorded) return; state.recorded = true; $("readynote").textContent = "Ready for the next call. Rosa's call is closed; its outcomes are below.";
+  if (state.grievance === true) { const k = D.cases.find(x => x.id === "G-26-0417"); const g = { id: "G-26-0417", member: "M-001", type: "grievance", opened: 0, days: 30, subject: "Repeat calls about a $120 biopsy bill" + (state.grievanceAnswered ? "; answered on the call" : ""), status: state.grievanceAnswered ? "resolved" : "open", owner: "Grievances team" }; if (k) Object.assign(k, g); else D.cases.push(g); }
+  if (state.appealCase) D.cases.push({ id: state.appealCase, member: "M-009", type: "appeal", opened: 0, days: 2, subject: `Fast-track appeal filed with the Quality Improvement Organization; skilled nursing coverage ending ${fmtOff(2)}`, status: "open", owner: "Appeals team" });
+  if (state.site === "office") { const cl = D.claims.find(x => x.id === "C-26-5519"); if (cl) cl.reason = "Sent back for reprocessing at the $25 office copay"; }
+  D.contacts.push({ member: "M-001", day: 0, reason: "Claims and billing", note: `Biopsy bill ${state.site === "hospital" ? "explained: outpatient hospital copay" : state.site === "office" ? "sent for reprocessing" : "place of service still to confirm"}${state.appealCase ? "; mother's fast-track appeal filed with supervisor" : ""}`, callback: state.callback ? { promised: true, scheduled: true, day: 2 } : null, by: "Nik J." });
+  outcomes = { site: state.site, grievance: state.grievance, answered: !!state.grievanceAnswered, appeal: state.appealCase, callback: state.callback, recap: false };
+  renderHome(); }
+function renderLastCall() { const w = $("lastcall-wrap"); if (!w) return; const o = outcomes; w.hidden = !o; if (!o) return; const rosa = member("M-001"), elena = member("M-009");
+  const rows = [];
+  rows.push(item(rosa, `Biopsy bill C-26-5519: ${o.site === "hospital" ? "the $120 outpatient hospital copay is correct; explained on the call" : o.site === "office" ? "done in the office; sent back to be reprocessed at $25" : "place of service still to confirm"}.`, `<span class="pill ${o.site ? "good" : "warn"}">${o.site ? "answered" : "open"}</span>`));
+  if (o.grievance === true) rows.push(item(rosa, `Complaint <strong>G-26-0417</strong> logged for her repeat calls${o.answered ? ", and answered on the call" : ""}.`, `<span class="pill ${o.answered ? "good" : "warn"}">${o.answered ? "resolved" : "open · 30 days"}</span>`));
+  if (o.appeal) rows.push(item(elena, `Appeal <strong>${o.appeal}</strong>: supervisor filed a fast-track appeal with the Quality Improvement Organization. Decision within one full day of the reviewers having her information.`, `<span class="pill warn">decision pending</span>`));
+  if (o.callback) rows.push(item(rosa, `Callback booked <mark>${o.callback}</mark> to check her mother's appeal decision.`, `<span class="pill good">scheduled</span>`));
+  rows.push(item(rosa, `Note approved${o.recap ? "; recap texted to Rosa" : ""}.`, `<span class="pill good">closed</span>`));
+  $("lastcall").innerHTML = rows.join(""); }
+
+// ---------- Watch the full call: the same desk, with each suggested action pressed after a beat ----------
+const auto = {
+  beat: 1800,
+  // Which button the demo presses: the claim shows the biopsy at the hospital's outpatient department.
+  preferAlt: (k, say) => /hospital outpatient department has a \$120/.test(say),
+  start() { state.auto = true; $("goready").click(); setTimeout(() => { const a = $("answer"); if (a) a.click(); }, 900); },
+  verify() { let i = 0; const boxes = ["v1", "v2", "v3"]; const tickNext = () => { if (i < boxes.length) { const v = $(boxes[i++]); v.checked = true; v.dispatchEvent(new Event("change")); setTimeout(tickNext, 450); } else setTimeout(() => $("verified").click(), 700); }; setTimeout(tickNext, 600); },
+  finish() { setTimeout(() => { $("approve").click(); setTimeout(() => { $("sendrecap").click(); setTimeout(() => { show("home"); renderHome(); const w = $("lastcall-wrap"); if (w) w.scrollIntoView({ block: "start" }); toast("Call closed. Its outcomes are on Home."); state.auto = false; }, 1600); }, 1400); }, 2200); }
+};
 
 // ---------- My day ----------
 function renderDay() {

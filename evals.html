@@ -135,8 +135,9 @@ td.num.bad{color:var(--bad);font-weight:700}
       </div>
 
       <div class="tab" id="t-check" role="tabpanel">
-        <p>Before testing CureCue, we test the test data. If anything doesn't add up, the run stops.</p>
+        <p>Before testing CureCue, we test the test data and the sources. If anything doesn't add up, the run stops.</p>
         <div class="kv">
+          <div><b>The source documents</b><p>Each PDF kept in the repo matches its published checksum, and every quoted line in the plan rules is found on the page it cites. A wrong figure or page fails the build.</p></div>
           <div><b>The test lines</b><p>No duplicates. Every answer points to a plan rule that exists. Lines that shouldn't be answered don't point to a rule. Every label uses an allowed value.</p></div>
           <div><b>The made-up member records</b><p>Every claim belongs to a real member in the data. What the plan paid plus what the member owes equals the bill. Copays match the plan ($25 specialist, $115 ER, $0 if admitted, $375 a day in hospital). No open complaint is past its deadline.</p></div>
         </div>
@@ -160,7 +161,7 @@ td.num.bad{color:var(--bad);font-weight:700}
       </div>
 
       <div class="tab" id="t-ci" role="tabpanel">
-        <p>Every time the code changes, GitHub runs the data check and the full test automatically. If any check fails, the build fails, and there is no switch to skip it. Old releases are kept so we can re-test them on today's lines.</p>
+        <p>Every time the code changes, GitHub runs the source check, the data check and the full test automatically. If any check fails, the build fails, and there is no switch to skip it. Old releases are kept so we can re-test them on today's lines.</p>
         <div class="rel" id="rel" style="margin-top:14px"></div>
         <details class="qa" style="margin-top:14px"><summary>Raw test output</summary><div class="ci" id="ci" style="margin-top:10px"></div></details>
         <div class="limit"><b>Where this is weak</b><ul>
@@ -285,13 +286,13 @@ td.num.bad{color:var(--bad);font-weight:700}
  const KINDS=[["Plan question",x=>x.v==="answer"&&x.lang==="en"&&x.source==="hand"&&x.c==="S-ER"&&/admit/i.test(x.t)],["Plan question, in Spanish",x=>x.v==="answer"&&x.lang==="es"],["Through an interpreter",x=>x.lang==="interp"&&x.v==="answer"],["Account question",x=>x.v==="human"&&!x.g&&x.source==="hand"&&x.lang==="en"],["Unhappy, said indirectly",x=>x.g&&x.register==="implicit"&&x.source==="hand"],["Supervisor call",x=>x.v==="escalate"&&x.source==="hand"&&x.lang==="en"],["Written to trick it",x=>x.source==="adversarial"&&x.v==="escalate"],["New, written after Release 3",x=>x.source==="hard"&&x.v==="escalate"]];
  const RULE=Object.fromEntries(Object.values(R.GRAPH.nodes).filter(n=>n.id).map(n=>[n.id,n.label]));
  const exRows=KINDS.map(([kind,pred])=>[kind,G.find(pred)]).filter(([,x])=>x);
- const srcCell=x=>{const S=x.doc?R.SOURCES[x.doc]:null;return S?`<a href="${S.url}${x.page?"#page="+x.page:""}" target="_blank" rel="noopener">${S.title}${x.page?", p. "+x.page:""}</a>`:`<span class="small">${x.why||""}</span>`;};
+ const srcCell=x=>{const S=x.doc?R.SOURCES[x.doc]:null;return S?`<a href="${/\.pdf$/.test(S.file)?S.file+(x.page?"#page="+x.page:""):S.url}" target="_blank" rel="noopener">${S.title}${x.page?", p. "+x.page:""}</a>`:`<span class="small">${x.why||""}</span>`;};
  $("extbl").innerHTML=exRows.map(([kind,x])=>`<tr><td>"${x.t}"</td><td>${VERB[x.v][0].toUpperCase()+VERB[x.v].slice(1)}${x.c?` <span class="small">(${RULE[x.c]})</span>`:""}${x.g?" · member unhappy":""}</td><td>${srcCell(x.src||{})}</td><td class="small">${kind}</td></tr>`).join("");
  const one=exRows[0][1];$("exjson").textContent=JSON.stringify(Object.fromEntries(Object.entries(one).filter(([k])=>k!=="labels")),null,2);
  $("ex-n").textContent=G.length;$("ex-n2").textContent=G.length;
 
  // sources: the documents, and each plan rule with the line on its page
- const link=(S,page,txt)=>`<a href="${S.url}${page?"#page="+page:""}" target="_blank" rel="noopener">${txt}</a>`;
+ const link=(S,page,txt)=>`<a href="${/\.pdf$/.test(S.file)?S.file+(page?"#page="+page:""):S.url}" target="_blank" rel="noopener">${txt}</a>`;
  $("srcdocs").innerHTML=Object.entries(R.SOURCES).map(([k,S])=>{const used=Object.values(R.GRAPH.nodes).filter(n=>(n.src||[]).some(x=>x.doc===k)).map(n=>n.label);const lines=G.filter(r=>r.src&&r.src.doc===k).length;return `<tr><td><b>${S.title}</b><div class="small">${S.pages?S.pages+" pages, public PDF":"public regulation"}</div></td><td>${link(S,null,`<code>${S.code}</code>`)}</td><td>${used.join(" · ")}<div class="small">Sets the right response for ${lines} test lines.</div></td></tr>`;}).join("");
  $("srcrules").innerHTML=Object.values(R.GRAPH.nodes).filter(n=>n.id).map(n=>`<tr><td><b>${n.label}</b></td><td>${n.text}</td><td class="small">${n.src.map(x=>`"${x.quote}"`).join("<br>")}</td><td class="small">${n.src.map(x=>{const S=R.SOURCES[x.doc];return link(S,x.page,`${S.title}${x.page?", p. "+x.page:""}`);}).join("<br>")}</td></tr>`).join("");
 

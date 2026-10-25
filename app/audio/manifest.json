@@ -1,1 +1,39 @@
-{ "lines": [] }
+{
+ "voices": {
+  "Rosa": "Samantha",
+  "Advocate": "Daniel",
+  "Supervisor": "Moira"
+ },
+ "clips": {
+  "Advocate|Thanks for calling. Before I can look at anything, can I get your full name?": "advocate-6b70c4d91e.m4a",
+  "Rosa|Rosa Martinez.": "rosa-d91512d323.m4a",
+  "Advocate|And your date of birth?": "advocate-4e83a774af.m4a",
+  "Rosa|March 9th, 1955.": "rosa-11e7ae622c.m4a",
+  "Advocate|Last four of your member ID?": "advocate-c27675c85e.m4a",
+  "Rosa|4821.": "rosa-96d92548c2.m4a",
+  "Rosa|This is the third time I've called about this bill from the skin doctor.": "rosa-08ef9795ef.m4a",
+  "Advocate|I'm sorry, Rosa. I can see both earlier calls, so you won't have to repeat yourself. Let's sort it out.": "advocate-6329a7202f.m4a",
+  "Rosa|They billed me $120 for the skin doctor and I thought I only pay $25.": "rosa-a925245346.m4a",
+  "Advocate|Let me check where the biopsy on September 30th was done.": "advocate-dfe0521544.m4a",
+  "Rosa|While I have you, if I go to the ER and they admit me, what do I owe?": "rosa-a25c1dab2b.m4a",
+  "Rosa|And my mother is in rehab. They are sending her home on Wednesday and she is not ready.": "rosa-2c2427fb91.m4a",
+  "Advocate|I'm bringing a supervisor onto the call for that right now.": "advocate-b8788824cd.m4a",
+  "Supervisor|Hi Rosa, this is Dana, the supervisor. I'm sorry you're dealing with this. Is your mother a member with us too?": "supervisor-0853593e00.m4a",
+  "Rosa|Yes, Elena Martinez. I'm her authorized representative.": "rosa-9d28aa0a7a.m4a",
+  "Supervisor|I can see that on her record. Did the rehab facility give her a written notice called the Notice of Medicare Non-Coverage?": "supervisor-b71cd868d3.m4a",
+  "Rosa|They had her sign something this morning. Does that mean she agreed to leave?": "rosa-461320b945.m4a",
+  "Supervisor|No. Signing only shows she received it. Her coverage ends on Wednesday, so she can ask for a fast-track appeal. The deadline is noon tomorrow.": "supervisor-40c4fcd78c.m4a",
+  "Rosa|Who decides? You?": "rosa-e79bdfe4bd.m4a",
+  "Supervisor|No. The Quality Improvement Organization decides. They're independent doctors paid by the federal government, not part of the plan, and they decide within one full day of having her information.": "supervisor-d16b18bd8e.m4a",
+  "Rosa|Can we do it right now?": "rosa-8992049879.m4a",
+  "Supervisor|Yes. I'm conferencing them in, and I'll stay on until they confirm the appeal is filed.": "supervisor-517c22ac10.m4a",
+  "Supervisor|They've confirmed it. Your mother's appeal is filed, and the plan will send the detailed reasons for ending her coverage today.": "supervisor-8669e93a5b.m4a",
+  "Advocate|On your bill: the biopsy was done in the hospital's outpatient department, so the $120 copay is correct under your plan.": "advocate-45071b7379.m4a",
+  "Advocate|On your bill: the biopsy was done in the doctor's office, so it should have been $25. I've sent the claim back to be reprocessed.": "advocate-9c3b58c2b3.m4a",
+  "Advocate|On your bill: I still need to confirm where the biopsy was done, so I'll call you back with the answer.": "advocate-a5ae6c516e.m4a",
+  "Advocate|I've logged your repeat calls as a complaint, and noted that we answered it on today's call.": "advocate-5d182074b7.m4a",
+  "Advocate|I've noted your repeat calls on your record.": "advocate-ba5bb94524.m4a",
+  "Advocate|I'm scheduling a callback for Wednesday morning to check the decision on your mother's appeal, and texting you a recap.": "advocate-5fc7283d3e.m4a",
+  "Rosa|Thank you both. That finally makes sense.": "rosa-478a9e5ef3.m4a"
+ }
+}

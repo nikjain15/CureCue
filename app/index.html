@@ -87,6 +87,9 @@ section.scr{display:none}section.scr.on{display:block}
 .transcript{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow:auto;padding-right:2px}
 .line{padding:10px 12px;border-radius:12px;background:var(--bg-2);max-width:92%;font-size:16px}
 .line.adv{background:var(--panel);border:1px solid var(--line);align-self:flex-end}
+.evhelp{margin:10px 0 14px;padding:10px 14px;border-radius:12px;background:var(--panel-2);font-size:15px}
+.line.sup{background:var(--warn-bg);border:1px solid transparent}
+.cue button.pressed{outline:3px solid var(--mint);outline-offset:2px}
 .line .w{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;font-weight:700}
 .line mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:2px}
 .typing{color:var(--muted);font-size:14px;font-style:italic}
@@ -235,6 +238,7 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
     <div class="home">
       <div class="brief">
         <div class="bhead"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg></div><h2 id="greet">Good afternoon, Nik. Here is what I found.</h2><span class="small" id="briefmeta"></span></div>
+        <div class="group" id="lastcall-wrap" hidden><h3>From your last call</h3><div id="lastcall" class="brief"></div></div>
         <div class="group"><h3>Callbacks you promised, due today</h3><div id="cb" class="brief"></div></div>
         <div class="group"><h3>Cases close to their clock</h3><div id="clock" class="brief"></div></div>
         <div class="group"><h3>Likely to call back today</h3><div id="likely" class="brief"></div></div>
@@ -245,7 +249,7 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
         <div class="kpis" id="kpis"></div>
         <div class="card"><h3>Queue</h3>
           <p class="small" id="readynote">Press ready to take calls. Cue listens alongside you and speaks only when it has something useful.</p>
-          <button class="btn primary" id="goready">I'm ready for calls</button>
+          <button class="btn primary" id="goready">I'm ready for calls</button> <button class="btn" id="autoplay">Watch the full call</button><p class="small" style="margin:8px 0 0">Watch the full call plays Rosa's call end to end, pressing each suggested action for you, and ends back here with the cases it created.</p>
           <div class="queue" id="queue" hidden style="margin-top:12px"></div>
           <p class="small" id="voicenote" style="margin-top:10px"></p>
         </div>
@@ -343,7 +347,8 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
   <!-- EVALS CONSOLE -->
   <div class="view" id="view-quality">
     <div class="evhead"><div><h2 style="margin:0">Test console</h2><p class="small" style="margin:4px 0 0">Every version of CureCue, tested on made-up lines a member might say, each with the right response written down in advance. Computed in this page from the same files the automatic test runs on every code change. <a href="../evals.html">How the testing works</a></p></div>
-      <div class="tabs" id="evtabs" role="tablist"><button role="tab" aria-selected="true" data-ev="runs">Releases</button><button role="tab" aria-selected="false" data-ev="detail">Release detail</button><button role="tab" aria-selected="false" data-ev="compare">Compare</button><button role="tab" aria-selected="false" data-ev="failures">Mistakes</button><button role="tab" aria-selected="false" data-ev="dataset">Test lines</button><button role="tab" aria-selected="false" data-ev="judge">Auto-grader</button></div></div>
+      <div class="tabs" id="evtabs" role="tablist"><button role="tab" aria-selected="true" data-ev="runs">Releases</button><button role="tab" aria-selected="false" data-ev="detail">Release detail</button><button role="tab" aria-selected="false" data-ev="compare">Compare</button><button role="tab" aria-selected="false" data-ev="failures">Mistakes</button><button role="tab" aria-selected="false" data-ev="dataset">Test lines</button><button role="tab" aria-selected="false" data-ev="judge">Auto-grader</button><button role="tab" aria-selected="false" data-ev="files">Files</button></div></div>
+    <p class="evhelp" id="ev-help"></p>
 
     <section class="evp on" id="ev-runs"><div class="card">
       <div class="tscroll"><table class="slices"><thead><tr><th>Release</th><th>Commit</th><th>Supervisor calls flagged</th><th>Right plan rule</th><th>Right place</th><th>Lines wrong</th><th>Result</th><th></th></tr></thead><tbody id="ev-runs-body"></tbody></table></div>
@@ -381,6 +386,17 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
       <h3>Can the automatic grader be trusted?</h3>
       <div class="tscroll"><table class="slices"><thead><tr><th>What it marks</th><th>Agrees with people</th><th>Lines compared</th><th>Trusted?</th></tr></thead><tbody id="ev-judge-body"></tbody></table></div>
       <p class="small" id="ev-judge-note" style="margin-top:10px"></p></div></section>
+    <section class="evp" id="ev-files"><div class="card">
+      <h3>Source documents</h3><p class="small" style="margin:0 0 10px">The public documents the plan rules and right answers come from. A copy of each is kept in the repository; the checksum shows it is the same file as the original.</p>
+      <div id="ev-files-src"></div>
+      <h3 style="margin-top:18px">Every file the demo runs on</h3><p class="small" style="margin:0 0 10px">Open any file on GitHub. Nothing here calls a model or a live service.</p>
+      <div id="ev-files-code"></div>
+      <h3 style="margin-top:18px">Check it yourself</h3>
+      <pre class="small" style="background:var(--bg-2);padding:12px 14px;border-radius:12px;overflow:auto;margin:0">git clone https://github.com/nikjain15/CureCue && cd CureCue
+shasum -a 256 sources/*.pdf          # matches the checksums above
+node eval/check-sources.mjs          # every quoted line is on its cited page
+node eval/check-data.mjs             # the made-up records add up
+node eval/run.mjs                    # scores the current release on all test lines</pre></div></section>
   </div>
 
   <!-- LOOP -->
@@ -410,6 +426,7 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
 <script src="../eval/judge.js"></script>
 <script src="data.js"></script>
 <script src="voice.js"></script>
+<script src="script.js"></script>
 <script src="app.js"></script>
 <script src="evals.js"></script>
 </body>

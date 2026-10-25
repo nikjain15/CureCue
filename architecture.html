@@ -67,6 +67,12 @@
 .loop div::before{counter-increment:s;content:counter(s);display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-weight:800;font-size:12px;margin-bottom:6px;font-family:var(--display)}
 .loop div.human{background:var(--fg);color:#fff}.loop div.human::before{background:var(--brand);color:#1d2a0c}
 .loop b{display:block;font-family:var(--display);font-size:15px}
+.pipe{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;counter-reset:p}
+@media (max-width:860px){.pipe{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pipe li{counter-increment:p;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 12px 12px;font-size:14px;color:var(--muted)}
+.pipe li b{display:block;color:var(--fg);font-family:var(--display);font-size:16px;margin-bottom:2px}
+.pipe li b::before{content:counter(p) " · ";color:var(--green)}
+ul.tight{margin:6px 0 0;padding-left:18px;font-size:15px}ul.tight li{margin:6px 0}
 </style>
 </head>
 <body>
@@ -128,6 +134,37 @@
   </div>
 </section>
 
+<section class="sec" id="documents">
+  <div class="head"><p class="eyebrow">From document to rule</p><h2>How a page in a plan document becomes a rule Cue can cite.</h2><p>Today's pipeline is small and checked by hand and by CI. The production design keeps the same contract: no rule exists without the exact line and page it came from.</p></div>
+  <ol class="pipe">
+    <li><b>Collect</b><span>Public plan PDFs, stored with a checksum and plan year.</span></li>
+    <li><b>Extract</b><span>Text per page, two reading orders: table rows and wrapped sentences.</span></li>
+    <li><b>Propose</b><span>Each rule: what it says, its figures, its exceptions, the quote and the page.</span></li>
+    <li><b>Verify</b><span>The quote must be on that page, or the rule is rejected.</span></li>
+    <li><b>Review</b><span>A person approves each rule and each change from last year.</span></li>
+    <li><b>Serve</b><span>Rules as a graph; the path walked is the citation shown.</span></li>
+  </ol>
+  <div class="two" style="margin-top:18px">
+    <div class="card flat"><p class="eyebrow">Built today</p><ul class="tight">
+      <li><b>Collect:</b> the plan's 2026 Summary of Benefits and Evidence of Coverage, kept in <code>sources/</code> with SHA-256 checksums (<a href="evals.html#sources">sources</a>).</li>
+      <li><b>Extract:</b> <code>pdftotext</code>, page by page, in layout and reading order, so a cost-sharing table and a wrapped sentence are both findable.</li>
+      <li><b>Propose:</b> by hand. 11 rules, each with its plain text, figures and the exact line it was read from (15 quotes).</li>
+      <li><b>Verify:</b> <code>eval/check-sources.mjs</code> runs on every code change: each PDF matches its checksum and each quote is found on its cited page. A planted wrong figure fails the build.</li>
+      <li><b>Serve:</b> phrase patterns find the entry rule; the walk follows typed edges (unless, then, counts to); every figure in a draft must sit on a rule on that path.</li>
+    </ul></div>
+    <div class="card flat"><p class="eyebrow">Designed for production</p><ul class="tight">
+      <li><b>Collect</b> every document per plan and plan year (Evidence of Coverage, Summary of Benefits, Annual Notice of Change, formulary, directory) into a versioned store; a new checksum triggers re-extraction.</li>
+      <li><b>Extract</b> with a layout-aware parser that turns cost-sharing tables into rows (service, setting, cost-share), with OCR as a fallback, keeping page anchors.</li>
+      <li><b>Propose</b> with a model that must return each rule with its quote and page. Candidates whose quote is not on the page are dropped automatically, by the same check as today.</li>
+      <li><b>Review</b> by a benefits analyst, starting from the year-over-year diff the Annual Notice of Change describes; test lines tied to a changed rule re-run before release.</li>
+      <li><b>Reconcile</b> against the plan's benefit configuration in the claims system, the source of truth for what is actually paid; mismatches go to a person.</li>
+      <li><b>Serve</b> from a graph per plan year; a vector index over sections finds the entry rule, the graph does the rest.</li>
+    </ul></div>
+  </div>
+  <details class="qa" style="margin-top:14px"><summary>Why not just retrieve chunks of the PDF?</summary><p>Benefit rules point at each other. The ER copay paragraph does not say what happens after admission; that is in another row, and the yearly maximum is on another page. A chunk answers "$115" and stops. The graph walks ER, then "$0 if admitted", then the daily hospital copay, then the yearly maximum, and shows each page.</p></details>
+  <details class="qa"><summary>What is the honest limit?</summary><p>Today the rules are entered by hand from one plan, and only 11 of them. The checks are real and run on every change, but model extraction, the year-over-year diff and reconciliation with the claims system are designed, not built.</p></details>
+</section>
+
 <section class="sec" id="safety">
   <div class="head"><p class="eyebrow">Safety</p><h2>Three independent controls stand between Cue and a coverage decision.</h2><p>No single layer holds, so none is trusted alone.</p></div>
   <div class="kv">
@@ -182,7 +219,7 @@ const STEPS=[
  {tab:"Hear",who:"Rosa",text:"This is the <mark>third time I've called</mark> about this bill from the skin doctor.",raw:"This is the third time I've called about this bill from the skin doctor.",on:["Guardian","Sentinel"],quiet:["Guardian"],reads:"The last two contacts (Oct 3, Oct 14) and the grievance rule.",out:d=>`<div class="cue flag"><span class="k">Heads up</span>"${esc(R.grievance(d.text).exec(d.text)[0])}" counts as a grievance, even without the word. Log it?</div><p class="small" style="margin-top:8px">Verdict: ${d.verdict}. Grievance flag: ${d.grievance}. Either answer is recorded in the note.</p>`,layers:["Harness","Context","Safety"]},
  {tab:"Bill",who:"Rosa",text:"They billed me <mark>$120</mark> for the skin doctor and I thought I only pay <mark>$25</mark>.",raw:"They billed me $120 for the skin doctor and I thought I only pay $25.",on:["Guardian","Citer"],quiet:["Guardian"],reads:"The rules on the retrieval path for this plan year, and the claim in question.",out:d=>`<div class="cue"><span class="k">Suggested answer</span>${d.draft.say}</div><p class="small" style="margin-top:8px">Path: <span class="path">${pathOf(d)}</span>. Figures checked against the path: ${R.figureCheck(d.draft.say,d.path).map(f=>f.figure+(f.onPath?" ✓":" ✗")).join(", ")||"none"}.</p>`,layers:["Harness","Context","Knowledge","Models"]},
  {tab:"What if",who:"Rosa",text:"If I go to the ER and they <mark>admit me</mark>, what do I owe?",raw:"While I have you, if I go to the ER and they admit me, what do I owe?",on:["Guardian","Citer"],quiet:["Guardian"],reads:"The ER rule, its admission exception, the inpatient copay, the yearly maximum.",out:d=>`<div class="cue"><span class="k">Suggested answer</span>${d.draft.say}</div><p class="small" style="margin-top:8px">Path: <span class="path">${pathOf(d)}</span>. A chunk retrieval would have stopped at the first node.</p>`,layers:["Harness","Knowledge","Models"]},
- {tab:"Stop",who:"Rosa",text:"My mother is in rehab. They are <mark>sending her home</mark> tomorrow and she is not ready.",raw:"And my mother is in rehab. They are sending her home tomorrow and she is not ready.",on:["Guardian"],reads:"Nothing from the plan. The stop runs before routing and before any retrieval.",out:d=>`<div class="cue stop"><span class="k">Stop</span><b>Bring a supervisor in now.</b> "${esc(d.trigger)}" signals a dispute about care or coverage. Nothing is drafted.</div><p class="small" style="margin-top:8px">Verdict: ${d.verdict}. Every other cue pauses for this topic. The handoff note says what was heard and what was not quoted.</p>`,layers:["Safety","Harness"]},
+ {tab:"Stop",who:"Rosa",text:"My mother is in rehab. They are <mark>sending her home</mark> on Wednesday and she is not ready.",raw:"And my mother is in rehab. They are sending her home on Wednesday and she is not ready.",on:["Guardian"],reads:"Nothing from the plan. The stop runs before routing and before any retrieval.",out:d=>`<div class="cue stop"><span class="k">Stop</span><b>Bring a supervisor in now.</b> "${esc(d.trigger)}" signals a dispute about care or coverage. Nothing is drafted.</div><p class="small" style="margin-top:8px">Verdict: ${d.verdict}. Every other cue pauses for this topic. The handoff note says what was heard and what was not quoted. When the supervisor joins, Cue shows only process facts from the plan's Evidence of Coverage (pp. 146 to 148): the notice, the fast-track appeal and its noon deadline. The supervisor files the appeal; Cue pre-fills the case.</p>`,layers:["Safety","Harness"]},
  {tab:"Wrap up",who:"End of call",text:"The advocate closes the call.",on:["Scribe","Reporter"],reads:"Only the turns and actions that happened on this call.",out:()=>`<p>A note built from those turns, a required-elements checklist, a recap the advocate sends. One eval row per turn, so the scorecard moves with the next release.</p>`,layers:["Harness","Evals","Governance and data","Observability"]}];
 let i=0;const $=id=>document.getElementById(id);
 const strip=$("strip");STEPS.forEach((s,k)=>{const b=document.createElement("button");b.textContent=(k+1)+" · "+s.tab;b.onclick=()=>go(k);strip.appendChild(b);});
