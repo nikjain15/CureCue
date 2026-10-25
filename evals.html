@@ -10,7 +10,10 @@
 <link rel="stylesheet" href="assets/site.css">
 <style>
 /* Evals: the finding first (chart), then the method as eight clickable steps, each with its evidence and its limit, then computed versus designed. Every result computed in the page. */
-.hero{padding:36px 0 8px;max-width:72ch}
+.hero{padding:36px 0 0;max-width:72ch}
+#method{padding-top:20px}
+#method .head{margin-bottom:16px}
+#method .head p{font-size:16px}
 .chart{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:28px;align-items:center}
 @media (max-width:860px){.chart{grid-template-columns:1fr}}
 .chart svg{width:100%;height:auto;display:block}
@@ -77,21 +80,12 @@ td.num.bad{color:var(--bad);font-weight:700}
 
 <section class="hero">
   <p class="eyebrow">Evaluation</p>
-  <h1>Gates that fail the build, numbers by slice, misses by name.</h1>
-  <p class="lead">Every result on this page is computed in your browser from <code>rules.js</code>, <code>eval/golden.js</code> and <code>eval/judge.js</code>, the same files CI scores on every push. The engine is rule-based and calls no model. The <span id="h-rows"></span> turns are synthetic and were written and labelled by one author. What that does and does not prove is stated step by step below.</p>
-  <p><a class="btn primary" href="app/#evals">Open the evaluation console</a></p>
-</section>
-
-<section class="sec" id="finding">
-  <div class="head"><p class="eyebrow">The finding</p><h2>Release 2 passed a 24-turn English-only test set. Re-scored with Spanish and interpreter calls, it failed.</h2><p id="finding-p"></p></div>
-  <div class="chart">
-    <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Escalation recall by language path, Release 2 and Release 3"></svg></div>
-    <div class="tscroll card flat"><table id="slicetbl"><thead><tr><th>Release</th><th class="num">English</th><th class="num">Spanish</th><th class="num">Interpreter</th><th class="num">Gap</th><th></th></tr></thead><tbody></tbody></table><p class="small" id="slicenote" style="margin:8px 0 0"></p></div>
-  </div>
+  <h1>How CureCue is evaluated, in eight steps.</h1>
+  <p class="lead">Every result here is computed in your browser from the files CI scores on every push. The engine is rule-based and calls no model; the <span id="h-rows"></span> turns are synthetic, written and labelled by one author. Each step says what it does not prove.</p>
 </section>
 
 <section class="sec" id="method">
-  <div class="head"><p class="eyebrow">How the evals are built</p><h2>Eight steps, from principle to live traffic.</h2><p>Pick a step to see what it does, the numbers it produces today, and what it does not prove. Steps 1 to 7 run in the prototype; step 8 is designed.</p></div>
+  <div class="head"><p>Pick a step to see what it does, the numbers it produces today, and what it does not prove. Steps 1 to 7 run in the prototype; step 8 is designed. <a href="app/#evals">Open the evaluation console</a> to browse every turn.</p></div>
   <div class="steps" role="tablist" aria-label="Evaluation steps" id="steps"></div>
   <div class="panel">
     <div class="ph-head"><h3 id="ph-title"></h3><span id="ph-pill"></span></div>
@@ -192,6 +186,14 @@ td.num.bad{color:var(--bad);font-weight:700}
 
     </div>
     <div class="ph-foot"><button class="btn sm" id="ph-prev">Previous step</button><span class="small" id="ph-count"></span><button class="btn sm primary" id="ph-next">Next step</button></div>
+  </div>
+</section>
+
+<section class="sec" id="finding">
+  <div class="head"><p class="eyebrow">The finding</p><h2>Release 2 passed a 24-turn English-only test set. Re-scored with Spanish and interpreter calls, it failed.</h2><p id="finding-p"></p></div>
+  <div class="chart">
+    <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Escalation recall by language path, Release 2 and Release 3"></svg></div>
+    <div class="tscroll card flat"><table id="slicetbl"><thead><tr><th>Release</th><th class="num">English</th><th class="num">Spanish</th><th class="num">Interpreter</th><th class="num">Gap</th><th></th></tr></thead><tbody></tbody></table><p class="small" id="slicenote" style="margin:8px 0 0"></p></div>
   </div>
 </section>
 
