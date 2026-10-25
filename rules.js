@@ -7,30 +7,40 @@
   // The release the desk runs. The eval runner reads it too; CI fails the build when this release misses a gate.
   const CURRENT_RELEASE = 3;
 
-  // ---------- Plan rules as a graph (one synthetic plan) ----------
+  // ---------- Where the plan rules come from: public documents for one real 2026 Medicare Advantage HMO-POS plan ----------
+  // Every node below cites the document and PDF page it was read from. Members, calls and records in this prototype are fictional.
+  const SOURCES = {
+    SB: { title: "2026 Summary of Benefits", code: "H6622026000SB26", pages: 25, url: "https://assets.humana.com/is/content/humana/H6622026000SB26pdf" },
+    EOC: { title: "2026 Evidence of Coverage", code: "H6622026000EOC26", pages: 185, url: "https://assets.humana.com/is/content/humana/H6622026000EOC26pdf" },
+    CFR: { title: "42 CFR § 422.561, Medicare Advantage definitions", code: "42 CFR 422.561", url: "https://www.law.cornell.edu/cfr/text/42/422.561" }
+  };
+
+  // ---------- Plan rules as a graph ----------
   const GRAPH = {
-    plan: "Sierra Advantage HMO 2026",
+    plan: "2026 Medicare Advantage HMO-POS",
     nodes: {
-      PLAN: { x: 210, y: 30, label: "Sierra Advantage HMO 2026", kind: "plan" },
-      PCP: { x: 70, y: 100, label: "Primary care $0", id: "S-PCP", text: "Primary care visits: $0 copay." },
-      REF: { x: 210, y: 100, label: "Referral rule", id: "S-REF", text: "Specialist visits need a referral from your primary care doctor. Without one the visit is not covered and you may be billed in full." },
-      SPEC: { x: 350, y: 100, label: "Specialist $35", id: "S-SPEC", text: "Specialist visits: $35 copay, with a referral on file." },
-      ER: { x: 70, y: 180, label: "ER $110", id: "S-ER", text: "Emergency room: $110 copay per visit." },
-      WAIVE: { x: 210, y: 180, label: "Waived if admitted", id: "S-ER-W", text: "The ER copay is waived if you are admitted within 24 hours." },
-      INPT: { x: 350, y: 180, label: "Hospital $325/day", id: "S-INPT", text: "Inpatient hospital: $325 per day for days 1 to 5, then $0." },
-      MOOP: { x: 70, y: 260, label: "Yearly max $4,900", id: "S-MOOP", text: "The most you pay in a year for covered in-network care: $4,900." },
-      GRV: { x: 210, y: 260, label: "Grievance", id: "P-GRV", text: "Any expression of dissatisfaction is a grievance, even without the word. It is logged when expressed and resolved within 30 days." },
-      APPL: { x: 350, y: 260, label: "Appeal / dispute", id: "P-APPL", text: "Disagreeing with a coverage or care decision, including a discharge, is handled by people. Nothing is drafted." }
+      PLAN: { x: 210, y: 28, label: "2026 HMO-POS plan", kind: "plan" },
+      PCP: { x: 70, y: 92, label: "Primary care $0", id: "S-PCP", text: "Primary care (PCP's office) visits: $0 copay.", src: [{ doc: "SB", page: 4, quote: "PCP's office: $0 copay" }] },
+      REF: { x: 210, y: 92, label: "No referral needed", id: "S-REF", text: "You do not need a referral for covered in-network services. Some services need prior authorization.", src: [{ doc: "EOC", page: 35, quote: "You do not need a referral for covered in-network services." }] },
+      SPEC: { x: 350, y: 92, label: "Specialist $25", id: "S-SPEC", text: "Specialist office visits: $25 copay.", src: [{ doc: "SB", page: 4, quote: "Specialist's office: $25 copay" }] },
+      DIAG: { x: 350, y: 148, label: "Hospital procedure $120", id: "S-DIAG", text: "Diagnostic procedures and tests: $25 copay at a specialist's office, $120 copay at an outpatient hospital.", src: [{ doc: "SB", page: 6, quote: "Diagnostic procedures and tests … Outpatient hospital: $120 copay" }] },
+      ER: { x: 70, y: 205, label: "ER $115", id: "S-ER", text: "Emergency room: $115 copay per visit.", src: [{ doc: "SB", page: 5, quote: "Emergency services at emergency room $115 copay" }] },
+      WAIVE: { x: 210, y: 205, label: "$0 if admitted", id: "S-ER-W", text: "If you are admitted to the same hospital within 24 hours for the same condition, you pay $0 for the emergency care.", src: [{ doc: "SB", page: 5, quote: "If you are admitted to the same hospital within 24 hours for the same condition, you pay $0" }] },
+      INPT: { x: 350, y: 205, label: "Hospital $375/day", id: "S-INPT", text: "Inpatient hospital: $375 copay per day for days 1 to 7, then $0 per day for days 8 to 90.", src: [{ doc: "SB", page: 4, quote: "$375 copay per day for days 1-7" }] },
+      MOOP: { x: 70, y: 262, label: "Yearly max $9,250", id: "S-MOOP", text: "The most you pay in a year for covered in-network medical services: $9,250.", src: [{ doc: "SB", page: 4, quote: "Medical Maximum out-of-pocket $9,250 in-network" }, { doc: "EOC", page: 43, quote: "Your in-network maximum out-of-pocket amount is $9,250." }] },
+      GRV: { x: 210, y: 262, label: "Complaint (grievance)", id: "P-GRV", text: "Any complaint expressing dissatisfaction is a grievance, even without the word: quality of care, waiting times, customer service. Most are answered within 30 calendar days.", src: [{ doc: "CFR", quote: "any complaint or dispute … expressing dissatisfaction … regardless of whether remedial action is requested" }, { doc: "EOC", page: 153, quote: "A complaint is also called a grievance." }, { doc: "EOC", page: 154, quote: "Most complaints are answered within 30 calendar days." }] },
+      APPL: { x: 350, y: 262, label: "Appeal / dispute", id: "P-APPL", text: "An appeal asks the plan to review and change a coverage decision. A discharge that feels too soon, or care coverage ending too soon, has its own fast appeal. Handled by people. Nothing is drafted.", src: [{ doc: "EOC", page: 22, quote: "An appeal is a formal way of asking us to review and change a coverage decision." }, { doc: "EOC", page: 143, quote: "How to ask us to cover a longer inpatient hospital stay if you think you're being discharged too soon" }, { doc: "EOC", page: 146, quote: "if you think your coverage is ending too soon" }] }
     },
     edges: [["PLAN", "PCP"], ["PLAN", "SPEC"], ["PLAN", "ER"], ["PLAN", "MOOP"], ["PLAN", "GRV"],
-      ["SPEC", "REF", "needs"], ["REF", "PCP", "from"], ["ER", "WAIVE", "unless"], ["WAIVE", "INPT", "then"], ["INPT", "MOOP", "counts to"], ["GRV", "APPL", "not an"]]
+      ["SPEC", "REF"], ["SPEC", "DIAG", "procedure at a hospital"], ["ER", "WAIVE", "unless"], ["WAIVE", "INPT", "then"], ["INPT", "MOOP", "counts to"], ["GRV", "APPL", "not an"]]
   };
 
   // ---------- Retrieval: entry pattern to a fixed path over the graph ----------
   // Order matters: the multi-hop ER+admission path is tried before the single ER rule.
   const HOPS = [
     { re: /admit|admitted|overnight|keep me after|admiten/i, and: /\ber\b|emergency|emergencias/i, path: ["ER", "WAIVE", "INPT", "MOOP"] },
-    { re: /dermatolog|specialist|referral|\$120|especialista|referido/i, path: ["SPEC", "REF", "PCP"] },
+    { re: /referral|referido/i, not: /\$\d|charged|billed|cobraron|d[oó]lares/i, path: ["REF"] },
+    { re: /dermatolog|specialist|\$120|especialista|biopsy/i, path: ["SPEC", "DIAG", "REF"] },
     { re: /\ber\b|emergency|emergencias/i, path: ["ER", "WAIVE"] },
     { re: /out.of.pocket|maximum|most (is )?(i|she|he) can pay|yearly max|stop paying for the year|máximo/i, path: ["MOOP"] },
     { re: /regular doctor|primary|primario/i, not: /switch|change my|cambiar/i, path: ["PCP"] }
@@ -58,14 +68,14 @@
   function draft(path) {
     const head = path[0];
     if (head === "SPEC") return {
-      say: "<b>$35 with a referral on file.</b> Without one, the visit isn't covered, which is how a bill for the full visit happens. <b>Check the referral for the visit date before you quote either way.</b>",
-      why: "Path: Specialist $35 needs Referral rule, issued by Primary care. The one figure here, $35, is in rule S-SPEC. Her bill amount is on the EOB in the member record, not in a plan rule, so it is shown there and not quoted here.",
-      main: { label: "Referral was on file", done: "Referral confirmed · bill to be reprocessed", set: { referral: true } },
-      alt: { label: "No referral on file", done: "No referral · explain the rule", set: { referral: false } }
+      say: "<b>$25 for the specialist visit, and no referral is needed.</b> A procedure done at a hospital outpatient department has a $120 copay instead, which would explain the bill. <b>Check where the procedure was done before you quote.</b>",
+      why: "Path: Specialist $25, then Hospital procedure $120, then No referral needed. $25 is in S-SPEC and S-DIAG; $120 is in S-DIAG. Her bill amount is on the claim in the member record, not in a plan rule, so it is shown there and not quoted here.",
+      main: { label: "Done in the doctor's office", done: "Office procedure · $25 applies · bill to be reprocessed", set: { site: "office" } },
+      alt: { label: "Done at a hospital outpatient department", done: "Hospital outpatient · $120 copay explained", set: { site: "hospital" } }
     };
     if (path.includes("INPT")) return {
-      say: "<b>If she's admitted within 24 hours, the $110 ER copay is waived.</b> The hospital copay applies instead: $325 a day for days 1 to 5, then $0. All of it counts toward her $4,900 yearly max.",
-      why: "Four rules in a chain: ER copay, unless admitted, then hospital copay, which counts to the yearly max. A single-rule lookup would have quoted $110 and been wrong.",
+      say: "<b>If she's admitted to the same hospital within 24 hours, she pays $0 for the ER visit instead of the $115 copay.</b> The hospital copay applies instead: $375 a day for days 1 to 7, then $0. All of it counts toward her $9,250 yearly max.",
+      why: "Four rules in a chain: ER copay, unless admitted, then hospital copay, which counts to the yearly max. A single-rule lookup would have quoted $115 and been wrong.",
       main: { label: "Read the rules", done: "Rules read", show: "WAIVE" }
     };
     return { say: GRAPH.nodes[head].text, why: "Single rule." };
@@ -105,7 +115,7 @@
       if (x.c && r.clause && r.clause !== x.c) fail.push("wrong clause");
       if (x.g && !r.grievance) fail.push("missed dissatisfaction");
       if (fig.some(f => !f.onPath)) fail.push("figure off path");
-      return { id: x.id, t: x.t, expected: { v: x.v, c: x.c, g: !!x.g }, actual: { v: r.verdict, c: r.clause, g: !!r.grievance, trigger: r.trigger || null, path: r.path || [] }, figures: fig, strata: { register: x.register, lang: x.lang, plan: x.plan, reason: x.reason, source: x.source }, ok: verdictOk && clauseOk && grievOk && !fig.some(f => !f.onPath), fail };
+      return { id: x.id, t: x.t, expected: { v: x.v, c: x.c, g: !!x.g }, actual: { v: r.verdict, c: r.clause, g: !!r.grievance, trigger: r.trigger || null, path: r.path || [] }, figures: fig, strata: { register: x.register, lang: x.lang, reason: x.reason, source: x.source }, ok: verdictOk && clauseOk && grievOk && !fig.some(f => !f.onPath), fail };
     });
   }
   // Metrics over a set of evaluated rows (any slice).
@@ -147,7 +157,7 @@
       { principle: "Fair and inclusive", name: "Escalation recall gap across language paths", metric: "recall_gap_lang", value: gapLang, must: "under 0.05", pass: gapLang < 0.05 },
       { principle: "Responsible in application", name: "Verdicts outside answer / human / escalate", metric: "verdicts_outside_enum", value: m.verdicts_outside_enum, must: "none", pass: m.verdicts_outside_enum === 0 }
     ];
-    return { release: release || CURRENT_RELEASE, metrics: m, gates, missed, badFigures, failed: gates.filter(g => !g.pass).length, rows: evald, slices: { lang: byLang, register: byReg, plan: sliceBy(evald, "plan"), reason: sliceBy(evald, "reason"), source: sliceBy(evald, "source") } };
+    return { release: release || CURRENT_RELEASE, metrics: m, gates, missed, badFigures, failed: gates.filter(g => !g.pass).length, rows: evald, slices: { lang: byLang, register: byReg, reason: sliceBy(evald, "reason"), source: sliceBy(evald, "source") } };
   }
   function scoreLegacy(golden, release) {
     let tp = 0, fp = 0, fn = 0, cOk = 0, cN = 0, gTp = 0, gN = 0, su = 0, halluc = 0, drafted = 0, vOk = 0;
@@ -185,5 +195,5 @@
     return null;
   }
 
-  return { CURRENT_RELEASE, RELEASES: Object.keys(ESC).map(Number), GRAPH, HOPS, retrieve, escalation, grievance, ACCOUNT, draft, figures, figureCheck, decide, evaluate, metricsOf, sliceBy, score };
+  return { CURRENT_RELEASE, RELEASES: Object.keys(ESC).map(Number), SOURCES, GRAPH, HOPS, retrieve, escalation, grievance, ACCOUNT, draft, figures, figureCheck, decide, evaluate, metricsOf, sliceBy, score };
 });

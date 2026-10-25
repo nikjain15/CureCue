@@ -368,10 +368,14 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
       <div class="tscroll"><table class="slices fails"><thead><tr><th>Group</th><th>What the member said</th><th>Right response</th><th>What CureCue did</th><th>Mistake and why</th><th>Status</th></tr></thead><tbody id="ev-fail-body"></tbody></table></div></div></section>
 
     <section class="evp" id="ev-dataset"><div class="card">
-      <h3>Test lines</h3><p class="small" id="ev-ds-meta"></p>
+      <h3>Where the right answers come from</h3><p class="small" style="margin:0 0 10px">Every plan rule and every right response points to a public document and page. Open any link to check it.</p>
+      <div id="ev-ds-sources"></div>
+      <h3 style="margin-top:18px">Every test line</h3><p class="small" id="ev-ds-meta"></p>
+      <div class="ctrl" style="margin:6px 0 10px"><label class="small" for="ev-ds-filter">Show</label><select id="ev-ds-filter" style="max-width:240px"><option value="all">All lines</option><option value="answer">Answer from a plan rule</option><option value="human">Leave to the advocate</option><option value="escalate">Hand to a supervisor</option><option value="g">Member sounds unhappy</option></select><input id="ev-ds-q" type="search" placeholder="Search the lines" style="max-width:240px"></div>
+      <div id="ev-ds-browse"></div>
+      <h3 style="margin-top:18px">What the lines cover</h3>
       <div class="strata" id="ev-ds-strata"></div>
-      <h3 style="margin-top:16px">When two people disagree on the right response</h3><div id="ev-ds-adj"></div>
-      <details style="margin-top:14px"><summary class="small" style="cursor:pointer;font-weight:700">Browse every test line</summary><div id="ev-ds-browse"></div></details></div></section>
+      <h3 style="margin-top:16px">When two people disagree on the right response</h3><div id="ev-ds-adj"></div></div></section>
 
     <section class="evp" id="ev-judge"><div class="card">
       <h3>Can the automatic grader be trusted?</h3>
@@ -395,7 +399,7 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
       <p class="small" style="margin-top:12px">All eight steps are planned. What works today is step 3 in miniature: on every code change, the current release is tested on the made-up test lines, and a failed check fails the build.</p></div>
   </div>
 
-  <p class="foot">Demonstration only. Every member, plan, provider, figure and call is synthetic. No real health plan, organisation, person or document is represented.</p>
+  <p class="foot">Demonstration only. Plan rules and figures come from the public 2026 documents of a real Medicare Advantage HMO-POS plan (<a href="../evals.html#sources">sources</a>). Members, providers, calls and records are fictional. Not affiliated with or endorsed by any health plan.</p>
   </div>
 </div>
 </div>

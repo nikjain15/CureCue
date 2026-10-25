@@ -27,7 +27,7 @@ The key is read from the environment only. Clips are gitignored; commit them del
 
 - **Verifies identity before anything.** Cue shows what it heard next to each check; the advocate ticks the box. It reads nothing and suggests nothing until then.
 - **Hears dissatisfaction** that counts as a grievance even without the word, and asks the advocate to log it. Both answers are recorded in the note.
-- **Answers benefit questions from the plan's own rules,** walking the plan's rules as a graph of clauses (specialist copay needs a referral, which comes from primary care; an ER copay is waived if admitted, then the hospital copay applies). Every figure in a draft is checked against the nodes on the path; a figure that is not there fails the eval.
+- **Answers benefit questions from the plan's own rules,** walking the plan's rules as a graph of clauses (a specialist visit is $25 but a procedure at a hospital outpatient department is $120, with no referral needed; the $115 ER copay drops to $0 if admitted within 24 hours, then the hospital copay applies). Every figure in a draft is checked against the nodes on the path; a figure that is not there fails the eval.
 - **Stops hard** on anything near a coverage decision, a discharge dispute or distress. Nothing is drafted; a supervisor is brought in.
 - **Drafts the note and the member recap from this call only,** with a required-elements checklist. The advocate approves the note and sends the recap.
 - **Scores itself the same way CI does.** The Quality tab runs `rules.js` against `eval/golden.js` in the page; `eval/run.mjs` runs the same files on every push and a missed gate fails the build.
@@ -49,7 +49,17 @@ Route first, then reason. Escalation wins every race. Fail closed. Deterministic
 
 ## Status
 
-Working prototype with rule-based agents, one synthetic plan and one scripted call. All members, plans, providers, figures and calls are synthetic. No real health plan, organisation, person or document is represented. The visual language is a design direction, not a brand. No model is called; the architecture page shows where models and a validated judge would sit.
+Working prototype with rule-based agents, one real plan's rules and one scripted call. Members, providers, calls and records are fictional. Not affiliated with or endorsed by any health plan.
+
+## Sources
+
+The plan rules and the right response for every test line come from public documents for one 2026 Medicare Advantage HMO-POS plan, cited by PDF page in `rules.js` (`SOURCES` and each node's `src`) and in `eval/golden.js` (each line's `src`):
+
+- 2026 Summary of Benefits, `H6622026000SB26`: https://assets.humana.com/is/content/humana/H6622026000SB26pdf
+- 2026 Evidence of Coverage, `H6622026000EOC26`: https://assets.humana.com/is/content/humana/H6622026000EOC26pdf
+- 42 CFR § 422.561, definition of grievance: https://www.law.cornell.edu/cfr/text/42/422.561
+
+The member lines themselves are written by hand, not taken from real calls. The visual language is a design direction, not a brand. No model is called; the architecture page shows where models and a validated judge would sit.
 
 ## Roadmap
 

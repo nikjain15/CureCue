@@ -13,7 +13,7 @@ const relDay = off => off === 0 ? "today" : off === 1 ? "tomorrow" : off === -1 
 function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on"); clearTimeout(toast.h); toast.h = setTimeout(() => e.classList.remove("on"), 2800); }
 
 // ---------- Views ----------
-const TITLES = { home: ["Home", "Member Services · Medicare · Mon Oct 27"], desk: ["Call", "Rosa M. · Sierra Advantage HMO"], day: ["My day", "Mon Oct 27"], quality: ["Evals", "Releases, checks, mistakes, test lines"], loop: ["How it learns", "Two human gates"] };
+const TITLES = { home: ["Home", "Member Services · Medicare · Mon Oct 27"], desk: ["Call", "Rosa M. · Medicare Advantage HMO-POS"], day: ["My day", "Mon Oct 27"], quality: ["Evals", "Releases, checks, mistakes, test lines"], loop: ["How it learns", "Two human gates"] };
 function show(v) { ["home", "desk", "day", "quality", "loop"].forEach(x => $("view-" + x).classList.toggle("on", x === v)); document.querySelectorAll(".rail button[data-view]").forEach(b => { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }); $("title").textContent = TITLES[v][0]; $("crumb").textContent = TITLES[v][1]; window.scrollTo({ top: 0 }); if (v === "day") renderDay(); try { history.replaceState(null, "", v === "quality" ? "#evals" : location.pathname + location.search); } catch (e) {} }
 document.querySelectorAll(".rail button[data-view]").forEach(b => b.onclick = () => show(b.dataset.view));
 
@@ -63,17 +63,19 @@ function drawGraph(path = []) { const svg = $("graph"); let s = "";
   Object.entries(G.nodes).forEach(([k, n]) => { const on = path.includes(k); const w = n.kind === "plan" ? 150 : Math.min(132, n.label.length * 5.6 + 18);
     s += `<g data-n="${k}" style="cursor:pointer"><rect x="${n.x - w / 2}" y="${n.y - 12}" width="${w}" height="24" rx="7" fill="${on ? 'var(--green)' : (n.kind === 'plan' ? 'var(--panel-2)' : 'var(--panel)')}" stroke="${on ? 'var(--green)' : 'var(--line)'}"/><text x="${n.x}" y="${n.y + 4}" font-size="9.5" text-anchor="middle" fill="${on ? '#fff' : 'var(--fg)'}" font-family="Mulish, sans-serif" font-weight="700">${n.label}</text></g>`; });
   svg.innerHTML = s; svg.querySelectorAll("g[data-n]").forEach(g => g.onclick = () => showClause(g.dataset.n)); }
-function showClause(k) { const n = G.nodes[k]; $("clause").innerHTML = n.text ? `<b>${n.label}</b> (${n.id}): ${n.text}` : `<b>${n.label}</b>`; }
+function showClause(k) { const n = G.nodes[k]; $("clause").innerHTML = n.text ? `<b>${n.label}</b> (${n.id}): ${n.text}${n.src ? `<br><span class="small">Source: ${srcLinks(n)}</span>` : ""}` : `<b>${n.label}</b>`; }
+// Links to the public document and PDF page each plan rule was read from
+function srcLinks(n) { return (n.src || []).map(x => { const S = R.SOURCES[x.doc]; return `<a href="${S.url}${x.page ? "#page=" + x.page : ""}" target="_blank" rel="noopener">${S.title}${x.page ? ", p. " + x.page : ""}</a>`; }).join(" · "); }
 
 // ---------- Member 360 ----------
 const M = member("M-001");
-const PLAN_ROWS = ["PCP", "SPEC", "REF", "ER", "WAIVE", "INPT", "MOOP"];
+const PLAN_ROWS = ["PCP", "SPEC", "DIAG", "REF", "ER", "WAIVE", "INPT", "MOOP"];
 let mtab = "plan", hot = null;
 function renderM360() {
   const claims = D.claims.filter(c => c.member === M.id).sort((a, b) => b.day - a.day), cases = D.cases.filter(k => k.member === M.id), contacts = D.contacts.filter(c => c.member === M.id).sort((a, b) => b.day - a.day), rx = D.pharmacy[M.id] || [];
   const tabs = [["plan", "Plan", PLAN_ROWS.length], ["claims", "Claims", claims.length], ["cases", "Cases", cases.length + (state.grievance ? 1 : 0)], ["contacts", "Contacts", contacts.length], ["rx", "Pharmacy", rx.length]];
   const panes = {
-    plan: PLAN_ROWS.map(k => `<div class="row ${hot === k ? "hot" : ""}"><b>${G.nodes[k].label}</b><span class="small">${G.nodes[k].id}</span><span class="sub">${G.nodes[k].text}</span></div>`).join(""),
+    plan: PLAN_ROWS.map(k => `<div class="row ${hot === k ? "hot" : ""}"><b>${G.nodes[k].label}</b><span class="small">${G.nodes[k].id}</span><span class="sub">${G.nodes[k].text}<br>Source: ${srcLinks(G.nodes[k])}</span></div>`).join(""),
     claims: claims.map(c => `<div class="row ${hot === c.id ? "hot" : ""}"><b>${c.service} · ${fmtOff(c.day)}</b><span class="amt">${money(c.owed)}</span><span class="sub">${c.provider} · ${c.id} · billed ${money(c.billed)}, plan paid ${money(c.planPaid)} · <b>${c.reason}</b> (${c.rule})</span></div>`).join(""),
     cases: (state.grievance ? `<div class="row hot"><b>Grievance G-26-0417 · opened today</b><span class="pill warn">due ${fmtOff(30)}</span><span class="sub">Repeat contact about an unresolved bill · 30-day clock · Grievances team</span></div>` : "") + (cases.map(k => `<div class="row"><b>${k.type === "grievance" ? "Grievance" : "Appeal"} ${k.id} · ${fmtOff(k.opened)}</b><span class="pill ${k.status === "open" ? "warn" : "good"}">${k.status}</span><span class="sub">${k.subject}</span></div>`).join("") || `<p class="small">No cases on file.</p>`),
     contacts: contacts.map(c => `<div class="row ${hot === "contacts" && c.reason === "Claims and billing" ? "hot" : ""}"><b>${fmtOff(c.day)} · ${c.reason}</b><span class="small">${c.by}</span><span class="sub">${c.note}${c.callback ? (c.callback.scheduled ? " · callback scheduled" : ` · <span class="pill bad">callback promised, never scheduled</span>`) : ""}</span></div>`).join(""),
@@ -89,7 +91,7 @@ function openTab(t, h) { mtab = t; hot = h; renderM360(); }
 
 // ---------- Call state ----------
 const cues = () => $("cues"), quiet = () => $("quiet");
-const state = { grievance: null, grievanceHeard: false, escalated: false, figures: [], pathsSeen: [], asked: {}, referral: null, callback: null, docSent: null, caseOpened: null, transferred: null, ended: false, accepted: 0, declined: 0 };
+const state = { grievance: null, grievanceHeard: false, escalated: false, figures: [], pathsSeen: [], asked: {}, site: null, callback: null, docSent: null, caseOpened: null, transferred: null, ended: false, accepted: 0, declined: 0 };
 function cue({ k, cls = "", say, main, alt, why, cite }) { const el = document.createElement("div"); el.className = "cue " + cls;
   el.innerHTML = `<div class="k">${k}</div><div class="say">${say}</div><div class="acts">${main ? `<button class="main">${main.label}</button>` : ""}${alt ? `<button class="alt">${alt.label}</button>` : ""}<button class="why">Why?</button></div><div class="det">${why}${cite ? `<br>Source: <code>${cite}</code>` : ""}</div>`;
   const m = el.querySelector(".main"), a = el.querySelector(".alt"), w = el.querySelector(".why");
@@ -123,9 +125,9 @@ $("ask").onsubmit = e => { e.preventDefault(); const q = $("askq").value.trim();
 
 // ---------- Tools: Cue pre-fills, the advocate confirms ----------
 const TOOLS = {
-  case: () => ({ title: "Open a case", pre: state.grievanceHeard ? "Pre-filled from what Rosa said" : "Pre-filled from the member record", fields: [["Type", "select", ["Grievance", "Appeal", "Inquiry"], 0], ["Subject", "text", "Repeat contact about unresolved $120 dermatology bill (C-26-5519)"], ["Clock", "text", "30 days, due " + fmtOff(30)], ["Route to", "select", ["Grievances team", "Appeals team", "Claims"], 0]], confirm: f => { state.caseOpened = "G-26-0417"; state.grievance = true; openTab("cases"); return "G-26-0417 opened"; } }),
-  callback: () => ({ title: "Schedule a callback", pre: "Pre-filled: the referral check is the open item", fields: [["Date", "date", dayDate(2).toISOString().slice(0, 10)], ["Window", "select", ["Morning", "Afternoon"], 1], ["Reason", "text", "Confirm referral status for Sep 30 visit, claim C-26-5519"], ["Number", "text", "On file ending 0188"]], confirm: f => { state.callback = fmt(new Date(f[0] + "T12:00:00")) + ", " + f[1].toLowerCase(); return "Callback " + state.callback; } }),
-  doc: () => ({ title: "Send a document", pre: "Pre-filled: the rules this call used", fields: [["Document", "select", ["Referral rule and specialist copay (S-REF, S-SPEC)", "ER and hospital copays (S-ER, S-ER-W, S-INPT)", "Evidence of Coverage, full"], 0], ["Channel", "select", ["Text link", "Email", "Mail"], 0]], confirm: f => { state.docSent = f[0] + " by " + f[1].toLowerCase(); return "Sent: " + f[0]; } }),
+  case: () => ({ title: "Open a case", pre: state.grievanceHeard ? "Pre-filled from what Rosa said" : "Pre-filled from the member record", fields: [["Type", "select", ["Grievance", "Appeal", "Inquiry"], 0], ["Subject", "text", "Repeat contact about unresolved $120 dermatology procedure bill (C-26-5519)"], ["Clock", "text", "30 days, due " + fmtOff(30)], ["Route to", "select", ["Grievances team", "Appeals team", "Claims"], 0]], confirm: f => { state.caseOpened = "G-26-0417"; state.grievance = true; openTab("cases"); return "G-26-0417 opened"; } }),
+  callback: () => ({ title: "Schedule a callback", pre: "Pre-filled: where the procedure was done is the open item", fields: [["Date", "date", dayDate(2).toISOString().slice(0, 10)], ["Window", "select", ["Morning", "Afternoon"], 1], ["Reason", "text", "Confirm where the Sep 30 biopsy was done, claim C-26-5519"], ["Number", "text", "On file ending 0188"]], confirm: f => { state.callback = fmt(new Date(f[0] + "T12:00:00")) + ", " + f[1].toLowerCase(); return "Callback " + state.callback; } }),
+  doc: () => ({ title: "Send a document", pre: "Pre-filled: the rules this call used", fields: [["Document", "select", ["Specialist and procedure copays (S-SPEC, S-DIAG)", "ER and hospital copays (S-ER, S-ER-W, S-INPT)", "Evidence of Coverage, full"], 0], ["Channel", "select", ["Text link", "Email", "Mail"], 0]], confirm: f => { state.docSent = f[0] + " by " + f[1].toLowerCase(); return "Sent: " + f[0]; } }),
   transfer: () => ({ title: "Transfer or conference", pre: state.escalated ? "Pre-filled: discharge dispute" : "Pre-filled from the call so far", fields: [["To", "select", ["Supervisor", "Appeals team", "Grievances team", "Pharmacy"], 0], ["Mode", "select", ["Conference (stay on)", "Warm transfer"], 0], ["Handoff note", "text", state.escalated ? "Mother's rehab discharge disputed; member distressed; nothing quoted" : "Repeat caller, billing question in progress"]], confirm: f => { state.transferred = f[0] + ", " + f[1].toLowerCase(); return f[0] + " joining"; } })
 };
 let openTool = null;
@@ -142,8 +144,8 @@ const VERIFY = [{ w: "Advocate", t: "Thanks for calling. Before I can look at an
 const CALL = [
   { w: "Rosa", t: "This is the third time I've called about this bill from the skin doctor." },
   { w: "Advocate", t: "I'm sorry, Rosa. I can see both earlier calls, so you won't have to repeat yourself. Let's sort it out." },
-  { w: "Rosa", t: "They billed me $120 for a specialist visit and I thought I only pay $35." },
-  { w: "Advocate", t: "Let me check whether a referral was on file for September 30th." },
+  { w: "Rosa", t: "They billed me $120 for the skin doctor and I thought I only pay $25." },
+  { w: "Advocate", t: "Let me check where the biopsy on September 30th was done." },
   { w: "Rosa", t: "While I have you, if I go to the ER and they admit me, what do I owe?" },
   { w: "Rosa", t: "And my mother is in rehab. They are sending her home tomorrow and she is not ready." },
   { w: "Advocate", t: "I'm bringing a supervisor onto the call for that right now." }];
@@ -169,8 +171,8 @@ $("endcall").onclick = () => { state.ended = true; if (player) player.stop(); cl
 function wrapup() {
   const did = [];
   if (state.caseOpened) did.push(`Opened grievance ${state.caseOpened}, 30-day clock, due ${fmtOff(30)}`);
-  if (state.referral === true) did.push("Confirmed referral on file; bill C-26-5519 sent for reprocessing");
-  if (state.referral === false) did.push("Confirmed no referral on file; explained the rule");
+  if (state.site === "office") did.push("Confirmed the procedure was done in the office; bill C-26-5519 sent for reprocessing at $25");
+  if (state.site === "hospital") did.push("Confirmed the procedure was done at a hospital outpatient department; explained the $120 copay");
   if (state.callback) did.push(`Scheduled callback ${state.callback}`);
   if (state.docSent) did.push(`Sent ${state.docSent}`);
   if (state.transferred) did.push(`Brought in ${state.transferred}`);
@@ -178,19 +180,19 @@ function wrapup() {
   const allOnPath = state.figures.length > 0 && state.figures.every(f => f.onPath);
   const items = [["Identity verified", true], ["Grievance decision recorded", state.grievance !== null, state.grievanceHeard],
     [state.figures.length ? `Every figure quoted traced to a plan rule (${state.figures.length} checked)` : "No figure was quoted", state.figures.length ? allOnPath : true, true],
-    ["Referral checked before quoting", state.referral !== null, state.asked.spec], ["Discharge concern handed to a supervisor", state.escalated && !!state.transferred, state.escalated], ["Callback scheduled with a date", !!state.callback, state.referral !== true]];
+    ["Place of service checked before quoting", state.site !== null, state.asked.spec], ["Discharge concern handed to a supervisor", state.escalated && !!state.transferred, state.escalated], ["Callback scheduled with a date", !!state.callback, state.site !== "office"]];
   $("checklist").innerHTML = items.filter(([l, ok, applies]) => applies !== false).map(([l, ok]) => `<li><span class="b ${ok ? 'ok' : 'miss'}">${ok ? '✓' : '!'}</span><span>${l}${ok ? '' : ' <span class="pill bad">missing</span>'}</span></li>`).join("");
-  const n = [`Rosa M. called (3rd contact) about a $120 specialist bill, date of service Sep 30 (C-26-5519).`];
-  if (state.asked.spec) n.push(`Plan rule: $35 with referral on file (S-SPEC); not covered without (S-REF). ${state.referral === true ? "Referral confirmed; bill sent for reprocessing." : state.referral === false ? "No referral on file; rule explained." : "Referral status not confirmed on this call."}`);
+  const n = [`Rosa M. called (3rd contact) about a $120 bill from a dermatology visit with a biopsy, date of service Sep 30 (C-26-5519).`];
+  if (state.asked.spec) n.push(`Plan rules: specialist office $25 (S-SPEC); diagnostic procedure at an outpatient hospital $120 (S-DIAG); no referral needed (S-REF). ${state.site === "office" ? "Done in the office; bill sent for reprocessing." : state.site === "hospital" ? "Done at a hospital outpatient department; $120 copay explained." : "Place of service not confirmed on this call."}`);
   if (state.grievanceHeard) n.push(state.grievance === true ? `Grievance logged G-26-0417, 30-day clock, due ${fmtOff(30)}.` : state.grievance === false ? "Repeat contact noted; advocate judged not a grievance." : "Dissatisfaction heard; grievance decision NOT recorded.");
-  if (state.asked.er) n.push("Asked about ER with admission: ER copay waived if admitted (S-ER-W); hospital $325/day days 1-5 (S-INPT); counts to $4,900 max (S-MOOP).");
+  if (state.asked.er) n.push("Asked about ER with admission: $0 for the ER visit if admitted within 24 hours (S-ER-W); hospital $375/day days 1-7 (S-INPT); counts to $9,250 max (S-MOOP).");
   if (state.escalated) n.push(state.transferred ? "Mother's discharge concern: supervisor brought onto the call; nothing quoted." : "Mother's discharge concern raised; supervisor NOT yet brought in.");
   if (state.callback) n.push(`Callback scheduled ${state.callback}.`); if (state.docSent) n.push(`Document sent: ${state.docSent}.`);
   $("note").value = n.join("\n");
   $("code").value = state.escalated && !state.asked.spec ? "Escalated to supervisor" : state.grievance ? "Grievance · repeat contact" : "Benefits and cost question";
   const rc = [`Hi Rosa, a recap of today's call.`];
-  if (state.asked.spec) { rc.push(`Specialist visits are $35 when your primary doctor's referral is on file.`); if (state.referral === true) rc.push(`Your referral was on file, so the $120 bill is being reprocessed.`); else if (state.referral === false) rc.push(`No referral was on file for your Sep 30 visit, which is why the $120 bill stands; we went through how to get a referral before the next visit.`); else rc.push(`We are still confirming your referral for Sep 30.`); }
-  if (state.asked.er) rc.push(`If you ever go to the ER and are admitted within 24 hours, the $110 ER copay is waived and the daily hospital copay applies instead.`);
+  if (state.asked.spec) { rc.push(`Specialist visits are $25, and you don't need a referral. A procedure done at a hospital outpatient department has a $120 copay.`); if (state.site === "office") rc.push(`Your Sep 30 biopsy was done in the office, so the $120 bill is being reprocessed at $25.`); else if (state.site === "hospital") rc.push(`Your Sep 30 biopsy was done at the hospital's outpatient department, which is why the bill is $120.`); else rc.push(`We are still confirming where your Sep 30 biopsy was done.`); }
+  if (state.asked.er) rc.push(`If you ever go to the ER and are admitted to the same hospital within 24 hours, you pay $0 for the ER visit instead of $115, and the daily hospital copay applies instead.`);
   if (state.callback) rc.push(`We will call you back ${state.callback}.`); if (state.docSent) rc.push(`The plan rules we discussed are on their way to you.`);
   rc.push(`Reply to this text if anything doesn't match what you understood.`); $("recap").textContent = rc.join(" ");
   $("approve").onclick = () => { $("approved").textContent = "Note approved. Call closed and added to today's timeline."; $("sendrecap").disabled = false; $("next").disabled = false; state.closed = true; state.closedAt = new Date(); $("dot").className = "dot ready"; $("stt").textContent = "Ready"; $("timer").textContent = ""; };

@@ -14,10 +14,11 @@ D.claims.forEach(c => {
   if (!ids.has(c.member)) errors.push(`claim ${c.id}: member ${c.member} does not exist`);
   if (!ruleIds.has(c.rule)) errors.push(`claim ${c.id}: rule ${c.rule} is not a node`);
   if (c.planPaid + c.owed !== c.billed) errors.push(`claim ${c.id}: paid ${c.planPaid} + owed ${c.owed} != billed ${c.billed}`);
-  if (c.rule === "S-SPEC" && c.owed !== 35) errors.push(`claim ${c.id}: specialist copay should be $35, is ${c.owed}`);
-  if (c.rule === "S-ER" && c.owed !== 110) errors.push(`claim ${c.id}: ER copay should be $110, is ${c.owed}`);
+  if (c.rule === "S-SPEC" && c.owed !== 25) errors.push(`claim ${c.id}: specialist copay should be $25, is ${c.owed}`);
+  if (c.rule === "S-DIAG" && ![25, 120].includes(c.owed)) errors.push(`claim ${c.id}: procedure copay should be $25 (office) or $120 (outpatient hospital), is ${c.owed}`);
+  if (c.rule === "S-ER" && c.owed !== 115) errors.push(`claim ${c.id}: ER copay should be $115, is ${c.owed}`);
   if (c.rule === "S-ER-W" && c.owed !== 0) errors.push(`claim ${c.id}: waived ER copay should be $0`);
-  if (c.rule === "S-INPT" && c.owed % 325 !== 0) errors.push(`claim ${c.id}: inpatient owed ${c.owed} is not a multiple of $325`);
+  if (c.rule === "S-INPT" && c.owed % 375 !== 0) errors.push(`claim ${c.id}: inpatient owed ${c.owed} is not a multiple of $375`);
   if (c.rule === "S-PCP" && c.owed !== 0) errors.push(`claim ${c.id}: primary care should be $0`);
   if (c.day > 0) errors.push(`claim ${c.id}: service date in the future`);
 });
@@ -32,11 +33,11 @@ D.cases.forEach(k => {
 });
 D.contacts.forEach((c, i) => { if (!ids.has(c.member)) errors.push(`contact ${i}: member missing`); if (c.day > 0) errors.push(`contact ${i}: in the future`); if (c.callback && c.callback.scheduled && typeof c.callback.day !== "number") errors.push(`contact ${i}: scheduled callback without a day`); });
 D.shift.forEach(s => { if (!ids.has(s.member)) errors.push(`shift ${s.time}: member missing`); if (!(s.minutes > 0)) errors.push(`shift ${s.time}: no duration`); });
-// Rosa's story must match the script: two prior calls about the bill, one claim with no referral, callback promised and not scheduled
+// Rosa's story must match the script: two prior calls about the bill, a $120 biopsy at the outpatient hospital copay, callback promised and not scheduled
 const rosa = D.contacts.filter(c => c.member === "M-001" && c.reason === "Claims and billing");
 if (rosa.length !== 2) errors.push(`Rosa should have two prior billing contacts, has ${rosa.length}`);
 if (!rosa.some(c => c.callback && c.callback.promised && !c.callback.scheduled)) errors.push("Rosa's unscheduled callback is missing");
-const bill = D.claims.find(c => c.member === "M-001" && c.rule === "S-REF");
-if (!bill || bill.owed !== 120) errors.push("Rosa's $120 no-referral claim is missing");
+const bill = D.claims.find(c => c.member === "M-001" && c.rule === "S-DIAG");
+if (!bill || bill.owed !== 120) errors.push("Rosa's $120 outpatient procedure claim is missing");
 if (errors.length) { console.error("Data check failed:\n  " + errors.join("\n  ")); process.exit(1); }
 console.log(`Data check: ${D.members.length} members, ${D.claims.length} claims, ${D.cases.length} cases, ${D.contacts.length} contacts, ${D.shift.length} shift calls. Consistent.`);

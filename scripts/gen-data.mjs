@@ -1,4 +1,4 @@
-// Generates app/data.js: one synthetic plan's worth of members, contacts, cases, claims and callbacks.
+// Generates app/data.js: fictional members, contacts, cases, claims and callbacks on one real 2026 HMO-POS plan's rules (see SOURCES in rules.js).
 // Deterministic (seeded), so every number on the desk traces to a row here. Run: node scripts/gen-data.mjs
 // Dates are day offsets from the demo's "today" (a Monday), so clocks and due dates stay consistent on any real day.
 import { writeFileSync } from "node:fs";
@@ -13,29 +13,30 @@ const TODAY = "2026-10-27"; // demo day, a Monday
 
 // ---------- Members (8). Rosa M. is the scripted call; the others fill the briefing and the queue. ----------
 const members = [
-  { id: "M-001", name: "Rosa Martinez", short: "Rosa M.", age: 71, plan: "Sierra Advantage HMO", lang: "English", last4: "4821", pcp: "Dr. Imani Okafor", flags: ["repeat caller"] },
-  { id: "M-002", name: "Daniel Kowalski", short: "Daniel K.", age: 68, plan: "Sierra Advantage HMO", lang: "English", last4: "7730", pcp: "Dr. Priya Raman", flags: [] },
-  { id: "M-003", name: "Anita Pereira", short: "Anita P.", age: 74, plan: "Sierra Advantage PPO", lang: "Portuguese", last4: "1194", pcp: "Dr. Luis Barroso", flags: ["interpreter"] },
-  { id: "M-004", name: "Walter Nguyen", short: "Walter N.", age: 79, plan: "Sierra Advantage HMO", lang: "English", last4: "5582", pcp: "Dr. Imani Okafor", flags: ["recently discharged"] },
-  { id: "M-005", name: "Gloria Whitfield", short: "Gloria W.", age: 66, plan: "Sierra Advantage HMO", lang: "English", last4: "2047", pcp: "Dr. Priya Raman", flags: ["caregiver calls"] },
-  { id: "M-006", name: "Hector Alvarez", short: "Hector A.", age: 72, plan: "Sierra Advantage D-SNP", lang: "Spanish", last4: "9013", pcp: "Dr. Luis Barroso", flags: ["dual eligible"] },
-  { id: "M-007", name: "June Takahashi", short: "June T.", age: 70, plan: "Sierra Advantage PPO", lang: "English", last4: "6618", pcp: "Dr. Noor Haddad", flags: ["TTY"] },
-  { id: "M-008", name: "Samuel Osei", short: "Samuel O.", age: 77, plan: "Sierra Advantage HMO", lang: "English", last4: "3356", pcp: "Dr. Noor Haddad", flags: [] }
+  { id: "M-001", name: "Rosa Martinez", short: "Rosa M.", age: 71, plan: "Medicare Advantage HMO-POS", lang: "English", last4: "4821", pcp: "Dr. Imani Okafor", flags: ["repeat caller"] },
+  { id: "M-002", name: "Daniel Kowalski", short: "Daniel K.", age: 68, plan: "Medicare Advantage HMO-POS", lang: "English", last4: "7730", pcp: "Dr. Priya Raman", flags: [] },
+  { id: "M-003", name: "Anita Pereira", short: "Anita P.", age: 74, plan: "Medicare Advantage HMO-POS", lang: "Portuguese", last4: "1194", pcp: "Dr. Luis Barroso", flags: ["interpreter"] },
+  { id: "M-004", name: "Walter Nguyen", short: "Walter N.", age: 79, plan: "Medicare Advantage HMO-POS", lang: "English", last4: "5582", pcp: "Dr. Imani Okafor", flags: ["recently discharged"] },
+  { id: "M-005", name: "Gloria Whitfield", short: "Gloria W.", age: 66, plan: "Medicare Advantage HMO-POS", lang: "English", last4: "2047", pcp: "Dr. Priya Raman", flags: ["caregiver calls"] },
+  { id: "M-006", name: "Hector Alvarez", short: "Hector A.", age: 72, plan: "Medicare Advantage HMO-POS", lang: "Spanish", last4: "9013", pcp: "Dr. Luis Barroso", flags: ["dual eligible"] },
+  { id: "M-007", name: "June Takahashi", short: "June T.", age: 70, plan: "Medicare Advantage HMO-POS", lang: "English", last4: "6618", pcp: "Dr. Noor Haddad", flags: ["TTY"] },
+  { id: "M-008", name: "Samuel Osei", short: "Samuel O.", age: 77, plan: "Medicare Advantage HMO-POS", lang: "English", last4: "3356", pcp: "Dr. Noor Haddad", flags: [] }
 ];
 
-// ---------- Claims (12). Each cites the plan rule that explains it. ----------
+// ---------- Claims (13). Each cites the plan rule that explains it. ----------
 const claims = [
-  { id: "C-26-5519", member: "M-001", day: -27, provider: "Lindqvist Dermatology", service: "Specialist visit", billed: 120, planPaid: 0, owed: 120, rule: "S-REF", reason: "No referral on file" },
+  { id: "C-26-5518", member: "M-001", day: -27, provider: "Lindqvist Dermatology", service: "Specialist visit", billed: 180, planPaid: 155, owed: 25, rule: "S-SPEC", reason: "Copay applied" },
+  { id: "C-26-5519", member: "M-001", day: -27, provider: "Lindqvist Dermatology, hospital outpatient dept.", service: "Skin biopsy", billed: 640, planPaid: 520, owed: 120, rule: "S-DIAG", reason: "Procedure billed at the outpatient hospital copay" },
   { id: "C-26-5301", member: "M-001", day: -41, provider: "Dr. Imani Okafor", service: "Primary care visit", billed: 140, planPaid: 140, owed: 0, rule: "S-PCP", reason: "Paid in full" },
-  { id: "C-26-5602", member: "M-002", day: -12, provider: "Valley Imaging", service: "MRI, knee", billed: 1180, planPaid: 1180, owed: 0, rule: "S-PCP", reason: "Paid, prior auth on file" },
+  { id: "C-26-5602", member: "M-002", day: -12, provider: "Valley Orthopedics", service: "Specialist visit", billed: 230, planPaid: 205, owed: 25, rule: "S-SPEC", reason: "Copay applied" },
   { id: "C-26-5610", member: "M-002", day: -9, provider: "Dr. Priya Raman", service: "Primary care visit", billed: 140, planPaid: 140, owed: 0, rule: "S-PCP", reason: "Paid in full" },
-  { id: "C-26-5488", member: "M-003", day: -31, provider: "Coastal Cardiology", service: "Specialist visit", billed: 210, planPaid: 175, owed: 35, rule: "S-SPEC", reason: "Copay applied" },
-  { id: "C-26-5633", member: "M-004", day: -6, provider: "St. Brigid Medical Center", service: "Inpatient, 3 days", billed: 14200, planPaid: 13225, owed: 975, rule: "S-INPT", reason: "$325 x 3 days" },
+  { id: "C-26-5488", member: "M-003", day: -31, provider: "Coastal Cardiology", service: "Specialist visit", billed: 210, planPaid: 185, owed: 25, rule: "S-SPEC", reason: "Copay applied" },
+  { id: "C-26-5633", member: "M-004", day: -6, provider: "St. Brigid Medical Center", service: "Inpatient, 3 days", billed: 14200, planPaid: 13075, owed: 1125, rule: "S-INPT", reason: "$375 x 3 days" },
   { id: "C-26-5629", member: "M-004", day: -7, provider: "St. Brigid Emergency", service: "Emergency room", billed: 2300, planPaid: 2300, owed: 0, rule: "S-ER-W", reason: "ER copay waived, admitted" },
   { id: "C-26-5571", member: "M-005", day: -18, provider: "Dr. Priya Raman", service: "Primary care visit", billed: 140, planPaid: 140, owed: 0, rule: "S-PCP", reason: "Paid in full" },
-  { id: "C-26-5540", member: "M-006", day: -22, provider: "Riverbend Podiatry", service: "Specialist visit", billed: 195, planPaid: 160, owed: 35, rule: "S-SPEC", reason: "Copay applied" },
-  { id: "C-26-5595", member: "M-007", day: -14, provider: "Hillcrest Audiology", service: "Hearing exam", billed: 160, planPaid: 160, owed: 0, rule: "S-PCP", reason: "Paid in full" },
-  { id: "C-26-5612", member: "M-008", day: -8, provider: "St. Brigid Emergency", service: "Emergency room", billed: 1900, planPaid: 1790, owed: 110, rule: "S-ER", reason: "ER copay, not admitted" },
+  { id: "C-26-5540", member: "M-006", day: -22, provider: "Riverbend Podiatry", service: "Specialist visit", billed: 195, planPaid: 170, owed: 25, rule: "S-SPEC", reason: "Copay applied" },
+  { id: "C-26-5595", member: "M-007", day: -14, provider: "Dr. Noor Haddad", service: "Primary care visit", billed: 160, planPaid: 160, owed: 0, rule: "S-PCP", reason: "Paid in full" },
+  { id: "C-26-5612", member: "M-008", day: -8, provider: "St. Brigid Emergency", service: "Emergency room", billed: 1900, planPaid: 1785, owed: 115, rule: "S-ER", reason: "ER copay, not admitted" },
   { id: "C-26-5420", member: "M-008", day: -36, provider: "Dr. Noor Haddad", service: "Primary care visit", billed: 140, planPaid: 140, owed: 0, rule: "S-PCP", reason: "Paid in full" }
 ];
 
@@ -48,7 +49,7 @@ const cases = [
   { id: "G-26-0405", member: "M-007", type: "grievance", opened: -12, days: 30, subject: "TTY call dropped", status: "open", owner: "Grievances team" },
   { id: "A-26-0151", member: "M-005", type: "appeal", opened: -10, days: 30, subject: "Home health hours", status: "open", owner: "Appeals team" },
   { id: "G-26-0409", member: "M-008", type: "grievance", opened: -5, days: 30, subject: "ER copay charged, member says admitted", status: "open", owner: "Grievances team" },
-  { id: "G-26-0351", member: "M-001", type: "grievance", opened: -58, days: 30, subject: "Dental allowance card declined", status: "resolved", owner: "Grievances team" },
+  { id: "G-26-0351", member: "M-001", type: "grievance", opened: -58, days: 30, subject: "Dental claim from an out-of-network dentist paid late", status: "resolved", owner: "Grievances team" },
   { id: "G-26-0372", member: "M-005", type: "grievance", opened: -40, days: 30, subject: "Callback promised, not made", status: "resolved", owner: "Grievances team" },
   { id: "A-26-0120", member: "M-004", type: "appeal", opened: -44, days: 30, subject: "Skilled nursing days", status: "resolved", owner: "Appeals team" }
 ];
@@ -58,8 +59,8 @@ const reasons = ["Benefits and cost question", "Claims and billing", "Pharmacy",
 const contacts = [
   { member: "M-001", day: -24, reason: "Claims and billing", note: "First call about dermatology bill; claim still processing", callback: null, by: "J. Alvarez" },
   { member: "M-001", day: -13, reason: "Claims and billing", note: "Same bill; told to call back after the EOB arrived", callback: { promised: true, scheduled: false }, by: "T. Brooks" },
-  { member: "M-001", day: -60, reason: "Benefits and cost question", note: "Dental allowance card declined at the dentist; grievance G-26-0351 opened", callback: null, by: "Nik J." },
-  { member: "M-004", day: -5, reason: "Claims and billing", note: "Asked why the inpatient bill shows $975; rule explained", callback: { promised: true, scheduled: true, day: 0 }, by: "Nik J." },
+  { member: "M-001", day: -60, reason: "Benefits and cost question", note: "Dental claim from an out-of-network dentist paid late; grievance G-26-0351 opened", callback: null, by: "Nik J." },
+  { member: "M-004", day: -5, reason: "Claims and billing", note: "Asked why the inpatient bill shows $1,125; rule explained", callback: { promised: true, scheduled: true, day: 0 }, by: "Nik J." },
   { member: "M-004", day: -26, reason: "Grievance", note: "No written discharge instructions; G-26-0388 opened", callback: null, by: "R. Chen" },
   { member: "M-002", day: -20, reason: "Appeal status", note: "Filed appeal A-26-0142 for PT visits", callback: null, by: "T. Brooks" },
   { member: "M-002", day: -3, reason: "Appeal status", note: "Asked for status; told decision due within the clock", callback: { promised: true, scheduled: true, day: 0 }, by: "Nik J." },

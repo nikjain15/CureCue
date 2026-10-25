@@ -8,7 +8,7 @@
     escalate: ["appeal", "apel", "denied", "deny", "negaron", "grievance", "queja", "complain", "discharg", "sending", "home from", "de alta", "not ready", "no estoy list", "chest", "pecho", "breathe", "respirar", "dizzy", "pass out", "refused to pay", "negaron a pagar", "cut me off", "should i go to the er", "coverage ended"],
     dissatisfied: ["third", "tercera", "fourth", "again", "nobody", "nadie", "never came", "frustrat", "ridiculous", "ridículo", "unacceptable", "fed up", "harto", "sick of", "tired of", "useless", "done being patient", "different answer", "keep calling", "here we go", "lol", "super.", "nobody told me", "on earth"],
     account: ["claim", "reclamo", "premium", "prima", "eob", "statement", "billing on", "status"],
-    clause: { "S-PCP": ["primary", "regular doctor", "primario", "primary doctor"], "S-SPEC": ["specialist", "dermatolog", "referral", "referido", "especialista"], "S-MOOP": ["out-of-pocket", "most i can pay", "yearly max", "maximum", "máximo", "stop paying"], "S-ER": ["er ", "er?", "emergency", "emergencias", "admit", "admitted"] }
+    clause: { "S-REF": ["referral", "referido"], "S-PCP": ["primary", "regular doctor", "primario", "primary doctor"], "S-SPEC": ["specialist", "dermatolog", "especialista", "skin doctor"], "S-DIAG": ["biopsy", "procedure"], "S-MOOP": ["out-of-pocket", "most i can pay", "yearly max", "maximum", "máximo", "stop paying"], "S-ER": ["er ", "er?", "emergency", "emergencias", "admit", "admitted"] }
   };
   const has = (t, words) => words.some(w => t.toLowerCase().includes(w));
   // The judge's own read of a turn. Different method from the rules (bag of words, scored, no ordering).

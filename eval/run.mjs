@@ -15,7 +15,7 @@ const release = Number(process.argv[2] || rules.CURRENT_RELEASE);
 // 1. Score the corpus as data before scoring the engine. Labels and strata must be well formed.
 const corpusErrors = [];
 const ids = new Set(Object.values(rules.GRAPH.nodes).map(n => n.id).filter(Boolean));
-const ENUM = { v: ["answer", "human", "escalate"], register: ["plain", "implicit", "angry"], lang: ["en", "es", "interp"], plan: ["HMO", "PPO", "D-SNP"], source: ["hand", "adversarial", "hard"], labeller: ["A", "B"] };
+const ENUM = { v: ["answer", "human", "escalate"], register: ["plain", "implicit", "angry"], lang: ["en", "es", "interp"], source: ["hand", "adversarial", "hard"], labeller: ["A", "B"] };
 const seen = new Set();
 golden.forEach((x, i) => {
   if (seen.has(x.id)) corpusErrors.push(`${x.id}: duplicate id`); seen.add(x.id);
@@ -25,6 +25,8 @@ golden.forEach((x, i) => {
   if (x.v !== "answer" && x.c) corpusErrors.push(`${x.id}: a non-answer carries a clause`);
   if (x.c && !ids.has(x.c)) corpusErrors.push(`${x.id}: clause ${x.c} is not a node`);
   if (x.v === "escalate" && x.g) corpusErrors.push(`${x.id}: an escalation is not also a grievance flag here`);
+  if (!x.src || (x.v !== "human" || x.g ? !x.src.doc : !x.src.why)) corpusErrors.push(`${x.id}: missing a source for its right response`);
+  if (x.src && x.src.doc && !["SB", "EOC", "CFR"].includes(x.src.doc)) corpusErrors.push(`${x.id}: unknown source ${x.src.doc}`);
   if (x.labels) { for (const L of ["A", "B"]) if (!x.labels[L] || !ENUM.v.includes(x.labels[L].v)) corpusErrors.push(`${x.id}: adjudicated row missing labeller ${L}`); }
 });
 if (corpusErrors.length) { console.error("Golden set is inconsistent:\n  " + corpusErrors.join("\n  ")); process.exit(2); }

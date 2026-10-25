@@ -17,8 +17,11 @@
 .hero .cta{display:flex;gap:10px;flex-wrap:wrap}
 .shot{margin:34px 0 0;border-radius:18px;overflow:hidden;box-shadow:0 24px 70px rgba(24,34,24,.16);border:1px solid var(--line);background:var(--bg-2)}
 .shot img{display:block;width:100%;height:auto}
-.proof{display:flex;gap:28px;flex-wrap:wrap;margin:18px 0 0;font-size:14px;color:var(--muted)}
-.proof b{display:block;font-family:var(--display);font-size:24px;color:var(--fg);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.proof{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:22px 0 0;font-size:14px;color:var(--muted)}
+@media (max-width:760px){.proof{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.proof a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:inherit;text-decoration:none;line-height:1.4}
+.proof a:hover{border-color:var(--line-2)}
+.proof b{display:block;font-family:var(--display);font-size:18px;color:var(--fg);margin-bottom:2px}
 /* beats */
 .beat{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:40px;align-items:center;padding:34px 0;border-top:1px solid var(--line)}
 .beat:first-of-type{border-top:0}
@@ -81,8 +84,8 @@
     <div class="pic"><img src="assets/beats/hear.png" alt="Cue flags a repeat contact as a grievance and asks the advocate to log it" width="768" height="916"></div>
   </div>
   <div class="beat">
-    <div><div class="num">3 · Answer</div><h3>Every figure comes from a rule on the plan, with the rule shown.</h3><p>The specialist copay depends on a referral, which depends on primary care. Cue walks that path and says what to check before quoting.</p><q>They billed me $120 and I thought I only pay $35.</q></div>
-    <div class="pic"><img src="assets/beats/answer.png" alt="Cue's suggested answer with the referral check and the two confirm buttons" width="768" height="1064"></div>
+    <div><div class="num">3 · Answer</div><h3>Every figure comes from a rule on the plan, with the rule shown.</h3><p>A specialist visit is $25, but a procedure done at a hospital outpatient department is $120. Cue walks from one rule to the next and says what to check before quoting.</p><q>They billed me $120 for the skin doctor and I thought I only pay $25.</q></div>
+    <div class="pic"><img src="assets/beats/answer.png" alt="Cue's suggested answer with the place-of-service check and the two confirm buttons" width="764" height="1254"></div>
   </div>
   <div class="beat">
     <div><div class="num">4 · Stop</div><h3>A dispute about care or coverage halts everything.</h3><p>Cue drafts nothing, pauses every other cue, and offers one button: bring a supervisor in. A coverage decision has no type to be emitted as.</p><q>They are sending my mother home tomorrow and she is not ready.</q></div>
@@ -118,7 +121,7 @@
 
 <div class="cta-band"><div><h2>See the call</h2><p>One member, one plan, four minutes, with voice.</p></div><a class="btn lg" href="app/">Open the advocate desk</a></div>
 
-<p class="foot">Demonstration only. Every member, plan, provider, figure and call is synthetic. No real health plan, organisation, person or document is represented.</p>
+<p class="foot">Demonstration only. Plan rules and figures come from the public 2026 documents of a real Medicare Advantage HMO-POS plan (<a href="evals.html#sources">sources</a>). Members, providers, calls and records are fictional. Not affiliated with or endorsed by any health plan.</p>
 </div>
 <script src="rules.js"></script>
 <script src="eval/golden.js"></script>
@@ -126,7 +129,7 @@
 (function(){const R=window.CureCueRules,G=window.CureCueGolden;const f=x=>x.toFixed(2),pc=x=>Math.round(x*100)+"%";
  const runs=R.RELEASES.map(rel=>({rel,...R.score(G,rel)}));const cur=runs.find(r=>r.rel===R.CURRENT_RELEASE);const prev=runs.find(r=>r.rel===R.CURRENT_RELEASE-1)||runs[0];
  const miss=cur.rows.filter(e=>!e.ok).length;
- document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>test lines</span><span><b>${cur.gates.length}</b>pass/fail checks</span><span><b>${runs.filter(r=>r.failed).length}</b>older versions fail today</span><span><b>${miss}</b>known mistakes, listed</span>`;
+ document.getElementById("proof").innerHTML=`<a href="evals.html#sources"><b>Every figure</b>comes from a page in the plan's public documents</a><a href="architecture.html"><b>Stops</b>on appeals, discharges and emergencies</a><a href="evals.html"><b>Tested</b>on every change; mistakes listed by name</a><a href="app/"><b>You decide</b>Cue suggests; the advocate confirms</a>`;
  const L=[["en","English"],["es","Spanish"],["interp","Interpreter"]];
  const W=520,H=250,x0=110,y0=20,bw=18,gap=8,rowH=64;const lastGate=cur.gates.find(g=>g.metric==="escalation_recall");
  let s=`<text x="${x0}" y="12" font-size="11" fill="#5b6660" font-family="Mulish">Supervisor calls flagged, by language</text>`;

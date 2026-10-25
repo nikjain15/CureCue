@@ -122,7 +122,7 @@
 </section>
 
 <div class="cta-band"><div><h2>See it on the desk</h2><p>Stages 1 to 11, one member, one plan.</p></div><a class="btn lg" href="app/">Open the advocate desk</a></div>
-<p class="foot">Demonstration only. Every member, plan, provider, figure and call is synthetic. No real health plan, organisation, person or document is represented.</p>
+<p class="foot">Demonstration only. Plan rules and figures come from the public 2026 documents of a real Medicare Advantage HMO-POS plan (<a href="evals.html#sources">sources</a>). Members, providers, calls and records are fictional. Not affiliated with or endorsed by any health plan.</p>
 </div>
 <script>
 const STAGES=[
@@ -138,8 +138,8 @@ const STAGES=[
   "Scrolls prior contacts while the member talks, or asks them to repeat the history.","The prior calls on this issue and the promise that was not kept. Then silence. Cue speaks a handful of times per call.","Narrates the call. Interrupts. Repeats itself: one cue per path.","Cues per call; cues accepted versus declined; advocate-reported interruptions."],
  ["Hear dissatisfaction","\"This is the third time I've called\"","A grievance counts without the word. Cue asks: log it?",
   "Must recognise a grievance without the word and start the clock while handling the question. Missed ones surface weeks later in QA.","Highlights the sentence, says it counts, asks to log it. Either answer is recorded. Logging opens the case with its clock.","Logs the grievance itself. The advocate decides; both outcomes are labelled.","Grievance recall by register, gate 0.88 each; advocate agreement with Cue's flag."],
- ["Answer from the plan's own rules","\"They billed me $120, I thought I pay $35\"","Every figure sits on a rule on the path, and the path is shown.",
-  "Searches a benefit document. Finds the specialist copay. Misses that it depends on a referral. Quotes a number that is right in isolation and wrong for this member.","Walks the rules as a graph: specialist copay needs a referral, which comes from primary care. Opens the claim. Says what to check before quoting.","Quotes a figure that is not in a rule on the path. Answers an account question from plan rules.","Citation accuracy, gate 0.92; figures off the path, gate zero; abstention rate reported with a band."],
+ ["Answer from the plan's own rules","\"They billed me $120, I thought I pay $25\"","Every figure sits on a rule on the path, and the path is shown.",
+  "Searches a benefit document. Finds the specialist copay. Misses that a procedure done at a hospital outpatient department has its own copay. Quotes a number that is right in isolation and wrong for this member.","Walks the rules as a graph: specialist visit $25, but a procedure at a hospital outpatient department is $120, and no referral is needed. Opens the claim. Says what to check before quoting.","Quotes a figure that is not in a rule on the path. Answers an account question from plan rules.","Citation accuracy, gate 0.92; figures off the path, gate zero; abstention rate reported with a band."],
  ["Act: case, callback, document, transfer","Whenever the call needs a thing done","Four actions pre-filled from the call. The advocate confirms.",
   "Four systems, four forms, retyped from memory after the call. The callback with no date is the commonest QA miss.","The case subject and clock, the callback date and reason, the document the rules used, the transfer handoff note. Outcomes stay on screen.","Sends, opens or transfers without the confirm. Pre-fills from inference.","Note omission rate, gate 0.05; actions confirmed versus edited; time in wrap-up."],
  ["Stop","\"They're sending my mother home tomorrow\"","A hard stop runs first on every turn. One button: connect a supervisor.",
