@@ -90,7 +90,7 @@
     <div><b>Route first, reason second</b><p>One owning rule per turn. The stop runs before routing, every turn.</p></div>
     <div><b>Deterministic first</b><p>Clocks, identity steps and allowance arithmetic are rules. A model handles language, where the eval says it may.</p></div>
     <div><b>Every figure has a source</b><p>A number not on the retrieval path cannot appear in a draft. Enforced in code, scored in CI.</p></div>
-    <div><b>Fail closed</b><p>Error, timeout or low confidence produces "needs a person", never a guess. Abstention is counted.</p></div>
+    <div><b>Fail closed</b><p>Anything no rule covers produces "needs a person", never a guess. Designed: errors, timeouts and low confidence do the same once a model is in the loop. Abstention is counted.</p></div>
     <div><b>Context is engineered</b><p>The clauses on the path, the last two contacts, the one policy that applies. Not the whole document.</p></div>
     <div><b>Nothing changes itself</b><p>Two named human gates in the loop. A council can sign that.</p></div>
   </div>

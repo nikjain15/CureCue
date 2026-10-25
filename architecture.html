@@ -98,7 +98,7 @@
 </section>
 
 <section class="sec" id="stack">
-  <div class="head"><p class="eyebrow">The stack</p><h2>Ten layers. Safety and evals wrap all of them.</h2><p>Data flows top to bottom on a call. Tap a layer for the why.</p></div>
+  <div class="head"><p class="eyebrow">The stack</p><h2>Ten layers. Safety and evals wrap all of them.</h2><p>This is the production design. The prototype runs the harness, the rules graph and the CI eval gate, on synthetic data; the other layers are designed. Tap a layer for the why.</p></div>
   <div class="stack" id="layers"></div>
 </section>
 
@@ -121,8 +121,8 @@
         <rect x="470" y="36" width="84" height="36" rx="10" fill="#2f4a1d"/><text x="512" y="59" text-anchor="middle" fill="#fff">$4,900</text>
       </g></svg>
     <div class="kv">
-      <div><b>Built from</b><p>Evidence of Coverage, Annual Notice of Change and Summary of Benefits, extracted with a human review step, per plan year.</p></div>
-      <div><b>Retrieval</b><p>A vector index finds the entry node from the member's words; the walk follows typed edges from there.</p></div>
+      <div><b>Built from</b><p>Today, hand-built for one synthetic plan. Designed: extracted from the Evidence of Coverage, Annual Notice of Change and Summary of Benefits with a human review step, per plan year.</p></div>
+      <div><b>Retrieval</b><p>Today, phrase patterns find the entry node from the member's words; the walk follows typed edges from there. Designed: a vector index finds the entry node.</p></div>
       <div><b>Honest limit</b><p>Graph construction is the expensive part. Outside the plan, the graph has nothing and Cue abstains.</p></div>
     </div>
   </div>
@@ -134,9 +134,9 @@
     <div><b>Type</b><p>The verdict has three values: answer, needs a person, escalate. A coverage decision has no type to be emitted as.</p></div>
     <div><b>Order</b><p>Guardian runs before routing on every turn, so a dispute mid-question still wins the race.</p></div>
     <div><b>Person</b><p>The advocate confirms every figure and sends every recap. Human accountability as a design property.</p></div>
-    <div><b>Edge</b><p>Identifiers are redacted before any model call. Member speech is data, never instruction.</p></div>
+    <div><b>Edge</b><p>Designed: identifiers redacted before any model call (the prototype calls none). Member speech is data, never instruction.</p></div>
     <div><b>Output</b><p>A figure not on the cited path fails the build. Tone and reading level are gated for anything member-facing.</p></div>
-    <div><b>Operations</b><p>Kill switch per skill with a named owner. A pause stops one behaviour, not the product.</p></div>
+    <div><b>Operations</b><p>Designed: a kill switch per skill with a named owner. A pause stops one behaviour, not the product.</p></div>
   </div>
 </section>
 
@@ -157,11 +157,11 @@
 <section class="sec" id="qa">
   <div class="head"><p class="eyebrow">Questions</p><h2>What this design gets asked.</h2></div>
   <details class="qa" open><summary>Why a graph and not just retrieval over documents?</summary><p>Benefit rules cross-reference each other with exceptions. A chunk returns the ER paragraph and stops; the graph walks to the admission exception. The path is also the citation a reviewer can read.</p></details>
-  <details class="qa"><summary>How do you know the evals are right?</summary><p>Labels are written without the engine, the data is checked before the engine runs, and the judge is validated against people on a held-out slice and refused where it disagrees.</p></details>
+  <details class="qa"><summary>How do you know the evals are right?</summary><p>Labels are written without the engine, the data is checked before the engine runs, and the judge (a stand-in lexicon scorer in the prototype) is validated against the labels on a held-out slice and refused where it disagrees.</p></details>
   <details class="qa"><summary>What stops it giving medical or coverage advice?</summary><p>The verdict type has no value for a decision, hard-stop topics run before routing, and the advocate confirms every figure. Three layers, independent.</p></details>
-  <details class="qa"><summary>How does it handle protected health information?</summary><p>Redacted at the edge before any model call; identity gate before any suggestion; member memory read-only; no per-member inference; traces carry run ids, not identifiers.</p></details>
-  <details class="qa"><summary>What happens when the plan year changes?</summary><p>The graph is versioned by plan year. A diff job compares the Annual Notice of Change against last year's nodes and lists exactly which golden rows need relabelling.</p></details>
-  <details class="qa"><summary>Which model?</summary><p>Whatever the enterprise gateway approves. Skills are model-agnostic: small model for classify and extract, larger for compose. A swap is a config change plus an eval run.</p></details>
+  <details class="qa"><summary>How does it handle protected health information?</summary><p>Built: the identity gate before any suggestion, and synthetic data only. Designed: redaction at the edge before any model call, member memory read-only, no per-member inference, traces that carry run ids, not identifiers.</p></details>
+  <details class="qa"><summary>What happens when the plan year changes?</summary><p>Designed: the graph is versioned by plan year, and a diff job compares the Annual Notice of Change against last year's nodes and lists exactly which golden rows need relabelling. The prototype has one plan year.</p></details>
+  <details class="qa"><summary>Which model?</summary><p>The prototype calls none: it proves the rules, gates and evals first. Designed: whatever the enterprise gateway approves, small model for classify and extract, larger for compose. A swap is a config change plus an eval run.</p></details>
   <details class="qa"><summary>How would you roll it out?</summary><p>Shadow mode on live calls, 5% canary, promotion on a signed checklist, a pause rule per topic, a kill switch per skill with a named owner.</p></details>
   <details class="qa"><summary>What is the business case?</summary><p>Advocate minutes per benefit lookup across a very large call volume, grievances logged that would have been missed, repeat calls avoided because the note was complete. A model with its assumptions visible, never a borrowed figure.</p></details>
   <details class="qa"><summary>What would you build next?</summary><p>Coverage clarity for members on the same graph, then network navigation once the directory's freshness problem is solved, then primary care last because it needs a clinical eval first.</p></details>
@@ -200,7 +200,7 @@ const LAYERS=[
  ["Edge","Speech-to-text, PHI redaction, identity state","Nothing flows until identity is verified. The model never needs identifiers, so it never sees them."],
  ["Harness","Guardian first, then one owning skill per turn, four narrow tools","One skill's context per turn is cheaper and has fewer ways to be wrong. Routing accuracy is itself gated."],
  ["Context","The smallest context that answers the question","The clauses on the path, the last two contacts, the one policy that applies. Not the whole Evidence of Coverage."],
- ["Knowledge","Plan knowledge graph, directory, policies","Benefit rules are relational with exceptions. The path is the citation and the update is localised."],
+ ["Knowledge","Plan rules graph, directory, policies","Benefit rules are relational with exceptions. The path is the citation and the update is localised."],
  ["Models","Routed by difficulty, behind the enterprise gateway","Small model for classify and extract, larger for compose. A swap is a config change plus an eval run."],
  ["Safety","Input, policy, output, kill switch","No single layer holds. Three independent controls stand between Cue and a coverage decision."],
  ["Evals","Golden sets by slice, validated judge, live sample, CI gate","The governance pack is a build artifact. A reviewer reads results, not promises."],
