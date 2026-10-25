@@ -14,7 +14,7 @@ function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on
 
 // ---------- Views ----------
 const TITLES = { home: ["Home", "Member Services · Medicare · Mon Oct 27"], desk: ["Call", "Rosa M. · Sierra Advantage HMO"], day: ["My day", "Mon Oct 27"], quality: ["Evals", "Releases, checks, mistakes, test lines"], loop: ["How it learns", "Two human gates"] };
-function show(v) { ["home", "desk", "day", "quality", "loop"].forEach(x => $("view-" + x).classList.toggle("on", x === v)); document.querySelectorAll(".rail button[data-view]").forEach(b => { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }); $("title").textContent = TITLES[v][0]; $("crumb").textContent = TITLES[v][1]; window.scrollTo({ top: 0 }); if (v === "day") renderDay(); }
+function show(v) { ["home", "desk", "day", "quality", "loop"].forEach(x => $("view-" + x).classList.toggle("on", x === v)); document.querySelectorAll(".rail button[data-view]").forEach(b => { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }); $("title").textContent = TITLES[v][0]; $("crumb").textContent = TITLES[v][1]; window.scrollTo({ top: 0 }); if (v === "day") renderDay(); try { history.replaceState(null, "", v === "quality" ? "#evals" : location.pathname + location.search); } catch (e) {} }
 document.querySelectorAll(".rail button[data-view]").forEach(b => b.onclick = () => show(b.dataset.view));
 
 // ---------- Home: Cue's briefing, computed from the data ----------
@@ -47,7 +47,7 @@ renderHome();
     ["05:42", `Tested release ${R.CURRENT_RELEASE} on the test lines: ${R.score(GOLDEN, R.CURRENT_RELEASE).failed ? "it failed a check and is stopped" : "it passed every check"}. Nothing changed overnight.`],
     ["05:42", "Drafted nothing for any member. Nothing above was sent anywhere."]];
   $("log").innerHTML = rows.map(([t, l]) => `<li><span class="t">${t}</span><span>${l}</span></li>`).join("");
-  $("logmeta").textContent = `run cue-2026-10-27-0540 · rules.js release ${R.CURRENT_RELEASE} · data.js ${D.members.length} members`;
+  $("logmeta").textContent = `Overnight run · release ${R.CURRENT_RELEASE} · ${D.members.length} made-up members`;
 })();
 
 // ---------- Queue ----------
@@ -205,7 +205,7 @@ function renderDay() {
   const mins = calls.reduce((a, s) => a + s.minutes, 0), acc = calls.reduce((a, s) => a + s.cues.accepted, 0), dec = calls.reduce((a, s) => a + s.cues.declined, 0);
   $("daytiles").innerHTML = [[calls.length, "calls today"], [`${Math.floor(mins / calls.length)}:${String(Math.round((mins / calls.length % 1) * 60)).padStart(2, "0")}`, "avg handle"], [`${Math.round(acc / Math.max(1, acc + dec) * 100)}%`, "cues accepted"], [calls.filter(c => c.qa).length, "in QA sample"]].map(([n, l]) => `<div class="tile"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
   $("daynote").textContent = state.closed ? (state.callback ? "Rosa's call: you scheduled the callback with a date, which is the element yesterday's sample missed. The grievance clock starts today." : "Rosa's call: a callback was promised on Oct 14 and is still not scheduled. Open Schedule callback next time; Cue pre-fills it.") : D.coaching;
-  $("qa").textContent = `${calls.filter(c => c.qa).length} of ${calls.length} calls today are in the daily 200-turn sample two advocates re-check. ${state.closed && state.grievance ? "Rosa's call was sampled because a grievance was logged." : "Calls with a grievance or an escalation are always sampled."}`;
+  $("qa").textContent = `${calls.filter(c => c.qa).length} of ${calls.length} calls today are in the daily sample of 200 lines two advocates re-check. ${state.closed && state.grievance ? "Rosa's call was sampled because a grievance was logged." : "Calls with a grievance or an escalation are always sampled."}`;
   $("handled").textContent = calls.length; $("aht").textContent = `${Math.floor(mins / calls.length)}:${String(Math.round((mins / calls.length % 1) * 60)).padStart(2, "0")}`;
 }
 

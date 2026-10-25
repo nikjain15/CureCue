@@ -11,7 +11,6 @@
 <style>
 /* Evals: a three-word glossary, the method as eight clickable steps (each with its results and where it is weak), what testing caught, then real versus made up versus planned. Every result computed in the page, in plain language. */
 .hero{padding:36px 0 0}
-.hero h1,.hero .lead{max-width:72ch}
 #method{padding-top:20px}
 #method .head{margin-bottom:16px}
 #method .head p{font-size:16px}
@@ -44,7 +43,6 @@ td.num.bad{color:var(--bad);font-weight:700}
 .panel .ph-head{padding:20px 24px 4px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
 .panel .ph-head h3{margin:0;font-size:22px}
 .panel .ph-body{padding:8px 24px 22px}
-.panel .ph-body>p{max-width:72ch}
 .panel .ph-body h4{margin:18px 0 8px;font-size:15px}
 .panel .ph-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 24px;border-top:1px solid var(--line);background:var(--bg-2)}
 @media (max-width:600px){.panel .ph-head,.panel .ph-body{padding-left:16px;padding-right:16px}.panel .ph-foot{padding:12px 16px}}
@@ -119,6 +117,16 @@ td.num.bad{color:var(--bad);font-weight:700}
         <div class="tscroll"><table><thead><tr><th>Group</th><th class="num">Lines</th><th>Written</th></tr></thead><tbody id="srctbl"></tbody></table></div>
         <h4>What they cover</h4>
         <div class="kv" id="strata"></div>
+        <h4>Examples, read live from the test file</h4>
+        <p class="small" style="margin:0 0 8px">One line of each kind, exactly as stored. The full list of <span id="ex-n"></span> is in the <a href="app/#evals">test console</a>, under Test lines.</p>
+        <div class="tscroll"><table><thead><tr><th>What the member says</th><th>Right response</th><th>Group</th></tr></thead><tbody id="extbl"></tbody></table></div>
+        <details class="qa" style="margin-top:14px"><summary>How one line is stored</summary><div class="ci" id="exjson" style="margin-top:10px"></div><p class="small" style="margin-top:8px"><b>v</b> is the right response (answer, human for the advocate, escalate for a supervisor). <b>c</b> is the plan rule an answer must use. <b>g</b> marks an unhappy member. <b>register</b> is the tone, <b>lang</b> the language, <b>source</b> how it was written, <b>reason</b> why the member called. <b>plan</b> and <b>labeller</b> are filled in by rotation and not used in any result.</p></details>
+        <h4>Where it is set up</h4>
+        <div class="kv">
+          <div><b>Written here</b><p><a href="https://github.com/nikjain15/CureCue/blob/main/scripts/gen-golden.mjs">scripts/gen-golden.mjs</a>: every line and its right response, typed by hand, grouped by kind. It never reads CureCue's rules.</p></div>
+          <div><b>Saved here</b><p><a href="https://github.com/nikjain15/CureCue/blob/main/eval/golden.js">eval/golden.js</a>: the generated file of <span id="ex-n2"></span> lines that the test and this page read.</p></div>
+          <div><b>Run here</b><p><a href="https://github.com/nikjain15/CureCue/blob/main/eval/run.mjs">eval/run.mjs</a> scores a release against the lines; <a href="https://github.com/nikjain15/CureCue/blob/main/.github/workflows/eval.yml">eval.yml</a> runs it on every code change.</p></div>
+        </div>
         <div class="limit"><b>Where this is weak</b><ul>
           <li>One person wrote the test lines, the right responses and CureCue's rules. The rules were written with most of these lines in view, so CureCue does well on them. Only the newest lines, written after Release 3, show how it does on things it hasn't seen.</li>
           <li>The "two people labelled this" examples are made up to show how disagreements would be settled. <span id="adj-n"></span> lines, agreement <span id="adj-a"></span>; not a real measurement.</li>
@@ -265,6 +273,14 @@ td.num.bad{color:var(--bad);font-weight:700}
  const src=by("source");
  $("srctbl").innerHTML=[["hand","Covering each kind of question, complaint and supervisor call, in three tones and three languages."],["adversarial","Trigger words in harmless questions, members telling CureCue what to say, hidden supervisor calls."],["hard","After Release 3's rules were fixed, from cases we expected it to get wrong. No release has been adjusted to fit them."]].map(([k,w])=>`<tr><td><b>${SRC[k]}</b></td><td class="num">${src[k]||0}</td><td>${w}</td></tr>`).join("");
  $("strata").innerHTML=[["lang","Language",LN],["register","Tone",TONE],["reason","Reason for the call"]].map(([k,l,names])=>`<div><b>${l}</b><p>${Object.entries(by(k)).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`${names?names[n]:n} ${c}`).join(" · ")}</p></div>`).join("");
+
+ // real examples: the first line of each kind, straight from eval/golden.js
+ const KINDS=[["Plan question",x=>x.v==="answer"&&x.lang==="en"&&x.source==="hand"&&x.c==="S-ER"&&/admit/i.test(x.t)],["Plan question, in Spanish",x=>x.v==="answer"&&x.lang==="es"],["Through an interpreter",x=>x.lang==="interp"&&x.v==="answer"],["Account question",x=>x.v==="human"&&!x.g&&x.source==="hand"&&x.lang==="en"],["Unhappy, said indirectly",x=>x.g&&x.register==="implicit"&&x.source==="hand"],["Supervisor call",x=>x.v==="escalate"&&x.source==="hand"&&x.lang==="en"],["Written to trick it",x=>x.source==="adversarial"&&x.v==="escalate"],["New, written after Release 3",x=>x.source==="hard"&&x.v==="escalate"]];
+ const RULE=Object.fromEntries(Object.values(R.GRAPH.nodes).filter(n=>n.id).map(n=>[n.id,n.label]));
+ const exRows=KINDS.map(([kind,pred])=>[kind,G.find(pred)]).filter(([,x])=>x);
+ $("extbl").innerHTML=exRows.map(([kind,x])=>`<tr><td>"${x.t}"</td><td>${VERB[x.v][0].toUpperCase()+VERB[x.v].slice(1)}${x.c?` <span class="small">(${RULE[x.c]})</span>`:""}${x.g?" · member unhappy":""}</td><td class="small">${kind}</td></tr>`).join("");
+ const one=exRows[0][1];$("exjson").textContent=JSON.stringify(Object.fromEntries(Object.entries(one).filter(([k])=>k!=="labels")),null,2);
+ $("ex-n").textContent=G.length;$("ex-n2").textContent=G.length;
 
  // step 4: by group
  const sliceRows=(o,names)=>Object.entries(o).map(([k,v])=>`<tr><td><b>${names[k]||k}</b></td><td class="num">${v.rows}</td>${frac(v.esc)}${frac(v.dis)}${frac(v.cite)}</tr>`).join("");
