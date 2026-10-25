@@ -13,7 +13,7 @@ const relDay = off => off === 0 ? "today" : off === 1 ? "tomorrow" : off === -1 
 function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on"); clearTimeout(toast.h); toast.h = setTimeout(() => e.classList.remove("on"), 2800); }
 
 // ---------- Views ----------
-const TITLES = { home: ["Home", "Member Services · Medicare · Mon Oct 27"], desk: ["Call", "Rosa M. · Sierra Advantage HMO"], day: ["My day", "Mon Oct 27"], quality: ["Evals", "Runs, gates, slices, failures, dataset, judge"], loop: ["How it learns", "Two human gates"] };
+const TITLES = { home: ["Home", "Member Services · Medicare · Mon Oct 27"], desk: ["Call", "Rosa M. · Sierra Advantage HMO"], day: ["My day", "Mon Oct 27"], quality: ["Evals", "Releases, checks, mistakes, test lines"], loop: ["How it learns", "Two human gates"] };
 function show(v) { ["home", "desk", "day", "quality", "loop"].forEach(x => $("view-" + x).classList.toggle("on", x === v)); document.querySelectorAll(".rail button[data-view]").forEach(b => { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }); $("title").textContent = TITLES[v][0]; $("crumb").textContent = TITLES[v][1]; window.scrollTo({ top: 0 }); if (v === "day") renderDay(); }
 document.querySelectorAll(".rail button[data-view]").forEach(b => b.onclick = () => show(b.dataset.view));
 
@@ -44,7 +44,7 @@ renderHome();
     ["05:40", `Re-checked ${open.length} open case clocks against today. ${nearClock.length} within 7 days, ${open.filter(k => k.opened + k.days <= 5).length} within 5. Nothing breached.`],
     ["05:41", `Read ${D.contacts.length} contacts from the last 90 days. ${D.contacts.filter(c => c.callback && c.callback.promised).length} carried a promised callback; ${cbDue.length} fall due today, ${D.contacts.filter(c => c.callback && c.callback.promised && !c.callback.scheduled).length} was never scheduled.`],
     ["05:41", `Flagged ${likely.length} member${likely.length === 1 ? "" : "s"} as likely to call back: two or more contacts on one reason in 30 days plus an unkept promise.`],
-    ["05:42", `Scored release ${R.CURRENT_RELEASE} against the golden set: ${R.score(GOLDEN, R.CURRENT_RELEASE).failed ? "blocked" : "every gate passed"}. No skill changed overnight.`],
+    ["05:42", `Tested release ${R.CURRENT_RELEASE} on the test lines: ${R.score(GOLDEN, R.CURRENT_RELEASE).failed ? "it failed a check and is stopped" : "it passed every check"}. Nothing changed overnight.`],
     ["05:42", "Drafted nothing for any member. Nothing above was sent anywhere."]];
   $("log").innerHTML = rows.map(([t, l]) => `<li><span class="t">${t}</span><span>${l}</span></li>`).join("");
   $("logmeta").textContent = `run cue-2026-10-27-0540 · rules.js release ${R.CURRENT_RELEASE} · data.js ${D.members.length} members`;

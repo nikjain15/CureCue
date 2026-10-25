@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>CureCue · An assistant beside the advocate</title>
-<meta name="description" content="CureCue listens alongside a member-service advocate on a live call, cites the plan rule behind every figure, stops hard near a coverage decision, and is gated by an evaluation that fails the build.">
+<meta name="description" content="CureCue listens alongside a member-service advocate on a live call, cites the plan rule behind every figure, stops hard near a coverage decision, and is tested on every change, with failing versions stopped.">
 <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Mulish:wght@400;600;700;800&display=swap">
 <link rel="stylesheet" href="assets/site.css">
@@ -92,13 +92,13 @@
 </section>
 
 <section class="sec" id="measured">
-  <div class="head"><p class="eyebrow">Measured before it ships</p><h2>Release 2 passed a 24-turn English-only test set. Re-scored with Spanish and interpreter calls, it failed.</h2><p>Release 2 passed CI on the original golden set: 24 English turns. When Spanish and interpreter-mediated turns were added, re-scoring showed it caught none of the Spanish escalations. Release 3 shipped in the same change. Recall is now reported per language path, and the gap between paths is itself a gate.</p></div>
+  <div class="head"><p class="eyebrow">Tested before advocates use it</p><h2>Release 2 worked in English and missed every Spanish supervisor call.</h2><p>Every version of CureCue is run against example lines members say, each with the right response written down in advance. Release 2 passed its first test of 24 English lines. When we added Spanish lines and calls through an interpreter, it missed every Spanish call that needed a supervisor. Release 3 fixed this. Now each language is checked separately, and a big gap between them stops the release.</p></div>
   <div class="chart">
-    <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Escalation recall by language path, by release"></svg></div>
+    <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Supervisor calls flagged, by language, Release 2 and Release 3"></svg></div>
     <div>
       <div class="tiles" id="tiles"></div>
       <p class="small" id="gsum" style="margin:12px 0 14px"></p>
-      <a class="btn primary" href="app/#evals">Open the evaluation console</a>
+      <a class="btn primary" href="evals.html">See how we test it</a>
     </div>
   </div>
 </section>
@@ -111,7 +111,7 @@
     <div><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><b>Sentinel</b><span>Hears dissatisfaction and asks to log it.</span></div>
     <div><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div><b>Citer</b><span>Answers from plan rules. Every figure has a source.</span></div>
     <div><div class="ic"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div><b>Scribe</b><span>Drafts the note and recap from what was said.</span></div>
-    <div><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19h16M7 16V9M12 16V5M17 16v-6"/></svg></div><b>Reporter</b><span>Turns every call into an eval row.</span></div>
+    <div><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19h16M7 16V9M12 16V5M17 16v-6"/></svg></div><b>Reporter</b><span>Turns every call into test results.</span></div>
   </div>
   <p style="margin-top:26px"><a class="btn" href="architecture.html">Walk one call, turn by turn</a></p>
 </section>
@@ -123,20 +123,20 @@
 <script src="rules.js"></script>
 <script src="eval/golden.js"></script>
 <script>
-(function(){const R=window.CureCueRules,G=window.CureCueGolden;const f=x=>x.toFixed(2);
+(function(){const R=window.CureCueRules,G=window.CureCueGolden;const f=x=>x.toFixed(2),pc=x=>Math.round(x*100)+"%";
  const runs=R.RELEASES.map(rel=>({rel,...R.score(G,rel)}));const cur=runs.find(r=>r.rel===R.CURRENT_RELEASE);const prev=runs.find(r=>r.rel===R.CURRENT_RELEASE-1)||runs[0];
  const miss=cur.rows.filter(e=>!e.ok).length;
- document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>labelled turns</span><span><b>${cur.gates.length}</b>release gates</span><span><b>${runs.filter(r=>r.failed).length}</b>older releases fail today</span><span><b>${miss}</b>open misses, listed</span>`;
+ document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>test lines</span><span><b>${cur.gates.length}</b>pass/fail checks</span><span><b>${runs.filter(r=>r.failed).length}</b>older versions fail today</span><span><b>${miss}</b>known mistakes, listed</span>`;
  const L=[["en","English"],["es","Spanish"],["interp","Interpreter"]];
  const W=520,H=250,x0=110,y0=20,bw=18,gap=8,rowH=64;const lastGate=cur.gates.find(g=>g.metric==="escalation_recall");
- let s=`<text x="${x0}" y="12" font-size="11" fill="#5b6660" font-family="Mulish">Escalation recall by language path</text>`;
+ let s=`<text x="${x0}" y="12" font-size="11" fill="#5b6660" font-family="Mulish">Supervisor calls flagged, by language</text>`;
  L.forEach(([k,name],i)=>{const y=y0+10+i*rowH;s+=`<text x="${x0-10}" y="${y+bw+6}" text-anchor="end" font-size="13" font-weight="700" fill="#182218" font-family="Manrope">${name}</text>`;
-  [[prev,"#cfd6c9","Release "+prev.rel],[cur,"#72992e","Release "+cur.rel]].forEach(([r,c,lab],j)=>{const v=r.slices.lang[k].escalation_recall;const w=Math.max(2,(W-x0-80)*v);const yy=y+j*(bw+gap);s+=`<rect x="${x0}" y="${yy}" width="${w}" height="${bw}" rx="4" fill="${c}"/><text x="${x0+w+6}" y="${yy+bw-5}" font-size="12" font-family="Mulish" fill="#182218" font-weight="700">${f(v)}</text><text x="${x0+w+42}" y="${yy+bw-5}" font-size="11" font-family="Mulish" fill="#5b6660">${lab}</text>`;});});
- const gx=x0+(W-x0-80)*0.97;s+=`<line x1="${gx}" y1="${y0+4}" x2="${gx}" y2="${H-20}" stroke="#b23a3a" stroke-dasharray="4 3"/><text x="${gx}" y="${H-6}" text-anchor="middle" font-size="11" fill="#b23a3a" font-family="Mulish">gate 0.97</text>`;
+  [[prev,"#cfd6c9","Release "+prev.rel],[cur,"#72992e","Release "+cur.rel]].forEach(([r,c,lab],j)=>{const v=r.slices.lang[k].escalation_recall;const w=Math.max(2,(W-x0-80)*v);const yy=y+j*(bw+gap);s+=`<rect x="${x0}" y="${yy}" width="${w}" height="${bw}" rx="4" fill="${c}"/><text x="${x0+w+6}" y="${yy+bw-5}" font-size="12" font-family="Mulish" fill="#182218" font-weight="700">${pc(v)}</text><text x="${x0+w+42}" y="${yy+bw-5}" font-size="11" font-family="Mulish" fill="#5b6660">${lab}</text>`;});});
+ const gx=x0+(W-x0-80)*0.97;s+=`<line x1="${gx}" y1="${y0+4}" x2="${gx}" y2="${H-20}" stroke="#b23a3a" stroke-dasharray="4 3"/><text x="${gx}" y="${H-6}" text-anchor="middle" font-size="11" fill="#b23a3a" font-family="Mulish">pass mark 97%</text>`;
  document.getElementById("chart").innerHTML=s;
  const gapP=prev.gates.find(g=>g.metric==="recall_gap_lang"),gapC=cur.gates.find(g=>g.metric==="recall_gap_lang");
- document.getElementById("tiles").innerHTML=[[f(prev.slices.lang.es.escalation_recall),"bad",`Spanish recall, Release ${prev.rel}`],[f(cur.slices.lang.es.escalation_recall),"good",`Spanish recall, Release ${cur.rel}`],[f(gapP.value),"bad",`Gap across paths, Release ${prev.rel}`],[f(gapC.value),"good",`Gap across paths, Release ${cur.rel}`]].map(([v,c,l])=>`<div class="tile"><div class="n ${c}">${v}</div><div class="l">${l}</div></div>`).join("");
- document.getElementById("gsum").textContent=`Release ${cur.rel} passes all ${cur.gates.length} gates over ${G.length} turns: escalation recall ${f(cur.metrics.escalation_recall)}, right rule cited ${f(cur.metrics.citation_accuracy)}, routing ${f(cur.metrics.routing_accuracy)}. ${miss} turns still miss and are listed by name. Synthetic turns, written and labelled by one author.`;})();
+ document.getElementById("tiles").innerHTML=[[pc(prev.slices.lang.es.escalation_recall),"bad",`Spanish supervisor calls flagged, Release ${prev.rel}`],[pc(cur.slices.lang.es.escalation_recall),"good",`Spanish supervisor calls flagged, Release ${cur.rel}`],[Math.round(gapP.value*100)+" pts","bad",`Gap between languages, Release ${prev.rel}`],[Math.round(gapC.value*100)+" pts","good",`Gap between languages, Release ${cur.rel}`]].map(([v,c,l])=>`<div class="tile"><div class="n ${c}">${v}</div><div class="l">${l}</div></div>`).join("");
+ document.getElementById("gsum").textContent=`Release ${cur.rel} passes all ${cur.gates.length} checks on ${G.length} test lines: it flags ${pc(cur.metrics.escalation_recall)} of supervisor calls, uses the right plan rule ${pc(cur.metrics.citation_accuracy)} of the time, and sends ${pc(cur.metrics.routing_accuracy)} of lines to the right place. It still gets ${miss} lines wrong, each listed. The test lines are made up and were written by one person.`;})();
 </script>
 </body>
 </html>

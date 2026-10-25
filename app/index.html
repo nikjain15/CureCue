@@ -342,40 +342,40 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
 
   <!-- EVALS CONSOLE -->
   <div class="view" id="view-quality">
-    <div class="evhead"><div><h2 style="margin:0">Evaluation console</h2><p class="small" style="margin:4px 0 0">Computed in this page from <code>rules.js</code>, <code>eval/golden.js</code> and <code>eval/judge.js</code>, the same files CI runs on every push.</p></div>
-      <div class="tabs" id="evtabs" role="tablist"><button role="tab" aria-selected="true" data-ev="runs">Runs</button><button role="tab" aria-selected="false" data-ev="detail">Run detail</button><button role="tab" aria-selected="false" data-ev="compare">Compare</button><button role="tab" aria-selected="false" data-ev="failures">Failures</button><button role="tab" aria-selected="false" data-ev="dataset">Dataset</button><button role="tab" aria-selected="false" data-ev="judge">Judge</button></div></div>
+    <div class="evhead"><div><h2 style="margin:0">Test console</h2><p class="small" style="margin:4px 0 0">Every version of CureCue, tested on made-up lines a member might say, each with the right response written down in advance. Computed in this page from the same files the automatic test runs on every code change. <a href="../evals.html">How the testing works</a></p></div>
+      <div class="tabs" id="evtabs" role="tablist"><button role="tab" aria-selected="true" data-ev="runs">Releases</button><button role="tab" aria-selected="false" data-ev="detail">Release detail</button><button role="tab" aria-selected="false" data-ev="compare">Compare</button><button role="tab" aria-selected="false" data-ev="failures">Mistakes</button><button role="tab" aria-selected="false" data-ev="dataset">Test lines</button><button role="tab" aria-selected="false" data-ev="judge">Auto-grader</button></div></div>
 
     <section class="evp on" id="ev-runs"><div class="card">
-      <div class="tscroll"><table class="slices"><thead><tr><th>Run</th><th>Commit</th><th>Scored against</th><th>Esc. recall</th><th>Cited</th><th>Routing</th><th>Failing turns</th><th>Result</th><th></th></tr></thead><tbody id="ev-runs-body"></tbody></table></div>
+      <div class="tscroll"><table class="slices"><thead><tr><th>Release</th><th>Commit</th><th>Supervisor calls flagged</th><th>Right plan rule</th><th>Right place</th><th>Lines wrong</th><th>Result</th><th></th></tr></thead><tbody id="ev-runs-body"></tbody></table></div>
       <p class="small" id="ev-runs-note" style="margin-top:10px"></p><button class="btn sm primary" id="ev-runs-open-current">Open the current release</button></div></section>
 
     <section class="evp" id="ev-detail"><div class="card">
       <h3 id="ev-detail-title"></h3><p class="small" id="ev-detail-note"></p><p id="ev-sum"></p>
       <div class="tiles" id="ev-tiles"></div>
-      <h3 style="margin-top:14px">Gates, by principle</h3>
-      <div class="tscroll"><table class="gates"><thead><tr><th>Principle</th><th>What we measure</th><th>Value</th><th>Must be</th><th>Result</th></tr></thead><tbody id="ev-gates"></tbody></table></div>
+      <h3 style="margin-top:14px">The eight pass/fail checks</h3>
+      <div class="tscroll"><table class="gates"><thead><tr><th>Check</th><th>Today</th><th>Must be</th><th>Result</th></tr></thead><tbody id="ev-gates"></tbody></table></div>
       <div id="ev-slices"></div>
-      <div class="ctrl"><button class="btn sm" id="ev-detail-fail">See this release's failing turns</button></div></div></section>
+      <div class="ctrl"><button class="btn sm" id="ev-detail-fail">See this release's mistakes</button></div></div></section>
 
     <section class="evp" id="ev-compare"><div class="card">
       <div class="ctrl" style="margin:0 0 10px"><label class="small">From</label><select id="cmpA" style="max-width:180px"></select><label class="small">to</label><select id="cmpB" style="max-width:180px"></select></div>
-      <div class="tscroll"><table class="slices"><thead><tr><th>Metric</th><th>From</th><th>To</th><th>Change</th></tr></thead><tbody id="ev-cmp-body"></tbody></table></div>
+      <div class="tscroll"><table class="slices"><thead><tr><th>Measure</th><th>From</th><th>To</th><th>Change</th></tr></thead><tbody id="ev-cmp-body"></tbody></table></div>
       <div id="ev-cmp-rows"></div></div></section>
 
     <section class="evp" id="ev-failures"><div class="card">
       <div class="ctrl" style="margin:0 0 10px"><label class="small">Release</label><select id="ev-fail-rel" style="max-width:180px"></select><span id="ev-fail-classes"></span></div>
       <p class="small" id="ev-fail-note"></p>
-      <div class="tscroll"><table class="slices fails"><thead><tr><th>Turn</th><th>What the member said</th><th>Human label</th><th>What the rules did</th><th>Failure and why</th><th>Status</th></tr></thead><tbody id="ev-fail-body"></tbody></table></div></div></section>
+      <div class="tscroll"><table class="slices fails"><thead><tr><th>Group</th><th>What the member said</th><th>Right response</th><th>What CureCue did</th><th>Mistake and why</th><th>Status</th></tr></thead><tbody id="ev-fail-body"></tbody></table></div></div></section>
 
     <section class="evp" id="ev-dataset"><div class="card">
-      <h3>Golden set</h3><p class="small" id="ev-ds-meta"></p>
+      <h3>Test lines</h3><p class="small" id="ev-ds-meta"></p>
       <div class="strata" id="ev-ds-strata"></div>
-      <h3 style="margin-top:16px">Adjudicated subset: two labellers</h3><div id="ev-ds-adj"></div>
-      <details style="margin-top:14px"><summary class="small" style="cursor:pointer;font-weight:700">Browse every turn</summary><div id="ev-ds-browse"></div></details></div></section>
+      <h3 style="margin-top:16px">When two people disagree on the right response</h3><div id="ev-ds-adj"></div>
+      <details style="margin-top:14px"><summary class="small" style="cursor:pointer;font-weight:700">Browse every test line</summary><div id="ev-ds-browse"></div></details></div></section>
 
     <section class="evp" id="ev-judge"><div class="card">
-      <h3>Judge validation on the held-out slice</h3>
-      <div class="tscroll"><table class="slices"><thead><tr><th>What the judge scores</th><th>Agreement with people</th><th>Held-out turns</th><th>Allowed to feed a gate?</th></tr></thead><tbody id="ev-judge-body"></tbody></table></div>
+      <h3>Can the automatic grader be trusted?</h3>
+      <div class="tscroll"><table class="slices"><thead><tr><th>What it marks</th><th>Agrees with people</th><th>Lines compared</th><th>Trusted?</th></tr></thead><tbody id="ev-judge-body"></tbody></table></div>
       <p class="small" id="ev-judge-note" style="margin-top:10px"></p></div></section>
   </div>
 
@@ -392,7 +392,7 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
         <div class="step gate"><b>7 a person signs</b>Stage-gate checklist, then everyone.</div>
         <div class="step"><b>8 watch</b>If a topic slips, Cue goes quiet on that topic.</div>
       </div>
-      <p class="small" style="margin-top:12px">Steps 1 to 4 and 6 to 8 are design. What runs today is step 3 in miniature: <code>eval/run.mjs</code> scores the release in <code>rules.js</code> against <code>eval/golden.js</code> on every push, and a missed gate fails the build.</p></div>
+      <p class="small" style="margin-top:12px">Steps 1 to 4 and 6 to 8 are design. What runs today is step 3 in miniature: on every code change, the current release is tested on the made-up test lines, and a failed check fails the build.</p></div>
   </div>
 
   <p class="foot">Demonstration only. Every member, plan, provider, figure and call is synthetic. No real health plan, organisation, person or document is represented.</p>
