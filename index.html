@@ -92,7 +92,7 @@
 </section>
 
 <section class="sec" id="measured">
-  <div class="head"><p class="eyebrow">Measured before it ships</p><h2>The average would have shipped Release 2. The slice did not.</h2><p>Release 2 passed the overall stop gate on English calls and missed every Spanish-language escalation. Recall is reported per language path, and the gap is itself a gate.</p></div>
+  <div class="head"><p class="eyebrow">Measured before it ships</p><h2>An English-only test set passed Release 2. The language slice did not.</h2><p>Release 2 passed its original golden set, which was English only. When Spanish and interpreter-mediated calls were labelled, re-scoring showed it caught no Spanish-language escalation. Recall is now reported per language path, and the gap is itself a gate.</p></div>
   <div class="chart">
     <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Escalation recall by language path, by release"></svg></div>
     <div>

@@ -48,7 +48,7 @@ table td.st{white-space:nowrap}
 </section>
 
 <section class="sec" id="finding">
-  <div class="head"><p class="eyebrow">The finding</p><h2>The average would have shipped Release 2.</h2><p>It passed the overall stop gate on English calls and caught no Spanish-language escalation. The gap across language paths is itself a gate.</p></div>
+  <div class="head"><p class="eyebrow">The finding</p><h2>An English-only test set passed Release 2. The language slice did not.</h2><p>Release 2 passed its original golden set, which was English only. When Spanish and interpreter-mediated calls were labelled, re-scoring showed it caught no Spanish-language escalation. Recall is now reported per language path, and the gap is itself a gate.</p></div>
   <div class="chart">
     <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Escalation recall by language path, by release"></svg></div>
     <div class="tscroll card flat"><table id="slicetbl"><thead><tr><th>Release</th><th>English</th><th>Spanish</th><th>Interpreter</th><th>Gap</th><th></th></tr></thead><tbody></tbody></table></div>
@@ -68,19 +68,19 @@ table td.st{white-space:nowrap}
 </section>
 
 <section class="sec" id="golden">
-  <div class="head"><p class="eyebrow">Golden set</p><h2>Labelled by a person who never ran the rules.</h2><p>Every turn carries a verdict, a clause when there is an answer, a dissatisfaction flag, and the strata it belongs to. A hard set, written from the shapes that fail in production, keeps the misses honest.</p></div>
+  <div class="head"><p class="eyebrow">Golden set</p><h2>Labelled by intent, not by what the rules output.</h2><p>Every turn carries a verdict, a clause when there is an answer, a dissatisfaction flag, and the strata it belongs to. A hard set, written from the shapes that fail in production, keeps the misses honest. The two-labeller subset is simulated in the prototype; in production two advocates relabel a daily sample.</p></div>
   <div class="tiles" id="gtiles"></div>
   <div class="kv" style="margin-top:14px" id="strata"></div>
 </section>
 
 <section class="sec" id="release">
-  <div class="head"><p class="eyebrow">Release history</p><h2>Two releases blocked, one on the desk.</h2><p>The eval runs on every push. A missed gate fails the build; no override flag exists. The repository's own history is the demonstration.</p></div>
+  <div class="head"><p class="eyebrow">Release history</p><h2>Re-scored on today's set: two releases fail, one ships.</h2><p>The eval runs on every push. A missed gate fails the build; no override flag exists. Release 2 passed CI against the English-only set it was built on; it fails once Spanish and interpreter calls are labelled. When the hard set was added, the bars were reset to defensible ranges (escalation recall 0.97, citation 0.92, dissatisfaction 0.88, precision raised to 0.85), and every remaining miss is listed.</p></div>
   <div class="rel" id="rel"></div>
   <details class="qa" style="margin-top:14px"><summary>What CI printed</summary><div class="ci" id="ci" style="margin-top:10px"></div></details>
 </section>
 
 <section class="sec" id="judge">
-  <div class="head"><p class="eyebrow">The judge</p><h2>Used only where it agrees with people.</h2><p>A model that scores answers gets its own eval. On a held-out slice its agreement is measured per metric; under 0.85 it is refused, and the refusal is printed. Escalation is never judged by a model.</p></div>
+  <div class="head"><p class="eyebrow">The judge</p><h2>Used only where it agrees with the labels.</h2><p>The prototype's judge is a stand-in lexicon scorer, not a model; a model judge would get the same eval. On a held-out slice its agreement is measured per metric; under 0.85 it is refused, and the refusal is printed. Escalation is never given to a judge.</p></div>
   <div class="tscroll card flat"><table id="judgetbl"><thead><tr><th>Scores</th><th>Agreement</th><th>Held-out turns</th><th>Allowed?</th></tr></thead><tbody></tbody></table></div>
   <p class="small" id="jnote" style="margin-top:8px"></p>
 </section>
@@ -91,7 +91,7 @@ table td.st{white-space:nowrap}
     <div><b>Labels share no code with the engine</b><p>An eval that reuses the engine's logic can only agree with it.</p></div>
     <div><b>Score the corpus before the engine</b><p>Every clause id exists, every claim adds up, every clock computes. Generated data reads as real until someone computes a ratio.</p></div>
     <div><b>Gates, not scores</b><p>Each metric has a threshold and a consequence. A missed gate fails the build.</p></div>
-    <div><b>The judge is validated or refused</b><p>Agreement with people on a held-out slice decides whether it may feed a gate.</p></div>
+    <div><b>The judge is validated or refused</b><p>Agreement with the labels on a held-out slice decides whether it may feed a gate.</p></div>
     <div><b>A number is a number per slice</b><p>An average hides exactly the members a fairness principle exists for.</p></div>
   </div>
 </section>
