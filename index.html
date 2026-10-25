@@ -4,119 +4,139 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>CureCue · An assistant beside the advocate</title>
-<meta name="description" content="CureCue listens alongside a member-service advocate on a live call, cites the plan rule behind every figure, stops hard near a coverage decision, and scores itself the way its CI does.">
+<meta name="description" content="CureCue listens alongside a member-service advocate on a live call, cites the plan rule behind every figure, stops hard near a coverage decision, and is gated by an evaluation that fails the build.">
 <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Mulish:wght@400;600;700;800&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 <style>
-.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:36px;align-items:center;padding:36px 0 28px}
-@media (max-width:900px){.hero{grid-template-columns:1fr}}
-.hero h1{font-size:clamp(34px,4.6vw,50px);font-weight:800;line-height:1.05;margin:0 0 14px}
+/* Landing: hero, then one call told in four beats (text left, the real desk right), then one chart, then the six responsibilities as a path, then the door to the desk. */
+.hero{padding:40px 0 10px;text-align:left}
+.hero h1{max-width:18ch;margin-bottom:14px}
 .hero h1 em{font-style:normal;color:var(--green)}
-.hero p.lead{font-size:19px;color:var(--muted);max-width:52ch}
-.hero .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-.hero .proof{display:flex;gap:18px;flex-wrap:wrap;margin-top:22px;font-size:14px;color:var(--muted)}
-.hero .proof b{display:block;font-size:22px;color:var(--fg);font-variant-numeric:tabular-nums}
-.shot{border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(20,30,10,.14);border:1px solid var(--line);background:var(--bg-2);display:block}
+.hero .lead{margin-bottom:22px}
+.hero .cta{display:flex;gap:10px;flex-wrap:wrap}
+.shot{margin:34px 0 0;border-radius:18px;overflow:hidden;box-shadow:0 24px 70px rgba(24,34,24,.16);border:1px solid var(--line);background:var(--bg-2)}
 .shot img{display:block;width:100%;height:auto}
-.band{padding:36px 0;border-top:1px solid var(--line)}
-.band h2{margin-bottom:6px}
-.band p.lead{color:var(--muted);max-width:66ch;margin-bottom:18px}
-.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
-.agent{padding:16px 18px}
-.agent .ic{width:36px;height:36px;border-radius:10px;background:var(--panel-2);display:grid;place-items:center;margin-bottom:10px}
-.agent .ic svg{width:20px;height:20px;stroke:var(--leaf);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.agent h4{font-size:17px;margin:0 0 4px}
-.agent p{font-size:15px;color:var(--muted);margin:0}
-.agent .when{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--leaf);font-weight:800;display:block;margin-bottom:4px}
-.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;counter-reset:s}
-@media (max-width:900px){.flow{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:520px){.flow{grid-template-columns:1fr}}
-.flow div{padding:16px;border-radius:14px;background:var(--panel-2);font-size:15px}
-.flow div::before{counter-increment:s;content:counter(s);display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;font-weight:800;font-size:13px;margin-bottom:8px}
-.flow b{display:block;font-size:16px;margin-bottom:2px}
-.two{display:grid;gap:14px;grid-template-columns:1.1fr .9fr}
-@media (max-width:900px){.two{grid-template-columns:1fr}}
-.tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));max-width:760px}
-.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.tile .n{font-size:30px;font-weight:800;line-height:1.1;color:var(--good)}.tile .l{font-size:13px;color:var(--muted)}
-.rules{list-style:none;margin:0;padding:0;display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
-.rules li{padding:10px 12px;border-radius:10px;background:var(--bg-2);font-size:15px}
-.rules li b{color:var(--leaf)}
-.cta-band{background:var(--fg);color:#fff;border-radius:18px;padding:28px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:12px}
-.cta-band h2{color:#fff;margin:0}
-.cta-band p{color:rgba(255,255,255,.75);margin:4px 0 0}
-.cta-band .btn{margin-left:auto;border-color:var(--brand);background:var(--brand);color:#1d2a0c}
+.proof{display:flex;gap:28px;flex-wrap:wrap;margin:18px 0 0;font-size:14px;color:var(--muted)}
+.proof b{display:block;font-family:var(--display);font-size:24px;color:var(--fg);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+/* beats */
+.beat{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:40px;align-items:center;padding:34px 0;border-top:1px solid var(--line)}
+.beat:first-of-type{border-top:0}
+.beat .num{font-family:var(--display);font-weight:800;color:var(--green);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.beat h3{font-size:clamp(22px,2.6vw,30px);font-weight:800;margin-bottom:8px}
+.beat p{font-size:18px;color:var(--muted);max-width:44ch;margin:0}
+.beat q{display:block;margin:14px 0 0;padding:10px 14px;border-left:4px solid var(--brand);background:var(--panel-2);border-radius:0 10px 10px 0;font-size:16px;color:var(--fg);quotes:"\201C" "\201D"}
+.beat .pic{border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--panel)}
+.beat .pic img{display:block;width:100%;height:auto}
+.beat:nth-of-type(even) .pic{order:-1}
+@media (max-width:860px){.beat{grid-template-columns:1fr;gap:18px;padding:26px 0}.beat:nth-of-type(even) .pic{order:0}}
+.after{font-size:16px;color:var(--muted);padding:6px 0 0;max-width:60ch}
+/* chart */
+.chart{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:28px;align-items:center}
+@media (max-width:860px){.chart{grid-template-columns:1fr}}
+.chart svg{width:100%;height:auto;display:block}
+.tiles{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.tile .n{font-family:var(--display);font-size:30px;font-weight:800;line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tile .n.good{color:var(--good)}.tile .n.bad{color:var(--bad)}
+.tile .l{font-size:13px;color:var(--muted);margin-top:2px}
+/* path */
+.path{display:grid;grid-template-columns:repeat(6,1fr);gap:0;position:relative;margin-top:8px}
+.path::before{content:"";position:absolute;left:8%;right:8%;top:22px;height:3px;background:var(--line-2);border-radius:2px}
+.path div{position:relative;text-align:center;padding:0 8px}
+.path .ic{width:46px;height:46px;border-radius:50%;background:var(--green);display:grid;place-items:center;margin:0 auto 10px;position:relative;border:4px solid var(--bg)}
+.path .ic.stop{background:var(--bad)}
+.path .ic svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.path b{display:block;font-family:var(--display);font-size:16px;margin-bottom:3px}
+.path span{font-size:13.5px;color:var(--muted);display:block}
+@media (max-width:860px){.path{grid-template-columns:repeat(3,1fr);row-gap:22px}.path::before{display:none}}
+@media (max-width:480px){.path{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <nav class="nav">
   <a class="logo" href="./"><img src="assets/mark.svg" alt="">CureCue</a>
-  <div class="links"><a href="approach.html">Approach</a><a href="evals.html">Evals</a><a href="architecture.html">Architecture</a><a class="btn primary sm" href="app/">Open the desk</a></div>
+  <div class="links"><a href="approach.html">Approach</a><a href="architecture.html">How it works</a><a href="evals.html">Evals</a><a class="btn primary sm" href="app/">Open the desk</a></div>
 </nav>
 
 <section class="hero">
-  <div>
-    <h1>An assistant that sits <em>beside</em> the advocate.</h1>
-    <p class="lead">CureCue listens on a live member call and speaks only when it has something useful. The advocate stays in charge of every word.</p>
-    <div class="cta"><a class="btn primary lg" href="app/">Try the demo call</a><a class="btn lg" href="approach.html">Read the approach</a></div>
-    <div class="proof" id="proof"></div>
+  <p class="eyebrow">For member-service advocates at a Medicare Advantage plan</p>
+  <h1>Cue listens on the call. <em>The advocate</em> stays in charge.</h1>
+  <p class="lead">An assistant that hears what the member means, answers only from the plan's own rules, and stops hard when a person must decide.</p>
+  <div class="cta"><a class="btn primary lg" href="app/">Take the demo call</a><a class="btn lg" href="approach.html">Read the approach</a></div>
+  <div class="proof" id="proof"></div>
+  <div class="shot"><img src="assets/desk.png" alt="The advocate desk: Cue's briefing before the first call" width="1280" height="820"></div>
+</section>
+
+<section class="sec" id="call">
+  <div class="head"><p class="eyebrow">One call, four beats</p><h2>What Cue does while Rosa talks.</h2><p>Rosa, 71, is calling for the third time about a bill. Four minutes, four moments where the assistant earns its place.</p></div>
+
+  <div class="beat">
+    <div><div class="num">1 · Verify</div><h3>Nothing is read until the advocate says who is calling.</h3><p>Cue shows what it heard beside each check. The advocate ticks the box. Identity is a human decision.</p><q>Rosa Martinez. March 9th, 1955.</q></div>
+    <div class="pic"><img src="assets/beats/verify.png" alt="Identity checks with what Cue heard beside each one" width="768" height="880"></div>
   </div>
-  <a class="shot" href="app/" aria-label="Open the advocate desk"><img src="assets/desk.png" alt="The advocate desk during a call" width="1280" height="860"></a>
-</section>
-
-<section class="band" id="how">
-  <h2>What happens on one call</h2>
-  <div class="flow">
-    <div><b>Verify</b>Nothing about the member is read until the advocate confirms who is calling.</div>
-    <div><b>Hear</b>"Third time I've called" is flagged as a grievance, even without the word.</div>
-    <div><b>Answer</b>A copay question is answered from the plan's own rules, with the rule shown.</div>
-    <div><b>Stop</b>A dispute about care or coverage halts everything. A supervisor is brought in.</div>
+  <div class="beat">
+    <div><div class="num">2 · Hear</div><h3>Dissatisfaction counts as a grievance, even without the word.</h3><p>Cue highlights the sentence, says why it counts, and asks the advocate to log it. Either answer goes in the note.</p><q>This is the third time I've called about this bill.</q></div>
+    <div class="pic"><img src="assets/beats/hear.png" alt="Cue flags a repeat contact as a grievance and asks the advocate to log it" width="768" height="916"></div>
   </div>
-  <p class="small" style="margin-top:12px">Then a note and a recap, drafted from this call only, approved and sent by the advocate.</p>
+  <div class="beat">
+    <div><div class="num">3 · Answer</div><h3>Every figure comes from a rule on the plan, with the rule shown.</h3><p>The specialist copay depends on a referral, which depends on primary care. Cue walks that path and says what to check before quoting.</p><q>They billed me $120 and I thought I only pay $35.</q></div>
+    <div class="pic"><img src="assets/beats/answer.png" alt="Cue's suggested answer with the referral check and the two confirm buttons" width="768" height="1064"></div>
+  </div>
+  <div class="beat">
+    <div><div class="num">4 · Stop</div><h3>A dispute about care or coverage halts everything.</h3><p>Cue drafts nothing, pauses every other cue, and offers one button: bring a supervisor in. A coverage decision has no type to be emitted as.</p><q>They are sending my mother home tomorrow and she is not ready.</q></div>
+    <div class="pic"><img src="assets/beats/stop.png" alt="Cue's stop cue with the single action to connect a supervisor" width="768" height="962"></div>
+  </div>
+  <p class="after">Then a note and a recap, drafted from this call only. The advocate approves one and sends the other.</p>
 </section>
 
-<section class="band" id="agents">
-  <h2>One assistant, six responsibilities</h2>
-  <p class="lead">Cue is organised the way a compliance review reads a call: who is speaking, is the member dissatisfied, where does the answer come from, must this stop, what goes in the note, what did we learn. Each responsibility is a separate skill with its own gate. In this prototype each is a rule in one shared file; the <a href="architecture.html">architecture</a> shows where a model sits behind each.</p>
-  <div class="grid">
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg></div><h4>Listener</h4><p>Confirms identity, remembers prior calls, routes each turn.</p></div>
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><h4>Sentinel</h4><p>Hears dissatisfaction and asks the advocate to log it.</p></div>
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div><h4>Citer</h4><p>Answers benefit questions from plan rules. Every figure has a source.</p></div>
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/><path d="M9 12h6"/></svg></div><h4>Guardian</h4><p>Stops everything near a coverage decision or distress. Runs first.</p></div>
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div><h4>Scribe</h4><p>Drafts the note and the recap from what was actually said.</p></div>
-    <div class="card agent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19h16M7 16V9M12 16V5M17 16v-6"/></svg></div><h4>Reporter</h4><p>Turns every call into an eval row for the scorecard.</p></div>
+<section class="sec" id="measured">
+  <div class="head"><p class="eyebrow">Measured before it ships</p><h2>The average would have shipped Release 2. The slice did not.</h2><p>Release 2 passed the overall stop gate on English calls and missed every Spanish-language escalation. Recall is reported per language path, and the gap is itself a gate.</p></div>
+  <div class="chart">
+    <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Escalation recall by language path, by release"></svg></div>
+    <div>
+      <div class="tiles" id="tiles"></div>
+      <p class="small" id="gsum" style="margin:12px 0 14px"></p>
+      <a class="btn primary" href="app/#evals">Open the evaluation console</a>
+    </div>
   </div>
 </section>
 
-<section class="band" id="evals">
-  <h2>Evaluated like a regulated product</h2>
-  <p class="lead">Gates that fail the build, error budgets with owners, a judge that is refused where people disagree with it, a live sample that can pause a topic. The expected side is written by a person who never ran the rules, and the data is checked before the engine reads it. The numbers below are computed on this page from the same two files CI runs.</p>
-  <div class="tiles" id="tiles"></div>
-  <p class="small" id="gsum"></p>
-  <ul class="rules">
-    <li><b>Escalation recall 1.00.</b> The one failure that cannot be budgeted. Never judged by a model.</li>
-    <li><b>Figures off the cited path: none.</b> A number not in a rule on the path is a build failure.</li>
-    <li><b>Three verdicts, by type.</b> Answer, needs a person, escalate. A coverage decision has no type to be emitted as.</li>
-    <li><b>Two releases were blocked</b> before the one on the desk: the first missed most escalations; the second missed every Spanish-language one, which only a per-slice view shows. Both runs are in the repository's history.</li>
-  </ul>
-  <p style="margin-top:14px"><a class="btn primary" href="app/#evals">Open the evaluation console</a> <a class="btn" href="evals.html">The framework and why</a></p>
+<section class="sec" id="how">
+  <div class="head"><p class="eyebrow">How it works</p><h2>One assistant, six responsibilities, in a fixed order.</h2><p>The stop runs first on every turn. Then one owner per turn, with only the context that owner needs.</p></div>
+  <div class="path">
+    <div><div class="ic stop"><svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/><path d="M9 12h6"/></svg></div><b>Guardian</b><span>Stops near a decision or distress. Runs first.</span></div>
+    <div><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg></div><b>Listener</b><span>Verifies identity, routes each turn to one owner.</span></div>
+    <div><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><b>Sentinel</b><span>Hears dissatisfaction and asks to log it.</span></div>
+    <div><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div><b>Citer</b><span>Answers from plan rules. Every figure has a source.</span></div>
+    <div><div class="ic"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div><b>Scribe</b><span>Drafts the note and recap from what was said.</span></div>
+    <div><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19h16M7 16V9M12 16V5M17 16v-6"/></svg></div><b>Reporter</b><span>Turns every call into an eval row.</span></div>
+  </div>
+  <p style="margin-top:26px"><a class="btn" href="architecture.html">Walk one call, turn by turn</a></p>
 </section>
 
-<section class="band">
-  <div class="cta-band"><div><h2>See the call</h2><p>One member, one plan, four minutes.</p></div><a class="btn lg" href="app/">Open the advocate desk</a></div>
-</section>
+<div class="cta-band"><div><h2>See the call</h2><p>One member, one plan, four minutes, with voice.</p></div><a class="btn lg" href="app/">Open the advocate desk</a></div>
 
 <p class="foot">Demonstration only. Every member, plan, provider, figure and call is synthetic. No real health plan, organisation, person or document is represented.</p>
 </div>
 <script src="rules.js"></script>
 <script src="eval/golden.js"></script>
 <script>
-(function(){const R=window.CureCueRules,G=window.CureCueGolden;const r=R.score(G,R.CURRENT_RELEASE),r1=R.score(G,1);const f=x=>x.toFixed(2);
- document.getElementById("tiles").innerHTML=[["Escalations caught",f(r.metrics.escalation_recall)],["Right rule cited",f(r.metrics.citation_accuracy)],["Figures off the path",String(Math.round(r.metrics.hallucination_rate*r.metrics.drafted))],["Turns fully right",f(r.metrics.task_success)]].map(([l,v])=>`<div class="tile"><div class="n">${v}</div><div class="l">${l}</div></div>`).join("");
- document.getElementById("gsum").textContent=`Release ${R.CURRENT_RELEASE} passes every gate over ${G.length} labelled turns across ${Object.keys(R.score(G,R.CURRENT_RELEASE).slices.lang).length} language paths and ${Object.keys(R.score(G,R.CURRENT_RELEASE).slices.register).length} registers. Release 1 caught ${Math.round(r1.metrics.escalation_recall*100)}% of escalations and was blocked.`;
- document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>labelled turns</span><span><b>${r.gates.length}</b>release gates</span><span><b>${Object.keys(r.slices.lang).length}</b>language paths</span><span><b>0</b>figures without a source</span>`;})();
+(function(){const R=window.CureCueRules,G=window.CureCueGolden;const f=x=>x.toFixed(2);
+ const runs=R.RELEASES.map(rel=>({rel,...R.score(G,rel)}));const cur=runs.find(r=>r.rel===R.CURRENT_RELEASE);const prev=runs.find(r=>r.rel===R.CURRENT_RELEASE-1)||runs[0];
+ const miss=cur.rows.filter(e=>!e.ok).length;
+ document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>labelled turns</span><span><b>${cur.gates.length}</b>release gates</span><span><b>${runs.filter(r=>r.failed).length}</b>releases blocked</span><span><b>${miss}</b>open misses, listed</span>`;
+ const L=[["en","English"],["es","Spanish"],["interp","Interpreter"]];
+ const W=520,H=250,x0=110,y0=20,bw=18,gap=8,rowH=64;const lastGate=cur.gates.find(g=>g.metric==="escalation_recall");
+ let s=`<text x="${x0}" y="12" font-size="11" fill="#5b6660" font-family="Mulish">Escalation recall by language path</text>`;
+ L.forEach(([k,name],i)=>{const y=y0+10+i*rowH;s+=`<text x="${x0-10}" y="${y+bw+6}" text-anchor="end" font-size="13" font-weight="700" fill="#182218" font-family="Manrope">${name}</text>`;
+  [[prev,"#cfd6c9","Release "+prev.rel],[cur,"#72992e","Release "+cur.rel]].forEach(([r,c,lab],j)=>{const v=r.slices.lang[k].escalation_recall;const w=Math.max(2,(W-x0-80)*v);const yy=y+j*(bw+gap);s+=`<rect x="${x0}" y="${yy}" width="${w}" height="${bw}" rx="4" fill="${c}"/><text x="${x0+w+6}" y="${yy+bw-5}" font-size="12" font-family="Mulish" fill="#182218" font-weight="700">${f(v)}</text><text x="${x0+w+42}" y="${yy+bw-5}" font-size="11" font-family="Mulish" fill="#5b6660">${lab}</text>`;});});
+ const gx=x0+(W-x0-80)*0.97;s+=`<line x1="${gx}" y1="${y0+4}" x2="${gx}" y2="${H-20}" stroke="#b23a3a" stroke-dasharray="4 3"/><text x="${gx}" y="${H-6}" text-anchor="middle" font-size="11" fill="#b23a3a" font-family="Mulish">gate 0.97</text>`;
+ document.getElementById("chart").innerHTML=s;
+ const gapP=prev.gates.find(g=>g.metric==="recall_gap_lang"),gapC=cur.gates.find(g=>g.metric==="recall_gap_lang");
+ document.getElementById("tiles").innerHTML=[[f(prev.slices.lang.es.escalation_recall),"bad",`Spanish recall, Release ${prev.rel}`],[f(cur.slices.lang.es.escalation_recall),"good",`Spanish recall, Release ${cur.rel}`],[f(gapP.value),"bad",`Gap across paths, Release ${prev.rel}`],[f(gapC.value),"good",`Gap across paths, Release ${cur.rel}`]].map(([v,c,l])=>`<div class="tile"><div class="n ${c}">${v}</div><div class="l">${l}</div></div>`).join("");
+ document.getElementById("gsum").textContent=`Release ${cur.rel} passes all ${cur.gates.length} gates over ${G.length} turns: escalation recall ${f(cur.metrics.escalation_recall)}, right rule cited ${f(cur.metrics.citation_accuracy)}, routing ${f(cur.metrics.routing_accuracy)}. ${miss} turns still miss and are listed by name in the console.`;})();
 </script>
 </body>
 </html>

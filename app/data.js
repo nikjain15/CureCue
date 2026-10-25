@@ -617,7 +617,7 @@
    "time": "08:04",
    "member": "M-006",
    "reason": "Pharmacy",
-   "minutes": 6,
+   "minutes": 7,
    "cues": {
     "accepted": 1,
     "declined": 0
@@ -628,7 +628,7 @@
    "time": "08:17",
    "member": "M-007",
    "reason": "Benefits and cost question",
-   "minutes": 4,
+   "minutes": 6,
    "cues": {
     "accepted": 1,
     "declined": 0
@@ -639,7 +639,7 @@
    "time": "08:31",
    "member": "M-003",
    "reason": "ID card",
-   "minutes": 5,
+   "minutes": 4,
    "cues": {
     "accepted": 0,
     "declined": 0
@@ -650,7 +650,7 @@
    "time": "08:49",
    "member": "M-004",
    "reason": "Claims and billing",
-   "minutes": 9,
+   "minutes": 12,
    "cues": {
     "accepted": 2,
     "declined": 0
@@ -661,7 +661,7 @@
    "time": "09:12",
    "member": "M-008",
    "reason": "Provider lookup",
-   "minutes": 5,
+   "minutes": 6,
    "cues": {
     "accepted": 1,
     "declined": 1
@@ -672,7 +672,7 @@
    "time": "09:30",
    "member": "M-002",
    "reason": "Appeal status",
-   "minutes": 7,
+   "minutes": 10,
    "cues": {
     "accepted": 1,
     "declined": 0
@@ -683,7 +683,7 @@
    "time": "10:02",
    "member": "M-005",
    "reason": "Benefits and cost question",
-   "minutes": 6,
+   "minutes": 8,
    "cues": {
     "accepted": 1,
     "declined": 0
