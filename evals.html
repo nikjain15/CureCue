@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>CureCue · Evaluation</title>
-<meta name="description" content="How CureCue is evaluated: a golden set with strata and a hard set, gates set to defensible ranges, metrics by slice, a validated judge, the release history, and what is computed versus designed.">
+<meta name="description" content="How CureCue is evaluated, in eight steps: gates from principles, a labelled golden set with a hard set, a data check, metrics by slice, a CI gate, misses by name, a validated judge, and the live design. With what each step does not prove.">
 <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Mulish:wght@400;600;700;800&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 <style>
-/* Evals: the finding first (chart), then the gates as a table, the misses by name, the release history, the judge, the honest table. Every number computed in the page. */
+/* Evals: the finding first (chart), then the method as eight clickable steps, each with its evidence and its limit, then computed versus designed. Every result computed in the page. */
 .hero{padding:36px 0 8px;max-width:72ch}
 .chart{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:28px;align-items:center}
 @media (max-width:860px){.chart{grid-template-columns:1fr}}
@@ -20,17 +20,52 @@
 .tile .n.good{color:var(--good)}.tile .n.bad{color:var(--bad)}
 .tile .l{font-size:13px;color:var(--muted);margin-top:2px}
 table td.st{white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td.num.bad{color:var(--bad);font-weight:700}
+/* the method: eight steps as a map, one open at a time */
+.steps{display:grid;gap:10px;grid-template-columns:repeat(4,minmax(0,1fr));counter-reset:s;margin:0;padding:0;list-style:none}
+@media (max-width:860px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.steps button{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;width:100%;height:100%;padding:14px 14px 12px;border-radius:14px;border:1.5px solid var(--line);background:var(--panel);cursor:pointer;position:relative}
+.steps button:hover{border-color:var(--line-2)}
+.steps button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.steps button[aria-selected="true"]{border-color:var(--green);background:var(--panel-2)}
+.steps .top{display:flex;align-items:center;gap:8px}
+.steps .no{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:12px;background:var(--bg-2);color:var(--leaf)}
+.steps button[aria-selected="true"] .no{background:var(--green);color:#fff}
+.steps .ph{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.steps .nm{font-family:var(--display);font-weight:800;font-size:16px;line-height:1.2;color:var(--fg)}
+.steps .ln{font-size:13.5px;color:var(--muted);line-height:1.4}
+.steps .pill{align-self:flex-start;margin-top:auto;white-space:normal}
+.panel{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.panel .ph-head{padding:20px 24px 4px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.panel .ph-head h3{margin:0;font-size:22px}
+.panel .ph-body{padding:8px 24px 22px}
+.panel .ph-body>p{max-width:72ch}
+.panel .ph-body h4{margin:18px 0 8px;font-size:15px}
+.panel .ph-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 24px;border-top:1px solid var(--line);background:var(--bg-2)}
+@media (max-width:600px){.panel .ph-head,.panel .ph-body{padding-left:16px;padding-right:16px}.panel .ph-foot{padding:12px 16px}}
+.tab{display:none}.tab.on{display:block}
+.limit{margin-top:16px;padding:12px 16px;border-radius:12px;background:var(--warn-bg);font-size:15px}
+.limit b{display:block;font-family:var(--display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--warn);margin-bottom:4px}
+.limit ul{margin:0;padding-left:18px}.limit li{margin:3px 0}
 .miss{display:grid;gap:8px}
-.miss div{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:start;padding:10px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--line);font-size:15px}
+.miss div{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:start;padding:10px 14px;border-radius:12px;background:var(--bg-2);border:1px solid var(--line);font-size:15px}
 .miss .id{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:3px}
 .miss .t{font-weight:600}
 .miss .why{grid-column:2;font-size:14px;color:var(--muted)}
-.rel{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-.rel .card h3{display:flex;gap:10px;align-items:center;margin-bottom:8px}
-.rel ul{margin:0;padding-left:18px;font-size:14.5px}
+.rel{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.rel .card{box-shadow:none}
+.rel .card h4{display:flex;gap:10px;align-items:center;margin:0 0 6px;flex-wrap:wrap}
+.rel p{font-size:14.5px;margin:0 0 6px}
+.rel ul{margin:0;padding-left:18px;font-size:14px}
 .rel li{margin:2px 0}
+.rel code{font-size:12.5px}
 .ci{font-family:var(--mono);font-size:12.5px;background:var(--fg);color:#e9efe0;border-radius:12px;padding:14px 16px;overflow:auto;white-space:pre}
 .ci .ok{color:#9bd36b}.ci .bad{color:#f28b8b}
+.notprove{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.notprove div{padding:14px 16px;border-radius:var(--r);background:var(--panel);border:1px solid var(--line)}
+.notprove b{display:block;font-family:var(--display);font-size:16px;margin-bottom:4px}
+.notprove p{margin:0;font-size:15px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -43,82 +78,136 @@ table td.st{white-space:nowrap}
 <section class="hero">
   <p class="eyebrow">Evaluation</p>
   <h1>Gates that fail the build, numbers by slice, misses by name.</h1>
-  <p class="lead">A regulated product is not measured by a score. Every number on this page is computed here from the same two files CI runs on every push.</p>
+  <p class="lead">Every result on this page is computed in your browser from <code>rules.js</code>, <code>eval/golden.js</code> and <code>eval/judge.js</code>, the same files CI scores on every push. The engine is rule-based and calls no model. The <span id="h-rows"></span> turns are synthetic and were written and labelled by one author. What that does and does not prove is stated step by step below.</p>
   <p><a class="btn primary" href="app/#evals">Open the evaluation console</a></p>
 </section>
 
 <section class="sec" id="finding">
-  <div class="head"><p class="eyebrow">The finding</p><h2>An English-only test set passed Release 2. The language slice did not.</h2><p>Release 2 passed its original golden set, which was English only. When Spanish and interpreter-mediated calls were labelled, re-scoring showed it caught no Spanish-language escalation. Recall is now reported per language path, and the gap is itself a gate.</p></div>
+  <div class="head"><p class="eyebrow">The finding</p><h2>Release 2 passed a 24-turn English-only test set. Re-scored with Spanish and interpreter calls, it failed.</h2><p id="finding-p"></p></div>
   <div class="chart">
-    <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Escalation recall by language path, by release"></svg></div>
-    <div class="tscroll card flat"><table id="slicetbl"><thead><tr><th>Release</th><th>English</th><th>Spanish</th><th>Interpreter</th><th>Gap</th><th></th></tr></thead><tbody></tbody></table></div>
+    <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Escalation recall by language path, Release 2 and Release 3"></svg></div>
+    <div class="tscroll card flat"><table id="slicetbl"><thead><tr><th>Release</th><th class="num">English</th><th class="num">Spanish</th><th class="num">Interpreter</th><th class="num">Gap</th><th></th></tr></thead><tbody></tbody></table><p class="small" id="slicenote" style="margin:8px 0 0"></p></div>
   </div>
 </section>
 
-<section class="sec" id="gates">
-  <div class="head"><p class="eyebrow">Gates</p><h2 id="gates-h"></h2><p>Each metric answers one question a reviewer asks. The gate is the number that stops a release. Thresholds are set where a production system can pass them, not at perfection: a 1.00 on every row is a toy.</p></div>
-  <div class="tiles" id="tiles" style="margin-bottom:14px"></div>
-  <div class="tscroll card flat"><table id="metrics"><thead><tr><th>Principle</th><th>Metric</th><th>Question it answers</th><th>Gate</th><th>Value</th><th>Status</th></tr></thead><tbody></tbody></table></div>
-  <p class="small" style="margin-top:10px">Figures off the cited path is zero by construction, not by luck: a draft can only contain numbers read from nodes on its path, and the check runs in CI on every change. Abstention and note omission are reported, not gated, until shadow-mode data sets the band.</p>
-</section>
+<section class="sec" id="method">
+  <div class="head"><p class="eyebrow">How the evals are built</p><h2>Eight steps, from principle to live traffic.</h2><p>Pick a step to see what it does, the numbers it produces today, and what it does not prove. Steps 1 to 7 run in the prototype; step 8 is designed.</p></div>
+  <div class="steps" role="tablist" aria-label="Evaluation steps" id="steps"></div>
+  <div class="panel">
+    <div class="ph-head"><h3 id="ph-title"></h3><span id="ph-pill"></span></div>
+    <div class="ph-body">
 
-<section class="sec" id="misses">
-  <div class="head"><p class="eyebrow">Open misses</p><h2 id="miss-h"></h2><p>Each one is a turn a person labelled, what the rules did instead, and why. They stay listed until a release fixes them.</p></div>
-  <div class="miss" id="miss"></div>
-</section>
+      <div class="tab" id="t-gates" role="tabpanel">
+        <p>Four principles become eight gates. Each gate answers one question a reviewer would ask, and a missed gate fails the build. <span id="gates-h"></span></p>
+        <div class="tiles" id="tiles" style="margin:14px 0"></div>
+        <div class="tscroll"><table id="metrics"><thead><tr><th>Principle</th><th>Metric</th><th>Question it answers</th><th>Gate</th><th class="num">Value</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+        <div class="limit"><b>What this does not prove</b><ul>
+          <li>The bars are judgement calls, and three were lowered in the same change that added the hard set: escalation recall 1.00 to 0.97, right rule cited 0.95 to 0.92, dissatisfaction 0.90 to 0.88. Escalation precision went up, from 0.80 to 0.85. Release 3 passes the new bars; on today's set it would fail the old escalation bar.</li>
+          <li id="lim-esc"></li>
+          <li>"Figures off the cited path" is zero partly because the prototype's drafts are three fixed templates. The check is real and runs on every draft. It starts to mean something once a model writes the drafts.</li>
+        </ul></div>
+      </div>
 
-<section class="sec" id="golden">
-  <div class="head"><p class="eyebrow">Golden set</p><h2>Labelled by intent, not by what the rules output.</h2><p>Every turn carries a verdict, a clause when there is an answer, a dissatisfaction flag, and the strata it belongs to. A hard set, written from the shapes that fail in production, keeps the misses honest. The two-labeller subset is simulated in the prototype; in production two advocates relabel a daily sample.</p></div>
-  <div class="tiles" id="gtiles"></div>
-  <div class="kv" style="margin-top:14px" id="strata"></div>
-</section>
+      <div class="tab" id="t-golden" role="tabpanel">
+        <p>Each turn is labelled by intent, not by what the rules output. A label is a verdict (answer, person, or escalate), a clause when there is an answer, a dissatisfaction flag, and strata. <code>eval/golden.js</code> is generated by a script that never imports the rules.</p>
+        <div class="tiles" id="gtiles" style="margin:14px 0"></div>
+        <h4>Three sources, and why they matter</h4>
+        <div class="tscroll"><table><thead><tr><th>Source</th><th class="num">Turns</th><th>Written</th></tr></thead><tbody id="srctbl"></tbody></table></div>
+        <h4>Strata</h4>
+        <div class="kv" id="strata"></div>
+        <div class="limit"><b>What this does not prove</b><ul>
+          <li>One person wrote the turns, the labels and the rules. Release 3's stop patterns were written with the hand and adversarial turns in view, so on those turns the set measures fit. The hard set, written after Release 3's patterns were fixed, is the closest thing to unseen data.</li>
+          <li>The labeller tag (A or B) alternates by row. The <span id="adj-n"></span>-turn two-labeller subset is scripted to show what disagreement looks like. Its agreement of <span id="adj-a"></span> is illustrative, not measured.</li>
+          <li>The prototype has one plan's rules. Plan type is tagged by rotation, so no result is reported by plan.</li>
+        </ul></div>
+      </div>
 
-<section class="sec" id="release">
-  <div class="head"><p class="eyebrow">Release history</p><h2>Re-scored on today's set: two releases fail, one ships.</h2><p>The eval runs on every push. A missed gate fails the build; no override flag exists. Release 2 passed CI against the English-only set it was built on; it fails once Spanish and interpreter calls are labelled. When the hard set was added, the bars were reset to defensible ranges (escalation recall 0.97, citation 0.92, dissatisfaction 0.88, precision raised to 0.85), and every remaining miss is listed.</p></div>
-  <div class="rel" id="rel"></div>
-  <details class="qa" style="margin-top:14px"><summary>What CI printed</summary><div class="ci" id="ci" style="margin-top:10px"></div></details>
-</section>
+      <div class="tab" id="t-check" role="tabpanel">
+        <p>Before the engine is scored, the data is scored. Two checks run first in CI and stop the build if anything is inconsistent.</p>
+        <div class="kv">
+          <div><b>The golden set</b><p>Unique ids and texts. Every stratum value is in its allowed list. Every answer names a clause, and every clause exists as a node in the rules graph. No non-answer carries a clause. Adjudicated rows carry both labels.</p></div>
+          <div><b>The synthetic book of business</b><p>Every claim's member and rule exist. Plan paid plus member owed equals billed. Copays match the rules ($35 specialist, $110 ER, $0 if admitted). No open case is past its clock. Rosa's record matches the scripted call.</p></div>
+        </div>
+        <div class="limit"><b>What this does not prove</b><ul>
+          <li>These checks catch inconsistency, not wrong judgement. A label that is consistent but wrong passes.</li>
+        </ul></div>
+      </div>
 
-<section class="sec" id="judge">
-  <div class="head"><p class="eyebrow">The judge</p><h2>Used only where it agrees with the labels.</h2><p>The prototype's judge is a stand-in lexicon scorer, not a model; a model judge would get the same eval. On a held-out slice its agreement is measured per metric; under 0.85 it is refused, and the refusal is printed. Escalation is never given to a judge.</p></div>
-  <div class="tscroll card flat"><table id="judgetbl"><thead><tr><th>Scores</th><th>Agreement</th><th>Held-out turns</th><th>Allowed?</th></tr></thead><tbody></tbody></table></div>
-  <p class="small" id="jnote" style="margin-top:8px"></p>
-</section>
+      <div class="tab" id="t-slices" role="tabpanel">
+        <p>An average hides exactly the members a fairness principle exists for, so every metric is also reported by slice. Counts are shown next to rates because many slices are small.</p>
+        <h4>By source: fit versus unseen</h4>
+        <div class="tscroll"><table id="bysrc"><thead><tr><th>Source</th><th class="num">Turns</th><th class="num">Escalations caught</th><th class="num">Dissatisfaction heard</th><th class="num">Right rule cited</th></tr></thead><tbody></tbody></table></div>
+        <h4>By language path</h4>
+        <div class="tscroll"><table id="bylang"><thead><tr><th>Language</th><th class="num">Turns</th><th class="num">Escalations caught</th><th class="num">Dissatisfaction heard</th><th class="num">Right rule cited</th></tr></thead><tbody></tbody></table></div>
+        <h4>By register</h4>
+        <div class="tscroll"><table id="byreg"><thead><tr><th>Register</th><th class="num">Turns</th><th class="num">Escalations caught</th><th class="num">Dissatisfaction heard</th><th class="num">Right rule cited</th></tr></thead><tbody></tbody></table></div>
+        <div class="limit"><b>What this does not prove</b><ul>
+          <li id="lim-hard"></li>
+          <li id="lim-small"></li>
+        </ul></div>
+      </div>
 
-<section class="sec" id="rules">
-  <div class="head"><p class="eyebrow">Five rules</p><h2>What the framework is built on.</h2></div>
-  <div class="kv">
-    <div><b>Labels share no code with the engine</b><p>An eval that reuses the engine's logic can only agree with it.</p></div>
-    <div><b>Score the corpus before the engine</b><p>Every clause id exists, every claim adds up, every clock computes. Generated data reads as real until someone computes a ratio.</p></div>
-    <div><b>Gates, not scores</b><p>Each metric has a threshold and a consequence. A missed gate fails the build.</p></div>
-    <div><b>The judge is validated or refused</b><p>Agreement with the labels on a held-out slice decides whether it may feed a gate.</p></div>
-    <div><b>A number is a number per slice</b><p>An average hides exactly the members a fairness principle exists for.</p></div>
-  </div>
-</section>
+      <div class="tab" id="t-ci" role="tabpanel">
+        <p>CI runs the data check and the eval on every push to every branch. A missed gate exits non-zero and fails the build; the runner has no override flag. Older releases stay in <code>rules.js</code> so they can be re-scored on today's set.</p>
+        <div class="rel" id="rel" style="margin-top:14px"></div>
+        <details class="qa" style="margin-top:14px"><summary>What the runner prints on today's set</summary><div class="ci" id="ci" style="margin-top:10px"></div></details>
+        <div class="limit"><b>What this does not prove</b><ul>
+          <li>In this repository a red build does not stop a deploy: <code>main</code> is not branch-protected and GitHub Pages publishes on its own. In production the eval check would be required before merge and deploy.</li>
+          <li>Releases 1 and 2 failing today is a re-score. In history, Release 1 was blocked on the original set and Release 2 passed it.</li>
+        </ul></div>
+      </div>
 
-<section class="sec" id="live">
-  <div class="head"><p class="eyebrow">Live, designed</p><h2>After shadow mode, the same gates on real calls.</h2></div>
-  <div class="kv">
-    <div><b>Shadow first</b><p>Live calls, no advocate sees a cue. Same metrics against labels from the daily sample.</p></div>
-    <div><b>Daily sample</b><p>200 turns relabelled by two advocates. Every grievance or escalation is sampled by rule.</p></div>
-    <div><b>Drift by slice</b><p>Recall by day, plan, language path and register. The same gap gate as offline.</p></div>
-    <div><b>Pause rule per topic</b><p>A topic under its gate stops drafting; the advocate sees "assist paused". The product keeps running.</p></div>
-    <div><b>Canary</b><p>5% of advocates, three days, against control on recall, abstention, note omissions and handle time.</p></div>
-    <div><b>Kill switch per skill</b><p>An owner stops one behaviour without stopping the product. The pause is itself logged.</p></div>
+      <div class="tab" id="t-misses" role="tabpanel">
+        <p id="miss-h"></p>
+        <div class="miss" id="miss" style="margin-top:12px"></div>
+        <div class="limit"><b>What this does not prove</b><ul>
+          <li>Passing every gate is not the same as no misses. The list is the complete set of turns where Release 3 disagrees with a label; it stays on the page until a release fixes each one.</li>
+        </ul></div>
+      </div>
+
+      <div class="tab" id="t-judge" role="tabpanel">
+        <p>A judge, normally a model scoring answers, may feed a gate only where it agrees with human labels on a held-out slice. Under the threshold it is refused, and the refusal is printed. Escalation is never given to a judge, whatever the agreement.</p>
+        <div class="tscroll" style="margin-top:12px"><table id="judgetbl"><thead><tr><th>Scores</th><th class="num">Agreement</th><th class="num">Held-out turns</th><th>Allowed?</th></tr></thead><tbody></tbody></table></div>
+        <p class="small" id="jnote" style="margin-top:8px"></p>
+        <div class="limit"><b>What this does not prove</b><ul>
+          <li>The prototype's judge is a word-list scorer, not a model. The same author wrote it and the golden set, so its agreement overstates what a real judge would reach.</li>
+          <li>No gate reads the judge today. Every gate is scored against the human labels directly. The table demonstrates the validation mechanism, nothing more.</li>
+        </ul></div>
+      </div>
+
+      <div class="tab" id="t-live" role="tabpanel">
+        <p>After launch, the same gates run on real calls. Nothing in this step is built yet.</p>
+        <div class="kv" style="margin-top:12px">
+          <div><b>Shadow first</b><p>Cue runs on live calls but no advocate sees a cue. The same metrics, scored against labels from the daily sample.</p></div>
+          <div><b>Daily sample</b><p>200 turns relabelled by two advocates. Every grievance or escalation is sampled by rule, and agreement between the two is reported.</p></div>
+          <div><b>Drift by slice</b><p>Recall by day, plan, language path and register, with the same gap gate as offline.</p></div>
+          <div><b>Pause rule per topic</b><p>A topic under its gate stops drafting and the advocate sees "assist paused". The rest of the product keeps running.</p></div>
+          <div><b>Canary</b><p>5% of advocates for three days, against control, on recall, abstention, note omissions and handle time.</p></div>
+          <div><b>Kill switch per skill</b><p>An owner stops one behaviour without stopping the product. The pause is itself logged.</p></div>
+        </div>
+        <div class="limit"><b>What this does not prove</b><ul>
+          <li>Sample sizes, percentages and durations here are starting proposals, to be set from shadow-mode data and agreed with the review board.</li>
+        </ul></div>
+      </div>
+
+    </div>
+    <div class="ph-foot"><button class="btn sm" id="ph-prev">Previous step</button><span class="small" id="ph-count"></span><button class="btn sm primary" id="ph-next">Next step</button></div>
   </div>
 </section>
 
 <section class="sec" id="honest">
-  <div class="head"><p class="eyebrow">Computed versus designed</p><h2>So no number here is mistaken for one it is not.</h2></div>
+  <div class="head"><p class="eyebrow">Computed, simulated, designed</p><h2>So no number here is mistaken for one it is not.</h2></div>
   <div class="tscroll card flat"><table>
     <thead><tr><th>Element</th><th>Today</th><th>Next</th></tr></thead><tbody>
-    <tr><td>Golden set</td><td><span id="hs-rows"></span> turns, hand-written and labelled by intent, with strata, a hard set and an adjudicated subset</td><td>Live relabels join the set; agreement reported per release</td></tr>
-    <tr><td>Escalation recall and precision, citation, routing, figures off path, dissatisfaction by register, recall gap, verdict enum</td><td><span class="pill good">computed</span> in CI and on this page, per slice</td><td>Same definitions on the live sample</td></tr>
-    <tr><td>Abstention rate</td><td><span class="pill good">computed</span>, reported without a gate</td><td>A band set from shadow-mode data</td></tr>
+    <tr><td>Golden set</td><td><span class="pill good">computed</span> <span id="hs-rows"></span> synthetic turns by one author, with strata, an adversarial set and a hard set</td><td>Live relabels join the set</td></tr>
+    <tr><td>Two-labeller agreement</td><td><span class="pill warn">simulated</span> a scripted <span id="hs-adj"></span>-turn subset</td><td>Two advocates relabel a daily sample; agreement reported per release</td></tr>
+    <tr><td>Escalation recall and precision, right rule cited, routing, figures off path, dissatisfaction by register, language recall gap, verdicts outside the enum</td><td><span class="pill good">computed</span> in CI and on this page, per slice</td><td>The same definitions on the live sample</td></tr>
+    <tr><td>Turns with no draft</td><td><span class="pill good">computed</span>, reported without a gate</td><td>A band set from shadow-mode data</td></tr>
     <tr><td>Note omission rate, note faithfulness</td><td><span class="pill design">designed</span>; the prototype has one scripted call</td><td>Computed over wrap-up notes against required elements</td></tr>
-    <tr><td>Judge</td><td><span class="pill good">computed</span> validation of a stand-in judge; no model yet</td><td>A model judge, same validation, per metric</td></tr>
-    <tr><td>Live sample, drift, pause rule, canary</td><td><span class="pill design">designed</span></td><td>Shadow mode first</td></tr>
+    <tr><td>Judge</td><td><span class="pill warn">stand-in</span> a word-list scorer is validated; no gate reads it</td><td>A model judge, same validation, per metric</td></tr>
+    <tr><td>CI gate</td><td><span class="pill good">computed</span> fails the build on any missed gate; does not block Pages</td><td>A required check before merge and deploy</td></tr>
     <tr><td>Data check</td><td><span class="pill good">computed</span> in CI before the eval</td><td>Extended to the live sample's labels</td></tr>
+    <tr><td>Live sample, drift, pause rule, canary</td><td><span class="pill design">designed</span></td><td>Shadow mode first</td></tr>
   </tbody></table></div>
 </section>
 
@@ -131,31 +220,73 @@ table td.st{white-space:nowrap}
 (function(){const R=window.CureCueRules,G=window.CureCueGolden,J=window.CureCueJudge;const f=x=>typeof x==="number"?x.toFixed(2):String(x);const $=id=>document.getElementById(id);
  const runs=R.RELEASES.map(rel=>({rel,...R.score(G,rel)}));const cur=runs.find(r=>r.rel===R.CURRENT_RELEASE);const prev=runs.find(r=>r.rel===R.CURRENT_RELEASE-1)||runs[0];const m=cur.metrics;
  const by=k=>G.reduce((a,r)=>{a[r[k]]=(a[r[k]]||0)+1;return a;},{});
- // chart
+ // k of n for one slice of evaluated rows: escalations caught, dissatisfaction heard, right rule cited
+ const kn=rows=>{const e=rows.filter(x=>x.expected.v==="escalate"),g=rows.filter(x=>x.expected.g),c=rows.filter(x=>x.expected.c);return {rows:rows.length,esc:[e.filter(x=>x.actual.v==="escalate").length,e.length],dis:[g.filter(x=>x.actual.g).length,g.length],cite:[c.filter(x=>x.actual.c===x.expected.c).length,c.length]};};
+ const sl=(run,key)=>{const o={};run.rows.forEach(x=>{(o[x.strata[key]]=o[x.strata[key]]||[]).push(x);});return Object.fromEntries(Object.entries(o).map(([k,v])=>[k,kn(v)]));};
+ const frac=([a,b])=>b?`<td class="num${a<b?" bad":""}">${a} of ${b}</td>`:`<td class="num">none</td>`;
+ const LN={en:"English",es:"Spanish",interp:"Interpreter"};
+ $("h-rows").textContent=G.length;$("hs-rows").textContent=G.length;
+ const adj=G.filter(r=>r.labels),agree=adj.filter(r=>r.labels.A.v===r.labels.B.v&&!!r.labels.A.g===!!r.labels.B.g).length;
+ $("adj-n").textContent=adj.length;$("adj-a").textContent=f(agree/adj.length);$("hs-adj").textContent=adj.length;
+
+ // the finding
+ const pl=sl(prev,"lang"),cl=sl(cur,"lang");
+ $("finding-p").textContent=`In history, Release 2 passed CI on the original golden set: 24 English turns with 8 escalations. When Spanish and interpreter-mediated turns were added, re-scoring showed it caught ${pl.es.esc[0]} of ${pl.es.esc[1]} Spanish escalations, and only ${pl.en.esc[0]} of ${pl.en.esc[1]} English ones on the larger set. Release 3 shipped in the same change. Escalation recall is now reported per language path, and the gap between paths is itself a gate.`;
  const L=[["en","English"],["es","Spanish"],["interp","Interpreter"]];const W=520,H=250,x0=110,y0=20,bw=18,gap=8,rowH=64;
- let s=`<text x="${x0}" y="12" font-size="11" fill="#5b6660" font-family="Mulish">Escalation recall by language path</text>`;
+ let s=`<text x="${x0}" y="12" font-size="11" fill="#5b6660" font-family="Mulish">Escalation recall by language path, on today's set</text>`;
  L.forEach(([k,name],i)=>{const y=y0+10+i*rowH;s+=`<text x="${x0-10}" y="${y+bw+6}" text-anchor="end" font-size="13" font-weight="700" fill="#182218" font-family="Manrope">${name}</text>`;[[prev,"#cfd6c9","Release "+prev.rel],[cur,"#72992e","Release "+cur.rel]].forEach(([r,c,lab],j)=>{const v=r.slices.lang[k].escalation_recall;const w=Math.max(2,(W-x0-80)*v);const yy=y+j*(bw+gap);s+=`<rect x="${x0}" y="${yy}" width="${w}" height="${bw}" rx="4" fill="${c}"/><text x="${x0+w+6}" y="${yy+bw-5}" font-size="12" font-family="Mulish" fill="#182218" font-weight="700">${f(v)}</text><text x="${x0+w+42}" y="${yy+bw-5}" font-size="11" font-family="Mulish" fill="#5b6660">${lab}</text>`;});});
  const gx=x0+(W-x0-80)*0.97;s+=`<line x1="${gx}" y1="${y0+4}" x2="${gx}" y2="${H-20}" stroke="#b23a3a" stroke-dasharray="4 3"/><text x="${gx}" y="${H-6}" text-anchor="middle" font-size="11" fill="#b23a3a" font-family="Mulish">gate 0.97</text>`;$("chart").innerHTML=s;
- document.querySelector("#slicetbl tbody").innerHTML=runs.map(r=>{const Lg=r.slices.lang;const g=r.gates.find(x=>x.metric==="recall_gap_lang");return `<tr><td><b>Release ${r.rel}</b></td><td>${f(Lg.en.escalation_recall)}</td><td>${f(Lg.es.escalation_recall)}</td><td>${f(Lg.interp.escalation_recall)}</td><td>${f(g.value)}</td><td>${r.failed?'<span class="pill bad">blocked</span>':'<span class="pill good">on the desk</span>'}</td></tr>`;}).join("");
- // gates
- $("gates-h").textContent=`Release ${cur.rel}: ${cur.gates.filter(g=>g.pass).length} of ${cur.gates.length} gates pass over ${G.length} turns.`;
- $("tiles").innerHTML=[[f(m.escalation_recall),"Escalations caught"],[f(m.escalation_precision),"Escalations that were real"],[f(m.citation_accuracy),"Right rule cited"],[f(m.routing_accuracy),"Right owner"],[String(Math.round(m.hallucination_rate*m.drafted)),"Figures off path, of "+m.drafted],[f(m.abstention_rate),"Abstention, reported"]].map(([v,l])=>`<div class="tile"><div class="n">${v}</div><div class="l">${l}</div></div>`).join("");
- const rows=[["Accountable","Escalation recall","Did the turns that needed a person get one?","escalation_recall"],["Accountable","Escalation precision","Of the turns escalated, how many needed it?","escalation_precision"],["Reliable and safe","Figures off the cited path","Did any draft contain a number not on a rule it cited?","hallucination_rate"],["Reliable and safe","Citation accuracy","Was the right rule cited?","citation_accuracy"],["Reliable and safe","Routing accuracy","Did the right owner get the turn?","routing_accuracy"],["Fair and inclusive","Dissatisfaction recall, worst register","Was dissatisfaction heard: plain, implicit, angry?","grievance_recall_min_register"],["Fair and inclusive","Escalation recall gap across language paths","Does the stop work worse for some members?","recall_gap_lang"],["Responsible in application","Verdicts outside the enum","Did it ever emit anything but answer, person, escalate?","verdicts_outside_enum"],["Reliable and safe","Abstention rate","How often did it say it had nothing to cite?",null],["Accountable","Note omission rate","Did the note miss a required element?",null]];
- document.querySelector("#metrics tbody").innerHTML=rows.map(([p,n,q,k])=>{const g=cur.gates.find(x=>x.metric===k);const v=g?g.value:(k==null&&n.startsWith("Abstention")?m.abstention_rate:null);const st=!k&&n.startsWith("Note")?'<span class="pill design">designed</span>':g?(g.pass?'<span class="pill good">pass</span>':'<span class="pill bad">blocked</span>'):'<span class="pill good">reported</span>';return `<tr><td>${p}</td><td><b>${n}</b></td><td>${q}</td><td class="st">${g?g.must:"band"}</td><td class="st"><b>${v===null?"":f(v)}</b></td><td class="st">${st}</td></tr>`;}).join("");
- // misses
- const fails=cur.rows.filter(e=>!e.ok);$("miss-h").textContent=`${fails.length} turns still miss on Release ${cur.rel}, inside the budgets.`;
- const WHY={"over-escalation":"A stop word inside a benign question. The safe failure, inside the precision budget.","missed escalation":"No stop pattern matched this phrasing. The next release adds it; until then it is the most important row on this page.","missed dissatisfaction":"Dissatisfaction without any of the lexicon's cues. The implicit register is where misses hide.","wrong clause":"The entry node was found from the wrong word; the walk started one rule too early.","no answer where a rule applies":"The rules abstained on a question the plan does answer. Safe, and counted.","answered an account or out-of-plan question":"A benefit word in a non-benefit question. Should have gone to a person."};
- $("miss").innerHTML=fails.map(e=>`<div><span class="id">${e.id}</span><span class="t">${e.t}</span><span class="why">Labelled ${e.expected.v}${e.expected.c?" · "+e.expected.c:""}${e.expected.g?" · dissatisfied":""}. Rules said ${e.actual.v}${e.actual.c?" · "+e.actual.c:""}. ${e.fail.map(k=>WHY[k]||k).join(" ")}</span></div>`).join("");
- // golden
- $("gtiles").innerHTML=[[G.length,"labelled turns"],[by("v").answer,"benefit questions"],[by("v").human,"advocate or account"],[G.filter(x=>x.g).length,"with dissatisfaction"],[by("v").escalate,"must escalate"],[by("source").hard||0,"hard set"],[G.filter(x=>x.labels).length,"double-labelled"]].map(([n,l])=>`<div class="tile"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
- $("strata").innerHTML=[["register","Register"],["lang","Language path"],["plan","Plan type"],["source","Source"],["labeller","Labeller"]].map(([k,l])=>`<div><b>${l}</b><p>${Object.entries(by(k)).map(([n,c])=>`${n} ${c}`).join(" · ")}</p></div>`).join("");
- // releases
- $("rel").innerHTML=runs.map(r=>{const bad=r.gates.filter(g=>!g.pass);return `<div class="card"><h3>Release ${r.rel} ${r.failed?'<span class="pill bad">blocked</span>':'<span class="pill good">on the desk</span>'}</h3>${bad.length?`<ul>${bad.map(g=>`<li>${g.name}: ${f(g.value)}, must be ${g.must}</li>`).join("")}</ul>`:`<p class="small" style="margin:0">Every gate passes. ${r.rows.filter(e=>!e.ok).length} turns miss inside the budgets, listed above.</p>`}</div>`;}).join("");
+ document.querySelector("#slicetbl tbody").innerHTML=runs.map(r=>{const Lg=sl(r,"lang");const g=r.gates.find(x=>x.metric==="recall_gap_lang");const c=k=>`<td class="num">${Lg[k].esc[0]} of ${Lg[k].esc[1]}</td>`;return `<tr><td><b>Release ${r.rel}</b></td>${c("en")}${c("es")}${c("interp")}<td class="num">${f(g.value)}</td><td>${r.failed?'<span class="pill bad">fails today</span>':'<span class="pill good">on the desk</span>'}</td></tr>`;}).join("");
+ $("slicenote").textContent=`Escalations caught, re-scored on today's ${G.length}-turn set. Interpreter turns are relayed in English, which is why Release 2 caught them.`;
+
+ // step 1: gates
+ $("gates-h").textContent=`Release ${cur.rel} passes ${cur.gates.filter(g=>g.pass).length} of ${cur.gates.length} over ${G.length} turns.`;
+ const noDraftBenefit=cur.rows.filter(e=>e.expected.v==="answer"&&e.actual.v==="human").length;
+ $("tiles").innerHTML=[[`${Math.round(m.escalation_recall*m.escalations)} of ${m.escalations}`,"Escalations caught"],[f(m.escalation_precision),"Escalations that were real"],[f(m.citation_accuracy),"Right rule cited"],[f(m.routing_accuracy),"Right owner"],[String(Math.round(m.hallucination_rate*m.drafted)),"Figures off path, of "+m.drafted+" drafts"]].map(([v,l])=>`<div class="tile"><div class="n">${v}</div><div class="l">${l}</div></div>`).join("");
+ const rows=[["Accountable","Escalation recall","Did the turns that needed a person get one?","escalation_recall"],["Accountable","Escalation precision","Of the turns escalated, how many needed it?","escalation_precision"],["Reliable and safe","Figures off the cited path","Did any draft contain a number not on a rule it cited?","hallucination_rate"],["Reliable and safe","Right rule cited","Was the right rule cited?","citation_accuracy"],["Reliable and safe","Routing accuracy","Did the turn go to the right owner: answer, person, or escalate?","routing_accuracy"],["Fair and inclusive","Dissatisfaction recall, worst register","Was dissatisfaction heard: plain, implicit, angry?","grievance_recall_min_register"],["Fair and inclusive","Escalation recall gap across language paths","Does the stop work worse for some members?","recall_gap_lang"],["Responsible in application","Verdicts outside the enum","Did it ever emit anything but answer, person, escalate?","verdicts_outside_enum"],["Reliable and safe","Turns with no draft","How often was the turn left to the advocate with no draft?","nodraft"],["Accountable","Note omission rate","Did the note miss a required element?","note"]];
+ document.querySelector("#metrics tbody").innerHTML=rows.map(([p,n,q,k])=>{const g=cur.gates.find(x=>x.metric===k);let gate,v,st;if(g){gate=g.must;v=f(g.value);st=g.pass?'<span class="pill good">pass</span>':'<span class="pill bad">fails</span>';}else if(k==="nodraft"){gate="reported";v=f(m.abstention_rate);st='<span class="pill good">reported</span>';}else{gate="";v="";st='<span class="pill design">designed</span>';}return `<tr><td>${p}</td><td><b>${n}</b>${k==="nodraft"?`<div class="small">Mostly account and out-of-plan questions, correctly handed over. ${noDraftBenefit} ${noDraftBenefit===1?"was a benefit question":"were benefit questions"} it should have answered.</div>`:""}</td><td>${q}</td><td class="st">${gate}</td><td class="num"><b>${v}</b></td><td class="st">${st}</td></tr>`;}).join("");
+ $("lim-esc").textContent=`At ${m.escalations} labelled escalations, the 0.97 bar allows one miss; two would fail the build. Cue never speaks to the member, and the advocate is on every call, so a missed stop is a missed cue, not an unsupervised answer. It is still the most important miss on this page.`;
+
+ // step 2: golden set
+ $("gtiles").innerHTML=[[G.length,"labelled turns"],[by("v").answer,"benefit questions"],[by("v").human,"for a person"],[by("v").escalate,"must escalate"],[G.filter(x=>x.g).length,"with dissatisfaction"]].map(([n,l])=>`<div class="tile"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+ const src=by("source");
+ $("srctbl").innerHTML=[["hand","Hand-written","Alongside the rules, covering each benefit, account and escalation shape in three registers and three language paths."],["adversarial","Adversarial","To break the rules: stop words in benign questions, instructions inside speech, hidden escalations."],["hard","Hard set","After Release 3's patterns were fixed, from shapes we expect to fail. No release has been tuned on them."]].map(([k,l,w])=>`<tr><td><b>${l}</b></td><td class="num">${src[k]||0}</td><td>${w}</td></tr>`).join("");
+ $("strata").innerHTML=[["register","Register"],["lang","Language path",LN],["reason","Call reason"]].map(([k,l,names])=>`<div><b>${l}</b><p>${Object.entries(by(k)).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`${names?names[n]:n} ${c}`).join(" · ")}</p></div>`).join("");
+
+ // step 4: slices
+ const sliceRows=(o,names)=>Object.entries(o).map(([k,v])=>`<tr><td><b>${names?names[k]||k:k}</b></td><td class="num">${v.rows}</td>${frac(v.esc)}${frac(v.dis)}${frac(v.cite)}</tr>`).join("");
+ const cs=sl(cur,"source");
+ document.querySelector("#bysrc tbody").innerHTML=sliceRows(cs,{hand:"Hand-written",adversarial:"Adversarial",hard:"Hard set (unseen)"});
+ document.querySelector("#bylang tbody").innerHTML=sliceRows(cl,LN);
+ document.querySelector("#byreg tbody").innerHTML=sliceRows(sl(cur,"register"));
+ const h=cs.hard;$("lim-hard").textContent=`On the hand-written and adversarial turns, Release 3 catches every escalation; that measures fit. On the ${h.rows}-turn hard set it catches ${h.esc[0]} of ${h.esc[1]} escalations, hears ${h.dis[0]} of ${h.dis[1]} dissatisfied turns and cites the right rule for ${h.cite[0]} of ${h.cite[1]} benefit questions. Those are the numbers to believe, and they are weak.`;
+ $("lim-small").textContent=`Slices are small. Spanish recall of 1.00 rests on ${cl.es.esc[1]} escalations and interpreter on ${cl.interp.esc[1]}. One more Spanish miss would push the language gap over its 0.05 gate.`;
+
+ // step 5: CI and release history (history verified against the repository's commits)
+ const HIST={1:{c:"86a0594",what:"Stop rule hears appeal, denied, grievance, complaint.",then:"Blocked on the original 24-turn English set: caught 3 of 8 escalations. Never shipped."},2:{c:"dbbe135",what:"Adds discharge, distress and refusal to pay.",then:"Passed every gate on the original 24-turn English set and ran on the desk."},3:{c:"97c8de2",what:"Adds Spanish and interpreter phrasings, more distress variants, instructions inside speech.",then:"Shipped with the Spanish and interpreter turns. The hard set and today's bars came later."}};
+ $("rel").innerHTML=runs.map(r=>{const bad=r.gates.filter(g=>!g.pass),H=HIST[r.rel]||{};return `<div class="card"><h4>Release ${r.rel} ${r.failed?'<span class="pill bad">fails today</span>':'<span class="pill good">on the desk</span>'}</h4><p>${H.what||""} <code>${H.c||""}</code></p><p class="small"><b>Then:</b> ${H.then||""}</p><p class="small" style="margin-bottom:2px"><b>Today:</b> ${bad.length?`${bad.length} of ${r.gates.length} gates fail.`:`all ${r.gates.length} gates pass, ${r.rows.filter(e=>!e.ok).length} turns still miss.`}</p>${bad.length?`<ul>${bad.map(g=>`<li>${g.name}: ${f(g.value)}, must be ${g.must}</li>`).join("")}</ul>`:""}</div>`;}).join("");
  const line=r=>`$ node eval/run.mjs ${r.rel}\nGolden set ${G.meta?G.meta.version:""}: ${G.length} rows, consistent.\nRelease ${r.rel}\n`+r.gates.map(g=>`  ${g.pass?'<span class="ok">pass </span>':'<span class="bad">FAIL </span>'}${g.name.padEnd(46)}${f(g.value).padStart(5)}  must be ${g.must}`).join("\n")+(r.failed?`\n<span class="bad">${r.failed} gate${r.failed>1?"s":""} failed. Release ${r.rel} is blocked.</span>`:`\n<span class="ok">Release ${r.rel} passes every gate.</span>`);
  $("ci").innerHTML=runs.map(line).join("\n\n");
- const jv=J.validate(G);document.querySelector("#judgetbl tbody").innerHTML=jv.rows.map(x=>`<tr><td>${x.name}</td><td>${x.agreement===null?"n/a":f(x.agreement)}</td><td>${x.n}</td><td>${x.policy==="never"?'<span class="pill bad">never, by policy</span>':x.allowed?'<span class="pill good">yes</span>':'<span class="pill warn">refused</span>'}</td></tr>`).join("");
- $("jnote").textContent=`Held-out ${jv.heldOut} turns, threshold ${jv.threshold}. The stand-in judge is an independent lexicon scorer that shares no code with the rules; a model replaces it under the same validation.`;
- $("hs-rows").textContent=G.length;})();
+
+ // step 6: misses
+ const fails=cur.rows.filter(e=>!e.ok);$("miss-h").textContent=`${fails.length} of ${G.length} turns still miss on Release ${cur.rel}. Each is a labelled turn, what the rules did instead, and why.`;
+ const WHY={"over-escalation":"A stop word inside a benign question. The safe failure, counted against precision.","missed escalation":"No stop pattern matched this phrasing. This is the most important row on the page.","missed dissatisfaction":"Dissatisfaction without any of the cues the rules listen for. The implicit register is where these hide.","wrong clause":"Retrieval entered the graph at the wrong rule.","no answer where a rule applies":"No entry pattern matched, so the turn fell to the advocate. Safe, and counted.","answered an account or out-of-plan question":"A benefit word in a question no plan rule settles. It should have gone to a person."};
+ $("miss").innerHTML=fails.map(e=>`<div><span class="id">${e.id}</span><span class="t">${e.t}</span><span class="why">Labelled ${e.expected.v}${e.expected.c?" · "+e.expected.c:""}${e.expected.g?" · dissatisfied":""}. Rules said ${e.actual.v}${e.actual.c?" · "+e.actual.c:""}. ${e.fail.map(k=>WHY[k]||k).join(" ")} <span class="pill design">${{hand:"hand-written",adversarial:"adversarial",hard:"hard set"}[e.strata.source]}</span></span></div>`).join("");
+
+ // step 7: judge
+ const jv=J.validate(G);document.querySelector("#judgetbl tbody").innerHTML=jv.rows.map(x=>`<tr><td>${x.name}</td><td class="num">${x.agreement===null?"n/a":f(x.agreement)}</td><td class="num">${x.n}</td><td>${x.policy==="never"?'<span class="pill bad">never, by policy</span>':x.allowed?'<span class="pill good">would be allowed</span>':'<span class="pill warn">refused</span>'}</td></tr>`).join("");
+ $("jnote").textContent=`Held-out slice: every third turn, ${jv.heldOut} in all. Threshold ${jv.threshold}. The word-list judge shares no code with the rules.`;
+
+ // the step map
+ const STEPS=[["gates","Define","Principles to gates","Four principles, eight gates, each a reviewer's question.","built"],["golden","Data","Write the golden set",`${G.length} turns labelled by intent, from three sources.`,"part"],["check","Data","Check the data first","The data is scored before the engine is.","built"],["slices","Measure","Score every slice","Each metric by source, language and register, with counts.","built"],["ci","Release","Gate the release in CI","A missed gate fails the build. History re-scored.","built"],["misses","Release","Name every miss",`${fails.length} turns still miss, each listed.`,"built"],["judge","Trust","Validate the judge","Allowed only where it agrees with people.","stand"],["live","Live","Run it live","Shadow, daily relabels, drift, canary.","design"]];
+ const PILL={built:'<span class="pill good">built</span>',part:'<span class="pill warn">built · one author</span>',stand:'<span class="pill warn">built · stand-in</span>',design:'<span class="pill design">designed</span>'};
+ const strip=$("steps");let cur_i=0;
+ STEPS.forEach(([k,ph,nm,ln,st],i)=>{const li=document.createElement("li");li.setAttribute("role","presentation");li.innerHTML=`<button role="tab" id="s-${k}" aria-controls="t-${k}" aria-selected="false" tabindex="-1"><span class="top"><span class="no">${i+1}</span><span class="ph">${ph}</span></span><span class="nm">${nm}</span><span class="ln">${ln}</span>${PILL[st]}</button>`;li.firstChild.onclick=()=>{go(i,true);if(innerWidth<860)document.querySelector(".panel").scrollIntoView({block:"start"});};strip.appendChild(li);});
+ function go(i,focus){cur_i=i;STEPS.forEach(([k],j)=>{const b=$("s-"+k);b.setAttribute("aria-selected",String(j===i));b.tabIndex=j===i?0:-1;$("t-"+k).classList.toggle("on",j===i);});const [k,,nm,,st]=STEPS[i];$("ph-title").textContent=`${i+1}. ${nm}`;$("ph-pill").innerHTML=PILL[st];$("ph-count").textContent=`Step ${i+1} of ${STEPS.length}`;$("ph-prev").disabled=i===0;$("ph-next").disabled=i===STEPS.length-1;$("t-"+k).setAttribute("aria-labelledby","s-"+k);if(focus){$("s-"+k).focus({preventScroll:true});try{history.replaceState(null,"","#"+k);}catch(e){}}}
+ strip.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown"){e.preventDefault();go(Math.min(STEPS.length-1,cur_i+1),true);}if(e.key==="ArrowLeft"||e.key==="ArrowUp"){e.preventDefault();go(Math.max(0,cur_i-1),true);}});
+ $("ph-prev").onclick=()=>go(Math.max(0,cur_i-1),true);$("ph-next").onclick=()=>go(Math.min(STEPS.length-1,cur_i+1),true);
+ const start=STEPS.findIndex(([k])=>"#"+k===location.hash);go(start<0?0:start);if(start>=0)$("method").scrollIntoView();
+})();
 </script>
 </body>
 </html>

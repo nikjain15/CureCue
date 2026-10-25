@@ -92,7 +92,7 @@
 </section>
 
 <section class="sec" id="measured">
-  <div class="head"><p class="eyebrow">Measured before it ships</p><h2>An English-only test set passed Release 2. The language slice did not.</h2><p>Release 2 passed its original golden set, which was English only. When Spanish and interpreter-mediated calls were labelled, re-scoring showed it caught no Spanish-language escalation. Recall is now reported per language path, and the gap is itself a gate.</p></div>
+  <div class="head"><p class="eyebrow">Measured before it ships</p><h2>Release 2 passed a 24-turn English-only test set. Re-scored with Spanish and interpreter calls, it failed.</h2><p>Release 2 passed CI on the original golden set: 24 English turns. When Spanish and interpreter-mediated turns were added, re-scoring showed it caught none of the Spanish escalations. Release 3 shipped in the same change. Recall is now reported per language path, and the gap between paths is itself a gate.</p></div>
   <div class="chart">
     <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Escalation recall by language path, by release"></svg></div>
     <div>
@@ -126,7 +126,7 @@
 (function(){const R=window.CureCueRules,G=window.CureCueGolden;const f=x=>x.toFixed(2);
  const runs=R.RELEASES.map(rel=>({rel,...R.score(G,rel)}));const cur=runs.find(r=>r.rel===R.CURRENT_RELEASE);const prev=runs.find(r=>r.rel===R.CURRENT_RELEASE-1)||runs[0];
  const miss=cur.rows.filter(e=>!e.ok).length;
- document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>labelled turns</span><span><b>${cur.gates.length}</b>release gates</span><span><b>${runs.filter(r=>r.failed).length}</b>releases blocked</span><span><b>${miss}</b>open misses, listed</span>`;
+ document.getElementById("proof").innerHTML=`<span><b>${G.length}</b>labelled turns</span><span><b>${cur.gates.length}</b>release gates</span><span><b>${runs.filter(r=>r.failed).length}</b>older releases fail today</span><span><b>${miss}</b>open misses, listed</span>`;
  const L=[["en","English"],["es","Spanish"],["interp","Interpreter"]];
  const W=520,H=250,x0=110,y0=20,bw=18,gap=8,rowH=64;const lastGate=cur.gates.find(g=>g.metric==="escalation_recall");
  let s=`<text x="${x0}" y="12" font-size="11" fill="#5b6660" font-family="Mulish">Escalation recall by language path</text>`;
@@ -136,7 +136,7 @@
  document.getElementById("chart").innerHTML=s;
  const gapP=prev.gates.find(g=>g.metric==="recall_gap_lang"),gapC=cur.gates.find(g=>g.metric==="recall_gap_lang");
  document.getElementById("tiles").innerHTML=[[f(prev.slices.lang.es.escalation_recall),"bad",`Spanish recall, Release ${prev.rel}`],[f(cur.slices.lang.es.escalation_recall),"good",`Spanish recall, Release ${cur.rel}`],[f(gapP.value),"bad",`Gap across paths, Release ${prev.rel}`],[f(gapC.value),"good",`Gap across paths, Release ${cur.rel}`]].map(([v,c,l])=>`<div class="tile"><div class="n ${c}">${v}</div><div class="l">${l}</div></div>`).join("");
- document.getElementById("gsum").textContent=`Release ${cur.rel} passes all ${cur.gates.length} gates over ${G.length} turns: escalation recall ${f(cur.metrics.escalation_recall)}, right rule cited ${f(cur.metrics.citation_accuracy)}, routing ${f(cur.metrics.routing_accuracy)}. ${miss} turns still miss and are listed by name in the console.`;})();
+ document.getElementById("gsum").textContent=`Release ${cur.rel} passes all ${cur.gates.length} gates over ${G.length} turns: escalation recall ${f(cur.metrics.escalation_recall)}, right rule cited ${f(cur.metrics.citation_accuracy)}, routing ${f(cur.metrics.routing_accuracy)}. ${miss} turns still miss and are listed by name. Synthetic turns, written and labelled by one author.`;})();
 </script>
 </body>
 </html>

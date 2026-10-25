@@ -101,12 +101,12 @@
   <div class="tscroll card flat"><table class="decisions">
     <thead><tr><th>Decision</th><th>Alternative</th><th>Why this way</th></tr></thead><tbody>
     <tr><td>Advocate-side first</td><td>A member chat in the app</td><td>A person stays between the model and the member on every turn. The same skills can later sit behind the app's chat.</td></tr>
-    <tr><td>Rules first, no model in the prototype</td><td>A model call per turn from day one</td><td>Rules make the eval exact and the stop provable. The harness, gates and data are the durable part.</td></tr>
+    <tr><td>Rules first, no model in the prototype</td><td>A model call per turn from day one</td><td>Rules make the eval exact and the stop testable turn by turn. The harness, gates and data are the durable part.</td></tr>
     <tr><td>Rules as a graph</td><td>Vector search over the benefit document</td><td>A chunk returns the ER paragraph and stops; the graph walks to the admission exception. The path is the citation.</td></tr>
     <tr><td>Three verdicts, enforced by type</td><td>A confidence threshold on free text</td><td>A coverage decision cannot be emitted because the type does not exist. Thresholds drift; types do not.</td></tr>
     <tr><td>The advocate ticks identity</td><td>Auto-verify from speech</td><td>Identity is a human decision in this industry. The system reports what it heard.</td></tr>
     <tr><td>Synthetic data, generated and checked</td><td>Hand-typed placeholders</td><td>Generated data reads as real until someone computes a ratio over it. A checker runs before the eval, in CI.</td></tr>
-    <tr><td>Gates set to defensible ranges</td><td>Perfect scores on a small set</td><td>A 1.00 on every row is a toy. The hard set keeps misses in the open and the gates where a release can realistically pass.</td></tr>
+    <tr><td>Gates below 1.00, every miss listed</td><td>A 1.00 bar on every metric</td><td>Three bars were lowered when the hard set was added, and the page says so. At 50 escalations the 0.97 bar allows one miss; the advocate is on every call, and each miss stays listed until a release fixes it.</td></tr>
     <tr><td>Honest edges on the page</td><td>Hide what is not built</td><td>A reviewer who finds the edge themselves stops trusting the rest.</td></tr>
   </tbody></table></div>
 </section>
