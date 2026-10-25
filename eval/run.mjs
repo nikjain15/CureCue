@@ -15,7 +15,7 @@ const release = Number(process.argv[2] || rules.CURRENT_RELEASE);
 // 1. Score the corpus as data before scoring the engine. Labels and strata must be well formed.
 const corpusErrors = [];
 const ids = new Set(Object.values(rules.GRAPH.nodes).map(n => n.id).filter(Boolean));
-const ENUM = { v: ["answer", "human", "escalate"], register: ["plain", "implicit", "angry"], lang: ["en", "es", "interp"], plan: ["HMO", "PPO", "D-SNP"], source: ["hand", "adversarial"], labeller: ["A", "B"] };
+const ENUM = { v: ["answer", "human", "escalate"], register: ["plain", "implicit", "angry"], lang: ["en", "es", "interp"], plan: ["HMO", "PPO", "D-SNP"], source: ["hand", "adversarial", "hard"], labeller: ["A", "B"] };
 const seen = new Set();
 golden.forEach((x, i) => {
   if (seen.has(x.id)) corpusErrors.push(`${x.id}: duplicate id`); seen.add(x.id);
