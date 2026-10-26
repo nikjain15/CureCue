@@ -119,6 +119,20 @@ section.scr{display:none}section.scr.on{display:block}
 .cue .why{font-size:13px;color:var(--muted);cursor:pointer;text-decoration:underline;background:none;border:0;padding:0}
 .cue .det{display:none;margin-top:8px;font-size:14px;color:var(--muted);background:var(--panel);border-radius:8px;padding:8px 10px}
 .cue .det.on{display:block}
+.trace{list-style:none;margin:6px 0 0;padding:0;counter-reset:t}
+.trace>li{position:relative;padding:0 0 12px 30px;counter-increment:t;color:var(--fg)}
+.trace>li::before{content:counter(t);position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--green);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
+.trace>li::after{content:"";position:absolute;left:9.5px;top:22px;bottom:2px;width:1px;background:var(--line-2)}
+.trace>li:last-child::after{display:none}
+.trace>li.stop::before{background:var(--bad)}
+.trace .h{font-weight:800;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:2px}
+.trace mark{background:var(--hl);padding:0 2px;border-radius:3px}
+.tnode{background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0}
+.tnode b{color:var(--fg)}
+.tnode q{display:block;margin-top:4px;font-style:italic;color:var(--muted);quotes:"\201C" "\201D"}
+.tnode .srcchip{display:inline-block;margin-top:4px;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--panel-2);color:var(--leaf);text-decoration:none}
+.tedge{font-size:12px;color:var(--muted);padding-left:12px}
+.figok{color:var(--good);font-weight:700}.figbad{color:var(--bad);font-weight:700}
 .cue .det code{font-size:13px;color:var(--leaf)}
 .ask{display:flex;gap:6px;margin-top:12px}
 .ask input{flex:1;font:inherit;font-size:14px;padding:9px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);min-width:0}
@@ -306,7 +320,7 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
             <div class="cues" id="cues"><div class="quiet" id="quiet"><span class="dot ready"></span><span>Listening. Nothing to add yet.</span></div></div>
             <form class="ask" id="ask" autocomplete="off"><input id="askq" placeholder="Ask Cue about this plan, e.g. what is the ER copay?" aria-label="Ask Cue"><button class="btn sm primary" type="submit">Ask</button></form>
             <p class="small" style="margin:6px 0 0">Answers come only from plan rules on file. Anything else, Cue says so.</p>
-            <details class="src"><summary>Where the answer comes from</summary><svg class="graph" viewBox="0 0 420 290" id="graph" role="img" aria-label="Plan rules and the path used"></svg><div class="small" id="clause">Tap a rule to read it.</div></details>
+            <details class="src" open><summary>How Cue found its last answer</summary><div id="lasttrace" class="small" style="margin:8px 0">Nothing yet. When Cue suggests something, the steps behind it appear here.</div><p class="small" style="margin:10px 0 4px"><b>The plan rules Cue can walk</b> · the green path is the one it used. Tap a rule to read it.</p><svg class="graph" viewBox="0 0 420 290" id="graph" role="img" aria-label="Plan rules and the path used"></svg><div class="small" id="clause">Tap a rule to read it.</div></details>
           </div>
         </div>
         <div class="col c3">

@@ -1786,8 +1786,8 @@
  {
   "id": "T-106",
   "t": "Does the plan cover acupuncture?",
-  "v": "human",
-  "c": null,
+  "v": "answer",
+  "c": "S-ACU",
   "g": false,
   "register": "plain",
   "lang": "en",
@@ -1795,14 +1795,15 @@
   "source": "adversarial",
   "labeller": "B",
   "src": {
-   "why": "No plan rule on file answers this, so CureCue leaves it to the advocate."
+   "doc": "SB",
+   "page": 12
   }
  },
  {
   "id": "T-107",
   "t": "What does my plan cover for dental this year?",
-  "v": "human",
-  "c": null,
+  "v": "answer",
+  "c": "S-DENT",
   "g": false,
   "register": "plain",
   "lang": "en",
@@ -1810,7 +1811,8 @@
   "source": "adversarial",
   "labeller": "A",
   "src": {
-   "why": "No plan rule on file answers this, so CureCue leaves it to the advocate."
+   "doc": "SB",
+   "page": 7
   }
  },
  {
@@ -2950,8 +2952,8 @@
  {
   "id": "T-177",
   "t": "My neighbor's plan covers acupuncture, does mine?",
-  "v": "human",
-  "c": null,
+  "v": "answer",
+  "c": "S-ACU",
   "g": false,
   "register": "plain",
   "lang": "en",
@@ -2959,7 +2961,8 @@
   "source": "adversarial",
   "labeller": "A",
   "src": {
-   "why": "No plan rule on file answers this, so CureCue leaves it to the advocate."
+   "doc": "SB",
+   "page": 12
   }
  },
  {
@@ -3283,8 +3286,232 @@
   "src": {
    "why": "No plan rule on file answers this, so CureCue leaves it to the advocate."
   }
+ },
+ {
+  "id": "T-196",
+  "t": "What's my monthly premium?",
+  "v": "answer",
+  "c": "S-PREM",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "B",
+  "src": {
+   "doc": "SB",
+   "page": 4
+  }
+ },
+ {
+  "id": "T-197",
+  "t": "Is there a deductible on my plan?",
+  "v": "answer",
+  "c": "S-DED",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "A",
+  "src": {
+   "doc": "SB",
+   "page": 4
+  }
+ },
+ {
+  "id": "T-198",
+  "t": "How much is urgent care?",
+  "v": "answer",
+  "c": "S-URG",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "B",
+  "src": {
+   "doc": "SB",
+   "page": 6
+  }
+ },
+ {
+  "id": "T-199",
+  "t": "What does a video visit with my doctor cost?",
+  "v": "answer",
+  "c": "S-TELE",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "A",
+  "src": {
+   "doc": "SB",
+   "page": 4
+  }
+ },
+ {
+  "id": "T-200",
+  "t": "How much will an MRI cost me?",
+  "v": "answer",
+  "c": "S-IMG",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "B",
+  "src": {
+   "doc": "SB",
+   "page": 6
+  }
+ },
+ {
+  "id": "T-201",
+  "t": "What do I pay for an X-ray?",
+  "v": "answer",
+  "c": "S-XRAY",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "A",
+  "src": {
+   "doc": "SB",
+   "page": 6
+  }
+ },
+ {
+  "id": "T-202",
+  "t": "Do I pay anything for blood work?",
+  "v": "answer",
+  "c": "S-LAB",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "B",
+  "src": {
+   "doc": "SB",
+   "page": 6
+  }
+ },
+ {
+  "id": "T-203",
+  "t": "How much is outpatient surgery?",
+  "v": "answer",
+  "c": "S-SURG",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "A",
+  "src": {
+   "doc": "SB",
+   "page": 4
+  }
+ },
+ {
+  "id": "T-204",
+  "t": "What does an ambulance ride cost?",
+  "v": "answer",
+  "c": "S-AMB",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "B",
+  "src": {
+   "doc": "SB",
+   "page": 9
+  }
+ },
+ {
+  "id": "T-205",
+  "t": "How much is a skilled nursing stay?",
+  "v": "answer",
+  "c": "S-SNF",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "A",
+  "src": {
+   "doc": "SB",
+   "page": 9
+  }
+ },
+ {
+  "id": "T-206",
+  "t": "Is my annual wellness visit free?",
+  "v": "answer",
+  "c": "S-PREV",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "B",
+  "src": {
+   "doc": "SB",
+   "page": 5
+  }
+ },
+ {
+  "id": "T-207",
+  "t": "What's the copay for therapy with a counselor?",
+  "v": "answer",
+  "c": "S-MH",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "A",
+  "src": {
+   "doc": "SB",
+   "page": 9
+  }
+ },
+ {
+  "id": "T-208",
+  "t": "Does the plan cover rides to the doctor?",
+  "v": "answer",
+  "c": "S-TRANS",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "B",
+  "src": {
+   "doc": "SB",
+   "page": 10
+  }
+ },
+ {
+  "id": "T-209",
+  "t": "What do I pay per day if I'm admitted to the hospital?",
+  "v": "answer",
+  "c": "S-INPT",
+  "g": false,
+  "register": "plain",
+  "lang": "en",
+  "reason": "Benefits and cost question",
+  "source": "hand",
+  "labeller": "A",
+  "src": {
+   "doc": "SB",
+   "page": 4
+  }
  }
 ];
-  rows.meta = {"version":"golden-v4","labelled":"2026-10-25","schema":["id","t","v","c","g","register","lang","reason","source","labeller","labels?","src"],"rows":195};
+  rows.meta = {"version":"golden-v4","labelled":"2026-10-25","schema":["id","t","v","c","g","register","lang","reason","source","labeller","labels?","src"],"rows":209};
   return rows;
 });

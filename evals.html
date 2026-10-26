@@ -166,7 +166,7 @@ td.num.bad{color:var(--bad);font-weight:700}
         <details class="qa" style="margin-top:14px"><summary>Raw test output</summary><div class="ci" id="ci" style="margin-top:10px"></div></details>
         <div class="limit"><b>Where this is weak</b><ul>
           <li>Here, a failed build doesn't stop the website from updating. In a real deployment, the test would have to pass before any change goes live.</li>
-          <li>Releases 1 and 2 fail on today's lines. At the time, Release 1 failed and was never used, and Release 2 passed the smaller English-only set.</li>
+          <li>Releases 1 to 3 fail on today's lines. At the time, Release 1 failed and was never used, Release 2 passed the smaller English-only set, and Release 3 passed until the new plan rules and their test lines were added in Release 4.</li>
         </ul></div>
       </div>
 
@@ -245,7 +245,7 @@ td.num.bad{color:var(--bad);font-weight:700}
 <script src="eval/judge.js"></script>
 <script>
 (function(){const R=window.CureCueRules,G=window.CureCueGolden,J=window.CureCueJudge;const f=x=>typeof x==="number"?x.toFixed(2):String(x);const pc=x=>Math.round(x*100)+"%";const $=id=>document.getElementById(id);
- const runs=R.RELEASES.map(rel=>({rel,...R.score(G,rel)}));const cur=runs.find(r=>r.rel===R.CURRENT_RELEASE);const prev=runs.find(r=>r.rel===R.CURRENT_RELEASE-1)||runs[0];const m=cur.metrics;
+ const runs=R.RELEASES.map(rel=>({rel,...R.score(G,rel)}));const cur=runs.find(r=>r.rel===R.CURRENT_RELEASE);const prev=runs.find(r=>r.rel===2);/* the language finding is about Release 2 */const r3=runs.find(r=>r.rel===3);const m=cur.metrics;
  const by=k=>G.reduce((a,r)=>{a[r[k]]=(a[r[k]]||0)+1;return a;},{});
  // k of n for one group of scored lines: supervisor calls flagged, unhappy members noticed, right rule used
  const kn=rows=>{const e=rows.filter(x=>x.expected.v==="escalate"),g=rows.filter(x=>x.expected.g),c=rows.filter(x=>x.expected.c);return {rows:rows.length,esc:[e.filter(x=>x.actual.v==="escalate").length,e.length],dis:[g.filter(x=>x.actual.g).length,g.length],cite:[c.filter(x=>x.actual.c===x.expected.c).length,c.length]};};
@@ -303,10 +303,12 @@ td.num.bad{color:var(--bad);font-weight:700}
  document.querySelector("#bylang tbody").innerHTML=sliceRows(cl,LN);
  document.querySelector("#byreg tbody").innerHTML=sliceRows(sl(cur,"register"),TONE);
  const h=cs.hard;$("lim-hard").textContent=`On the lines CureCue was built with, it flags every supervisor call. That only shows it fits what it was built on. On the ${h.rows} new lines it flags ${h.esc[0]} of ${h.esc[1]} supervisor calls, notices ${h.dis[0]} of ${h.dis[1]} unhappy members, and uses the right rule for ${h.cite[0]} of ${h.cite[1]} plan questions. Those are the honest numbers, and they are weak.`;
+ const seen=cs.hard?cur.rows.filter(e=>e.strata.source==="hard"&&e.ok&&r3&&!r3.rows.find(x=>x.id===e.id).ok):[];
+ if(seen.length)$("lim-hard").textContent+=` Release ${cur.rel} was written after these lines were, and now gets ${seen.length} of them right (${seen.map(e=>'"'+e.t+'"').join(", ")}). For Release ${cur.rel}, those ${seen.length} are no longer unseen.`;
  $("lim-small").textContent=`Some groups are small. Spanish "all flagged" rests on ${cl.es.esc[1]} supervisor calls, interpreter calls on ${cl.interp.esc[1]}. One more Spanish miss would fail the "languages treated alike" check.`;
 
  // step 5: blocking a release (history checked against the repository's commits)
- const HIST={1:{c:"86a0594",what:"Flags appeals, denials, grievances and complaints.",then:"Failed the first 24-line English test: flagged 3 of 8 supervisor calls. Never used."},2:{c:"dbbe135",what:"Also flags discharge disputes, chest pain, trouble breathing and refusals to pay.",then:"Passed the first 24-line English test and was used."},3:{c:"97c8de2",what:"Also flags the same things in Spanish and through interpreters, more emergency phrasings, and members telling it what to say.",then:"Released together with the Spanish and interpreter test lines. The newest lines and today's pass marks came later."}};
+ const HIST={4:{c:"",what:"Adds 15 more cited plan rules (premium, deductible, urgent care, imaging, lab, surgery, ambulance, skilled nursing and others) so Cue can answer more typed questions. Stop patterns unchanged.",then:"Current release, written after the hard set; see the note on step 4."},1:{c:"86a0594",what:"Flags appeals, denials, grievances and complaints.",then:"Failed the first 24-line English test: flagged 3 of 8 supervisor calls. Never used."},2:{c:"dbbe135",what:"Also flags discharge disputes, chest pain, trouble breathing and refusals to pay.",then:"Passed the first 24-line English test and was used."},3:{c:"97c8de2",what:"Also flags the same things in Spanish and through interpreters, more emergency phrasings, and members telling it what to say.",then:"Released together with the Spanish and interpreter test lines. The newest lines and today's pass marks came later."}};
  $("rel").innerHTML=runs.map(r=>{const bad=r.gates.filter(g=>!g.pass),H=HIST[r.rel]||{};return `<div class="card"><h4>Release ${r.rel} ${r.failed?'<span class="pill bad">fails today</span>':'<span class="pill good">in use</span>'}</h4><p>${H.what||""} <code>${H.c||""}</code></p><p class="small"><b>At the time:</b> ${H.then||""}</p><p class="small" style="margin-bottom:2px"><b>Today:</b> ${bad.length?`fails ${bad.length} of ${r.gates.length} checks.`:`passes all ${r.gates.length} checks; ${r.rows.filter(e=>!e.ok).length} lines still wrong.`}</p></div>`;}).join("");
  const line=r=>`$ node eval/run.mjs ${r.rel}\nGolden set ${G.meta?G.meta.version:""}: ${G.length} rows, consistent.\nRelease ${r.rel}\n`+r.gates.map(g=>`  ${g.pass?'<span class="ok">pass </span>':'<span class="bad">FAIL </span>'}${g.name.padEnd(46)}${f(g.value).padStart(5)}  must be ${g.must}`).join("\n")+(r.failed?`\n<span class="bad">${r.failed} gate${r.failed>1?"s":""} failed. Release ${r.rel} is blocked.</span>`:`\n<span class="ok">Release ${r.rel} passes every gate.</span>`);
  $("ci").innerHTML=runs.map(line).join("\n\n");

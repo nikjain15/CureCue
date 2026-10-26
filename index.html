@@ -127,7 +127,7 @@
 <script src="eval/golden.js"></script>
 <script>
 (function(){const R=window.CureCueRules,G=window.CureCueGolden;const f=x=>x.toFixed(2),pc=x=>Math.round(x*100)+"%";
- const runs=R.RELEASES.map(rel=>({rel,...R.score(G,rel)}));const cur=runs.find(r=>r.rel===R.CURRENT_RELEASE);const prev=runs.find(r=>r.rel===R.CURRENT_RELEASE-1)||runs[0];
+ const runs=R.RELEASES.map(rel=>({rel,...R.score(G,rel)}));const cur=runs.find(r=>r.rel===R.CURRENT_RELEASE);const prev=runs.find(r=>r.rel===2);/* the language finding is about Release 2 */
  const miss=cur.rows.filter(e=>!e.ok).length;
  document.getElementById("proof").innerHTML=`<a href="evals.html#sources"><b>Every figure</b>comes from a page in the plan's public documents</a><a href="architecture.html"><b>Stops</b>on appeals, discharges and emergencies</a><a href="evals.html"><b>Tested</b>on every change; mistakes listed by name</a><a href="app/"><b>You decide</b>Cue suggests; the advocate confirms</a>`;
  const L=[["en","English"],["es","Spanish"],["interp","Interpreter"]];

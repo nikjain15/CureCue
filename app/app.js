@@ -63,17 +63,49 @@ function drawGraph(path = []) { const svg = $("graph"); let s = "";
   G.edges.forEach(([a, b, l]) => { const A = G.nodes[a], B = G.nodes[b]; const on = path.includes(a) && path.includes(b) && Math.abs(path.indexOf(a) - path.indexOf(b)) === 1;
     s += `<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="${on ? 'var(--green)' : 'var(--line)'}" stroke-width="${on ? 3.5 : 1.2}"/>`;
     if (l) { const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2; const horizontal = A.y === B.y; s += `<text x="${mx}" y="${horizontal ? my - 16 : my - 6}" font-size="9" fill="var(--muted)" text-anchor="middle" font-family="Mulish, sans-serif">${l}</text>`; } });
-  Object.entries(G.nodes).forEach(([k, n]) => { const on = path.includes(k); const w = n.kind === "plan" ? 150 : Math.min(132, n.label.length * 5.6 + 18);
+  Object.entries(G.nodes).filter(([, n]) => n.x !== undefined).forEach(([k, n]) => { const on = path.includes(k); const w = n.kind === "plan" ? 150 : Math.min(132, n.label.length * 5.6 + 18);
     s += `<g data-n="${k}" style="cursor:pointer"><rect x="${n.x - w / 2}" y="${n.y - 12}" width="${w}" height="24" rx="7" fill="${on ? 'var(--green)' : (n.kind === 'plan' ? 'var(--panel-2)' : 'var(--panel)')}" stroke="${on ? 'var(--green)' : 'var(--line)'}"/><text x="${n.x}" y="${n.y + 4}" font-size="9.5" text-anchor="middle" fill="${on ? '#fff' : 'var(--fg)'}" font-family="Mulish, sans-serif" font-weight="700">${n.label}</text></g>`; });
   svg.innerHTML = s; svg.querySelectorAll("g[data-n]").forEach(g => g.onclick = () => showClause(g.dataset.n)); }
 function showClause(k) { const n = G.nodes[k]; $("clause").innerHTML = n.text ? `<b>${n.label}</b> (${n.id}): ${n.text}${n.src ? `<br><span class="small">Source: ${srcLinks(n)}</span>` : ""}` : `<b>${n.label}</b>`; }
 // Links to the public document and PDF page each plan rule was read from
 function srcHref(S, page) { return /\.pdf$/.test(S.file) ? `../${S.file}${page ? "#page=" + page : ""}` : S.url; }
+// ---------- How Cue got this: the steps behind each suggestion, with the rule cards and the pages ----------
+const escH = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+function hl(text, phrases) { let h = escH(text); (phrases || []).filter(Boolean).forEach(p => { const i = h.toLowerCase().indexOf(escH(p).toLowerCase()); if (i >= 0) h = h.slice(0, i) + "<mark>" + h.slice(i, i + escH(p).length) + "</mark>" + h.slice(i + escH(p).length); }); return h; }
+function nodeCard(k) { const n = G.nodes[k]; return `<div class="tnode"><b>${n.label}</b> <span class="small">${n.id}</span><div>${n.text}</div>${(n.src || []).map(x => { const S = R.SOURCES[x.doc]; return `<q>${escH(x.quote)}</q><a class="srcchip" href="${srcHref(S, x.page)}" target="_blank" rel="noopener">${S.title}${x.page ? ", p. " + x.page : ""} ↗</a>`; }).join("")}</div>`; }
+function edgeLabel(a, b) { const e = G.edges.find(([x, y]) => (x === a && y === b) || (x === b && y === a)); return e && e[2] ? e[2] : "then"; }
+const RULES_ON_FILE = Object.values(G.nodes).filter(n => n.id).length;
+function buildTrace(kind, text, d = {}) {
+  const st = (h, body, cls = "") => `<li class="${cls}"><span class="h">${h}</span>${body}</li>`;
+  const heard = p => st("Heard", `"${hl(text, p)}"`);
+  const safe = st("Safety check, always first", `None of the ${R.ESC[R.CURRENT_RELEASE].length} stop patterns for appeals, denials, discharges or emergencies matched, so Cue may go on.`);
+  let steps = [];
+  if (kind === "answer") {
+    const walk = d.path.map((k, i) => (i ? `<div class="tedge">↓ ${edgeLabel(d.path[i - 1], k)}</div>` : "") + nodeCard(k)).join("");
+    const figs = R.figureCheck(d.draft.say, d.path).map(f => { const at = d.path.find(k => (G.nodes[k].text || "").includes(f.figure)); return `<span class="${f.onPath ? "figok" : "figbad"}">${f.figure} ${f.onPath ? "✓" : "✗"}</span>${at ? ` <span class="small">in ${G.nodes[at].id}</span>` : ""}`; }).join(" · ");
+    steps = [heard([d.entry]), safe, st("Entry rule", `"${escH(d.entry)}" points to <b>${G.nodes[d.path[0]].label}</b>, one of ${RULES_ON_FILE} plan rules on file.`), st(d.path.length > 1 ? `Rules walked, ${d.path.length} in order` : "Rule used", walk), st("Every figure checked", (figs || "No dollar figures in this answer.") + `<div class="small">A figure that is not in a rule on this path would block the suggestion.</div>`), st("You decide", "Cue suggests. Nothing reaches the member until you say it.")];
+  } else if (kind === "escalate") {
+    steps = [heard([d.trigger]), st("Safety check, always first", `Stop pattern matched: "<b>${escH(d.trigger)}</b>". Nothing else runs: no rule lookup, no draft.`, "stop"), st("Rule", nodeCard("APPL")), st("You decide", "One action: bring in a person with authority.")];
+  } else if (kind === "grievance") {
+    steps = [heard([d.phrase]), st("Complaint check", `"${escH(d.phrase)}" is how dissatisfaction sounds, even without the word "complaint".`), st("Rule", nodeCard("GRV")), st("You decide", "Log it or not. Either choice is recorded in the note.")];
+  } else if (kind === "process") {
+    steps = [st("Heard", `"${hl(text, ["sending her home"])}"`), st("Supervisor joined", "Cue switches to process facts only. No benefit figure, no coverage decision."), st("Rule", nodeCard("FAST")), st("The supervisor decides", "Dana explains the rights and files the appeal with the member's representative.")];
+  } else if (kind === "account") {
+    steps = [heard([d.word]), safe, st("Not a plan rule", "This is about the member's own account (claims, premium, statements). The answer lives in the claim system, not the plan documents."), st("You decide", "Open the claim. Cue suggests no figure.")];
+  } else if (kind === "refuse") {
+    steps = [heard([]), safe, st("No rule matched", `None of the ${RULES_ON_FILE} plan rules on file covers this.`), st("Nothing drafted", "Cue says it has nothing to cite rather than guess. You answer, or look it up.")];
+  } else if (kind === "record") {
+    steps = [st("Read", "The member record: her contacts from the last 90 days."), st("Found", "Two calls about this bill (Oct 3 and Oct 14). On Oct 14 a callback was promised and never scheduled."), st("You decide", "Acknowledge both calls before she has to raise them.")];
+  } else if (kind === "prefill") {
+    steps = [st("From this call", "What the supervisor and the Quality Improvement Organization confirmed: appeal filed, coverage end date, decision timing."), st("Rule", nodeCard("FAST")), st("You decide", "Confirm the case and the callback. Nothing is filed until you do.")];
+  }
+  return `<ol class="trace">${steps.join("")}</ol>`;
+}
 function srcLinks(n) { return (n.src || []).map(x => { const S = R.SOURCES[x.doc]; return `<a href="${srcHref(S, x.page)}" target="_blank" rel="noopener">${S.title}${x.page ? ", p. " + x.page : ""}</a>`; }).join(" · "); }
 
 // ---------- Member 360 ----------
 const M = member("M-001");
-const PLAN_ROWS = ["PCP", "SPEC", "DIAG", "REF", "ER", "WAIVE", "INPT", "MOOP"];
+const PLAN_ROWS = Object.keys(G.nodes).filter(k => G.nodes[k].id && G.nodes[k].id.startsWith("S-")); // every cited benefit rule
 let mtab = "plan", hot = null;
 function renderM360() {
   const claims = D.claims.filter(c => c.member === M.id).sort((a, b) => b.day - a.day), cases = D.cases.filter(k => k.member === M.id), contacts = D.contacts.filter(c => c.member === M.id).sort((a, b) => b.day - a.day), rx = D.pharmacy[M.id] || [];
@@ -96,8 +128,8 @@ function openTab(t, h) { mtab = t; hot = h; renderM360(); }
 // ---------- Call state ----------
 const cues = () => $("cues"), quiet = () => $("quiet");
 const state = { grievance: null, grievanceHeard: false, escalated: false, figures: [], pathsSeen: [], asked: {}, site: null, callback: null, docSent: null, caseOpened: null, transferred: null, ended: false, accepted: 0, declined: 0 };
-function cue({ k, cls = "", say, main, alt, why, cite }) { const el = document.createElement("div"); el.className = "cue " + cls;
-  el.innerHTML = `<div class="k">${k}</div><div class="say">${say}</div><div class="acts">${main ? `<button class="main">${main.label}</button>` : ""}${alt ? `<button class="alt">${alt.label}</button>` : ""}<button class="why">Why?</button></div><div class="det">${why}${cite ? `<br>Source: <code>${cite}</code>` : ""}</div>`;
+function cue({ k, cls = "", say, main, alt, why, cite, trace }) { const el = document.createElement("div"); el.className = "cue " + cls; if (trace) { const lt = $("lasttrace"); if (lt) lt.innerHTML = `<b>${k}</b>` + trace; }
+  el.innerHTML = `<div class="k">${k}</div><div class="say">${say}</div><div class="acts">${main ? `<button class="main">${main.label}</button>` : ""}${alt ? `<button class="alt">${alt.label}</button>` : ""}<button class="why">${trace ? "How Cue got this" : "Why?"}</button></div><div class="det">${trace || ""}${why ? `<div class="small" style="margin-top:4px">${why}</div>` : ""}</div>`;
   const m = el.querySelector(".main"), a = el.querySelector(".alt"), w = el.querySelector(".why");
   if (m) m.onclick = () => { m.classList.add("done"); m.textContent = main.done; if (a) a.disabled = true; state.accepted++; if (main.fn) main.fn(); };
   if (a) a.onclick = () => { a.classList.add("done"); a.textContent = alt.done; if (m) m.disabled = true; state.declined++; if (alt.fn) alt.fn(); };
@@ -108,25 +140,26 @@ function setQuiet(t) { quiet().querySelector("span:last-child").textContent = t;
 function onMember(text) {
   const d = R.decide(text, R.CURRENT_RELEASE);   // the desk always runs the current release
   if (d.verdict === "escalate") { state.escalated = true; drawGraph(["APPL"]); showClause("APPL"); openTab("cases");
-    cue({ k: "Stop", cls: "stop", say: `<b>Bring a supervisor in now.</b> "${d.trigger}" signals a dispute about care or coverage. Don't quote a benefit or a decision for this.`, main: { label: "Connect supervisor", done: "Supervisor joining", fn: () => { state.transferred = "Supervisor (Dana), discharge dispute"; markTool("transfer", "Supervisor joined"); if (state.callDone) playSupervisor(); } }, why: "A dispute about a care or coverage decision is never answered from a plan document. Cue drafts nothing and pauses every other cue for this topic.", cite: "P-APPL" }); setQuiet("Paused on this topic. A supervisor is handling it."); return; }
+    cue({ k: "Stop", cls: "stop", say: `<b>Bring a supervisor in now.</b> "${d.trigger}" signals a dispute about care or coverage. Don't quote a benefit or a decision for this.`, trace: buildTrace("escalate", text, d), main: { label: "Connect supervisor", done: "Supervisor joining", fn: () => { state.transferred = "Supervisor (Dana), discharge dispute"; markTool("transfer", "Supervisor joined"); if (state.callDone) playSupervisor(); } }, why: "A dispute about a care or coverage decision is never answered from a plan document. Cue drafts nothing and pauses every other cue for this topic." }); setQuiet("Paused on this topic. A supervisor is handling it."); return; }
   if (d.grievance && !state.grievanceHeard) { state.grievanceHeard = true; drawGraph(["GRV"]); showClause("GRV"); openTab("contacts", "contacts"); const g = R.grievance(text);
-    cue({ k: "Heads up", cls: "flag", say: `She said "<mark>${g.exec(text)[0]}</mark>". That counts as a grievance, even without the word. Log it?`, main: { label: "Log grievance", done: "Logged · 30-day clock started", fn: () => { state.grievance = true; state.caseOpened = "G-26-0417"; markTool("case", "G-26-0417 opened"); openTab("cases"); } }, alt: { label: "Not a grievance", done: "Noted: not a grievance", fn: () => { state.grievance = false; } }, why: "Repeat contact about an unresolved issue is dissatisfaction. If logged, a case opens with a due date 30 days out. Either choice is recorded in the note.", cite: "P-GRV" }); }
+    cue({ k: "Heads up", cls: "flag", say: `She said "<mark>${g.exec(text)[0]}</mark>". That counts as a grievance, even without the word. Log it?`, trace: buildTrace("grievance", text, { phrase: g.exec(text)[0] }), main: { label: "Log grievance", done: "Logged · 30-day clock started", fn: () => { state.grievance = true; state.caseOpened = "G-26-0417"; markTool("case", "G-26-0417 opened"); openTab("cases"); } }, alt: { label: "Not a grievance", done: "Noted: not a grievance", fn: () => { state.grievance = false; } }, why: "If logged, a case opens with a due date 30 days out." }); }
   if (d.verdict === "answer") { const key = d.path.join(">"); if (state.pathsSeen.includes(key)) return; state.pathsSeen.push(key);
     drawGraph(d.path); showClause(d.path[0]); const dr = d.draft; R.figureCheck(dr.say, d.path).forEach(f => state.figures.push(f));
     if (d.path[0] === "SPEC") { state.asked.spec = true; openTab("claims", "C-26-5519"); } if (d.path.includes("INPT")) { state.asked.er = true; openTab("plan", "WAIVE"); }
     const main = dr.main ? { label: dr.main.label, done: dr.main.done, fn: () => { if (dr.main.set) Object.assign(state, dr.main.set); if (dr.main.show) showClause(dr.main.show); } } : null;
     const alt = dr.alt ? { label: dr.alt.label, done: dr.alt.done, fn: () => { if (dr.alt.set) Object.assign(state, dr.alt.set); if (d.path[0] === "SPEC") suggestTool("callback"); } } : null;
-    cue({ k: "Suggested answer", say: dr.say, main, alt, why: dr.why, cite: d.path.map(k => G.nodes[k].id).join(" → ") }); setQuiet("Listening. Nothing to add yet."); return; }
-  if (d.account) { cue({ k: "Check first", say: "That's about the account, not the plan rules. Open the claim before answering. No number suggested.", why: "Cue only quotes figures that exist in a plan rule. Account questions need the claim system." }); openTab("claims"); }
+    cue({ k: "Suggested answer", say: dr.say, main, alt, trace: buildTrace("answer", text, d) }); setQuiet("Listening. Nothing to add yet."); return; }
+  if (d.account) { cue({ k: "Check first", say: "That's about the account, not the plan rules. Open the claim before answering. No number suggested.", trace: buildTrace("account", text, { word: (R.ACCOUNT.exec(text) || [])[0] }) }); openTab("claims"); }
 }
 
 // ---------- Ask Cue: grounded in plan rules, refuses the rest ----------
 $("ask").onsubmit = e => { e.preventDefault(); const q = $("askq").value.trim(); if (!q) return; $("askq").value = "";
   const d = R.decide(q, R.CURRENT_RELEASE);
-  if (d.verdict === "escalate") { cue({ k: "Stop", cls: "stop", say: `<b>That needs a person.</b> "${d.trigger}" is a dispute or a decision. Cue won't draft an answer.`, why: "Escalation wins every race, including a typed question.", cite: "P-APPL" }); return; }
+  if (d.verdict === "escalate") { cue({ k: "Stop", cls: "stop", say: `<b>That needs a person.</b> "${d.trigger}" is a dispute or a decision. Cue won't draft an answer.`, trace: buildTrace("escalate", q, d) }); return; }
   if (d.verdict === "answer") { const dr = d.draft; drawGraph(d.path); showClause(d.path[0]); const fig = R.figureCheck(dr.say, d.path); fig.forEach(f => state.figures.push(f));
-    cue({ k: "You asked: " + q, say: dr.say, why: dr.why + (fig.length ? ` Figures checked against the path: ${fig.map(f => f.figure).join(", ")}.` : ""), cite: d.path.map(k => G.nodes[k].id).join(" → ") }); return; }
-  cue({ k: "You asked: " + q, say: d.account ? "That's about the account, not the plan rules. Open the claim. No number suggested." : "<b>Not in the plan rules on file.</b> Cue has nothing to cite, so it says so rather than guess.", why: d.account ? "Account questions need the claim system." : "A question outside the plan is an abstention. It is counted, not hidden: see the abstention rate on the scorecard design.", cite: "no path" }); };
+    cue({ k: "You asked: " + q, say: dr.say, trace: buildTrace("answer", q, d) }); return; }
+  cue({ k: "You asked: " + q, say: d.account ? "That's about the account, not the plan rules. Open the claim. No number suggested." : `<b>Not in the plan rules on file.</b> Cue has nothing to cite, so it says so rather than guess. It can answer questions like: ${["What's my ER copay?", "How much is an MRI?", "Is there a deductible?", "What does a skilled nursing stay cost?"].map(x => `<a href="#" class="tryq">${x}</a>`).join(" · ")}`, trace: buildTrace(d.account ? "account" : "refuse", q, { word: (R.ACCOUNT.exec(q) || [])[0] }) });
+  document.querySelectorAll(".tryq").forEach(a => a.onclick = e => { e.preventDefault(); $("askq").value = a.textContent; $("ask").requestSubmit(); }); };
 
 // ---------- Tools: Cue pre-fills, the advocate confirms ----------
 const TOOLS = {
@@ -159,18 +192,18 @@ function answer() {
 function chk() { $("verified").disabled = !(v1.checked && v2.checked && v3.checked); }
 ["v1", "v2", "v3"].forEach(id => $(id).onchange = chk);
 $("verified").onclick = () => { if (player) player.stop(); go(1); renderM360(); drawGraph(); const c = $("tr");
-  cue({ k: "Before you start", say: "She's called twice about this bill, Oct 3 and Oct 14. On Oct 14 she was promised a callback that never got scheduled.", why: "From the member record's prior contacts. Shown once so you can acknowledge it before she has to raise it." });
+  cue({ k: "Before you start", say: "She's called twice about this bill, Oct 3 and Oct 14. On Oct 14 she was promised a callback that never got scheduled.", trace: buildTrace("record", "") });
   player = CueVoice.play(CALL, { container: c, onStart: () => wave(true), onLine: (l) => { addLine(c, l.w, l.t); wave(false); if (l.w === "Rosa") onMember(l.t); }, isPaused: () => paused || state.ended, onDone: () => { state.callDone = true; if (state.transferred) playSupervisor(); } }); };
 
 // ---------- The supervisor's part, then the advocate's close. Guidance follows the plan's EOC, Chapter 9, Section 8. ----------
 const EOC = R.SOURCES.EOC, eocLink = (p, t) => `<a href="../${EOC.file}#page=${p}" target="_blank" rel="noopener">${t}</a>`;
 function playSupervisor() { if (state.supStarted || state.ended) return; state.supStarted = true; const c = $("tr");
   setQuiet("Supervisor on the call. Cue shows process facts only.");
-  cue({ k: "For the supervisor · from the plan's documents", say: `Rehab is covered skilled nursing care. A <b>Notice of Medicare Non-Coverage</b> comes at least 2 days ahead; signing it is not agreeing. For a <b>fast-track appeal</b>, contact the Quality Improvement Organization by <b>noon the day before coverage ends</b>. It decides within one full day of having the information.`, why: `Process facts, not a coverage decision. Source: ${eocLink(146, "EOC p. 146")} · ${eocLink(147, "p. 147")} · ${eocLink(148, "p. 148")}.` });
+  cue({ k: "For the supervisor · from the plan's documents", say: `Rehab is covered skilled nursing care. A <b>Notice of Medicare Non-Coverage</b> comes at least 2 days ahead; signing it is not agreeing. For a <b>fast-track appeal</b>, contact the Quality Improvement Organization by <b>noon the day before coverage ends</b>. It decides within one full day of having the information.`, trace: buildTrace("process", "They are sending her home on Wednesday and she is not ready."), why: "Process facts, not a coverage decision." }); drawGraph(["GRV", "APPL"]);
   toast("Elena Martinez's record opened: Rosa M. is her authorized representative.");
   player = CueVoice.play(SCRIPT.SUPERVISOR, { container: c, onStart: () => wave(true), onLine: l => { addLine(c, l.w, l.t); wave(false); }, isPaused: () => paused || state.ended, onDone: offerAppealCase }); }
 function offerAppealCase() { if (state.ended) return;
-  cue({ k: "Pre-filled for you", say: `<b>Appeal support case for Elena Martinez</b>: fast-track appeal filed with the Quality Improvement Organization on this call; skilled nursing coverage set to end ${fmtOff(2)}; decision within one full day of the reviewers having her information. <b>Callback to Rosa</b> ${fmtOff(2)}, morning.`, main: { label: "Open case and schedule callback", done: `A-26-0418 opened · callback ${fmtOff(2)}, morning`, fn: () => { state.appealCase = "A-26-0418"; if (!state.callback) { state.callback = fmtOff(2) + ", morning"; markTool("callback", "Callback " + state.callback); } playClose(); } }, why: "Cue fills it from what the supervisor and the Quality Improvement Organization confirmed. You confirm it; nothing is filed until you do." }); }
+  cue({ k: "Pre-filled for you", say: `<b>Appeal support case for Elena Martinez</b>: fast-track appeal filed with the Quality Improvement Organization on this call; skilled nursing coverage set to end ${fmtOff(2)}; decision within one full day of the reviewers having her information. <b>Callback to Rosa</b> ${fmtOff(2)}, morning.`, main: { label: "Open case and schedule callback", done: `A-26-0418 opened · callback ${fmtOff(2)}, morning`, fn: () => { state.appealCase = "A-26-0418"; if (!state.callback) { state.callback = fmtOff(2) + ", morning"; markTool("callback", "Callback " + state.callback); } playClose(); } }, trace: buildTrace("prefill", "") }); }
 function playClose() { if (state.closeStarted || state.ended) return; state.closeStarted = true; const C = SCRIPT.CLOSE, c = $("tr");
   const lines = [{ w: "Advocate", t: C.bill[state.site || "unknown"] }];
   if (state.grievance === true) { lines.push({ w: "Advocate", t: C.grievance.logged }); state.grievanceAnswered = true; } else if (state.grievance === false) lines.push({ w: "Advocate", t: C.grievance.declined });

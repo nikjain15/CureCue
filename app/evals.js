@@ -4,8 +4,8 @@ const R = window.CureCueRules, G = window.CureCueGolden, J = window.CureCueJudge
 const $ = id => document.getElementById(id);
 const pct = x => Math.round(x * 100) + "%";
 const RUNS = R.RELEASES.map(rel => ({ rel, ...R.score(G, rel) }));
-const COMMIT = { 1: "86a0594", 2: "dbbe135", 3: "97c8de2" }; // the commit each release landed in
-const NOTE = { 1: "Flags appeals, denials, grievances and complaints.", 2: "Also flags discharge disputes, chest pain, trouble breathing and refusals to pay.", 3: "Also flags the same things in Spanish and through interpreters, more emergency phrasings, and members telling it what to say." };
+const COMMIT = { 1: "86a0594", 2: "dbbe135", 3: "97c8de2", 4: "this change" }; // the commit each release landed in
+const NOTE = { 4: "Adds 15 more cited plan rules from the Summary of Benefits so Cue can answer more typed questions. Stop patterns unchanged.", 1: "Flags appeals, denials, grievances and complaints.", 2: "Also flags discharge disputes, chest pain, trouble breathing and refusals to pay.", 3: "Also flags the same things in Spanish and through interpreters, more emergency phrasings, and members telling it what to say." };
 // Plain names for the eight checks, the groups, the responses and the kinds of mistake
 const CHECK = { escalation_recall: "Supervisor calls flagged", escalation_precision: "Flags that were right", hallucination_rate: "Unbacked dollar amounts", citation_accuracy: "Right plan rule used", routing_accuracy: "Sent to the right place", grievance_recall_min_register: "Unhappy members noticed (worst tone)", recall_gap_lang: "Gap between languages", verdicts_outside_enum: "Responses outside the three allowed" };
 const MUST = { escalation_recall: "at least 97%", escalation_precision: "at least 85%", hallucination_rate: "none", citation_accuracy: "at least 92%", routing_accuracy: "at least 95%", grievance_recall_min_register: "at least 88% for every tone", recall_gap_lang: "under 5 points", verdicts_outside_enum: "none" };
@@ -36,7 +36,7 @@ document.querySelectorAll("#evtabs button").forEach(b => b.onclick = () => tab(b
 // ---------- Releases ----------
 function renderRuns() {
   $("ev-runs-body").innerHTML = RUNS.slice().reverse().map(r => `<tr class="${r.rel === sel ? "sel" : ""}"><td><b>Release ${r.rel}</b>${r.rel === R.CURRENT_RELEASE ? ' <span class="pill good">in use</span>' : ""}</td><td><code>${COMMIT[r.rel] || ""}</code></td><td class="num">${pct(r.metrics.escalation_recall)}</td><td class="num">${pct(r.metrics.citation_accuracy)}</td><td class="num">${pct(r.metrics.routing_accuracy)}</td><td class="num">${r.rows.filter(e => !e.ok).length}</td><td>${r.failed ? pill(false, "fails " + r.failed + " of " + r.gates.length + " checks") : pill(true, "passes all " + r.gates.length + " checks")}</td><td><button class="btn sm" data-open="${r.rel}">Open</button></td></tr>`).join("");
-  $("ev-runs-note").textContent = `Each row is one version of CureCue's rules, re-tested on today's ${G.length} test lines. At the time, Release 1 failed its first test (24 English lines) and was never used, and Release 2 passed it. Both fail today's bigger test. Advocates use Release ${R.CURRENT_RELEASE}. The test lines are made up and were written by one person.`;
+  $("ev-runs-note").textContent = `Each row is one version of CureCue's rules, re-tested on today's ${G.length} test lines. At the time, Release 1 failed its first test (24 English lines) and was never used, Release 2 passed it, and Release 3 passed until Release 4 added plan rules and their test lines. All three fail today's bigger test. Advocates use Release ${R.CURRENT_RELEASE}. The test lines are made up and were written by one person.`;
   document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { sel = Number(b.dataset.open); renderDetail(); renderRuns(); tab("detail"); });
 }
 // ---------- Release detail ----------

@@ -5,7 +5,7 @@
   else root.CureCueRules = factory();
 })(typeof self !== "undefined" ? self : this, function () {
   // The release the desk runs. The eval runner reads it too; CI fails the build when this release misses a gate.
-  const CURRENT_RELEASE = 3;
+  const CURRENT_RELEASE = 4;
 
   // ---------- Where the plan rules come from: public documents for one real 2026 Medicare Advantage HMO-POS plan ----------
   // Every node below cites the document and PDF page it was read from. Members, calls and records in this prototype are fictional.
@@ -30,7 +30,24 @@
       INPT: { x: 350, y: 205, label: "Hospital $375/day", id: "S-INPT", text: "Inpatient hospital: $375 copay per day for days 1 to 7, then $0 per day for days 8 to 90.", src: [{ doc: "SB", page: 4, quote: "$375 copay per day for days 1-7" }] },
       MOOP: { x: 70, y: 262, label: "Yearly max $9,250", id: "S-MOOP", text: "The most you pay in a year for covered in-network medical services: $9,250.", src: [{ doc: "SB", page: 4, quote: "Medical Maximum out-of-pocket $9,250 in-network" }, { doc: "EOC", page: 43, quote: "Your in-network maximum out-of-pocket amount is $9,250." }] },
       GRV: { x: 210, y: 262, label: "Complaint (grievance)", id: "P-GRV", text: "Any complaint expressing dissatisfaction is a grievance, even without the word: quality of care, waiting times, customer service. Most are answered within 30 calendar days.", src: [{ doc: "CFR", quote: "any complaint or dispute … expressing dissatisfaction … regardless of whether remedial action is requested" }, { doc: "EOC", page: 153, quote: "A complaint is also called a grievance." }, { doc: "EOC", page: 154, quote: "Most complaints are answered within 30 calendar days." }] },
-      APPL: { x: 350, y: 262, label: "Appeal / dispute", id: "P-APPL", text: "An appeal asks the plan to review and change a coverage decision. A discharge that feels too soon, or care coverage ending too soon, has its own fast appeal. Handled by people. Nothing is drafted.", src: [{ doc: "EOC", page: 22, quote: "An appeal is a formal way of asking us to review and change a coverage decision." }, { doc: "EOC", page: 143, quote: "How to ask us to cover a longer inpatient hospital stay if you think you're being discharged too soon" }, { doc: "EOC", page: 146, quote: "if you think your coverage is ending too soon" }] }
+      APPL: { x: 350, y: 262, label: "Appeal / dispute", id: "P-APPL", text: "An appeal asks the plan to review and change a coverage decision. A discharge that feels too soon, or care coverage ending too soon, has its own fast appeal. Handled by people. Nothing is drafted.", src: [{ doc: "EOC", page: 22, quote: "An appeal is a formal way of asking us to review and change a coverage decision." }, { doc: "EOC", page: 143, quote: "How to ask us to cover a longer inpatient hospital stay if you think you're being discharged too soon" }, { doc: "EOC", page: 146, quote: "if you think your coverage is ending too soon" }] },
+      // Release 4: more of the Summary of Benefits, so typed questions have something to cite. Listed, not drawn.
+      PREM: { label: "Premium $34.80", id: "S-PREM", kind: "table", text: "Monthly plan premium: $34.80. You also keep paying your Medicare Part B premium.", src: [{ doc: "SB", page: 4, quote: "Monthly plan premium $34.80" }] },
+      DED: { label: "No medical deductible", id: "S-DED", kind: "table", text: "This plan does not have a medical deductible.", src: [{ doc: "SB", page: 4, quote: "This plan does not have a deductible." }] },
+      URG: { label: "Urgent care $40", id: "S-URG", kind: "table", text: "Urgently needed services: $40 copay at an urgent care center or by telehealth.", src: [{ doc: "SB", page: 6, quote: "Urgent care center: $40 copay" }] },
+      TELE: { label: "Telehealth $0 / $25", id: "S-TELE", kind: "table", text: "Telehealth visits: $0 copay with your primary care provider, $25 copay with a specialist.", src: [{ doc: "SB", page: 4, quote: "Telehealth: $0 copay" }, { doc: "SB", page: 4, quote: "Telehealth: $25 copay" }] },
+      IMG: { label: "MRI or CT $200 / $335", id: "S-IMG", kind: "table", text: "MRI, MRA, PET or CT scans: $200 copay at a freestanding imaging center, $335 at an outpatient hospital, $280 at a doctor's office.", src: [{ doc: "SB", page: 6, quote: "Advanced imaging services (MRI, MRA, PET and CT" }, { doc: "SB", page: 6, quote: "Freestanding radiological facility: $200 copay" }, { doc: "SB", page: 6, quote: "Outpatient hospital: $335 copay" }] },
+      XRAY: { label: "X-ray $0 to $130", id: "S-XRAY", kind: "table", text: "X-rays: $0 at your PCP's office, $25 at a specialist's office, $50 at a freestanding imaging center, $130 at an outpatient hospital.", src: [{ doc: "SB", page: 6, quote: "Basic radiological services (X-rays)" }, { doc: "SB", page: 6, quote: "Freestanding radiological facility: $50 copay" }, { doc: "SB", page: 6, quote: "Outpatient hospital: $130 copay" }] },
+      LAB: { label: "Lab work $0", id: "S-LAB", kind: "table", text: "Lab services: $0 copay at a freestanding lab or a doctor's office, $50 at an outpatient hospital.", src: [{ doc: "SB", page: 6, quote: "Freestanding laboratory: $0 copay" }, { doc: "SB", page: 6, quote: "Outpatient hospital: $50 copay" }] },
+      SURG: { label: "Outpatient surgery $450 / $375", id: "S-SURG", kind: "table", text: "Outpatient surgery: $450 copay at an outpatient hospital, $375 at an ambulatory surgery center.", src: [{ doc: "SB", page: 4, quote: "Surgery services $450 copay" }, { doc: "SB", page: 4, quote: "Surgery services $375 copay" }] },
+      AMB: { label: "Ambulance $335", id: "S-AMB", kind: "table", text: "Ambulance: $335 copay per date of service.", src: [{ doc: "SB", page: 9, quote: "$335 copay per date of service" }] },
+      SNF: { label: "Skilled nursing $0 / $218", id: "S-SNF", kind: "table", text: "Skilled nursing facility, up to 100 days: $0 copay per day for days 1 to 20, $218 per day for days 21 to 100.", src: [{ doc: "SB", page: 9, quote: "$0 copay per day for days 1-20" }, { doc: "SB", page: 9, quote: "$218 copay per day for days 21-100" }] },
+      PREV: { label: "Preventive care $0", id: "S-PREV", kind: "table", text: "All Medicare preventive services, including the annual wellness visit and screenings: $0 copay.", src: [{ doc: "SB", page: 5, quote: "This plan covers all Medicare preventive services $0 copay" }] },
+      MH: { label: "Therapy visits $35", id: "S-MH", kind: "table", text: "Mental health therapy visits: $35 copay at an outpatient hospital, a specialist's office or by telehealth.", src: [{ doc: "SB", page: 9, quote: "Mental health therapy visits • Outpatient hospital: $35 copay" }] },
+      DENT: { label: "Medicare-covered dental $25", id: "S-DENT", kind: "table", text: "Medicare-covered dental services: $25 copay. A separate supplemental dental benefit has its own limits; check those with the member's record.", src: [{ doc: "SB", page: 7, quote: "Medicare-covered dental $25 copay" }] },
+      TRANS: { label: "Rides not covered", id: "S-TRANS", kind: "table", text: "Transportation to appointments is not covered by this plan.", src: [{ doc: "SB", page: 10, quote: "TRANSPORTATION Not Covered" }] },
+      FAST: { label: "Fast-track appeal", id: "P-FAST", kind: "table", text: "When skilled nursing, home health or rehab coverage is ending: a written notice comes at least 2 calendar days ahead, and signing it is not agreeing. The member asks the Quality Improvement Organization for a fast-track appeal by noon the day before the effective date; it decides within one full day of having the information. Handled by people.", src: [{ doc: "EOC", page: 147, quote: "You get a notice in writing at least 2 calendar days before our plan is going to stop covering your care." }, { doc: "EOC", page: 147, quote: "Signing it doesn't mean you agree with our plan's decision to stop care." }, { doc: "EOC", page: 148, quote: "by noon of the day before the effective date on the Notice of Medicare Non-Coverage" }, { doc: "EOC", page: 148, quote: "Within one full day after they have all the information they need" }] },
+      ACU: { label: "Acupuncture $25", id: "S-ACU", kind: "table", text: "Acupuncture for chronic low back pain (Medicare-covered): $25 copay.", src: [{ doc: "SB", page: 12, quote: "$25 copay for acupuncture for chronic low back pain" }] }
     },
     edges: [["PLAN", "PCP"], ["PLAN", "SPEC"], ["PLAN", "ER"], ["PLAN", "MOOP"], ["PLAN", "GRV"],
       ["SPEC", "REF"], ["SPEC", "DIAG", "procedure at a hospital"], ["ER", "WAIVE", "unless"], ["WAIVE", "INPT", "then"], ["INPT", "MOOP", "counts to"], ["GRV", "APPL", "not an"]]
@@ -46,7 +63,31 @@
     { re: /out.of.pocket|maximum|most (is )?(i|she|he) can pay|yearly max|stop paying for the year|máximo/i, path: ["MOOP"] },
     { re: /regular doctor|primary|primario/i, not: /switch|change my|cambiar/i, path: ["PCP"] }
   ];
-  const retrieve = q => HOPS.find(h => h.re.test(q) && (!h.and || h.and.test(q)) && !(h.not && h.not.test(q))) || null;
+  // Release 4 adds entry patterns for the new rules. Releases 1 to 3 keep the original list, so their history is unchanged.
+  const HOPS4 = [
+    HOPS[0],
+    { re: /hospital (copay|stay|charge|per day)|inpatient|admitted to the hospital|stay in the hospital|i('| a)m admitted/i, not: /\ber\b|emergency|mental|psychiatric/i, path: ["INPT", "MOOP"] },
+    { re: /skilled nursing|nursing (home|facility)|\bsnf\b/i, path: ["SNF"] },
+    HOPS[1],
+    { re: /\bmri\b|\bct scan|\bct\b|pet scan|\bmra\b|imaging/i, path: ["IMG"] },
+    { re: /x-?ray/i, path: ["XRAY"] },
+    { re: /\blabs?\b|lab work|blood (test|work)/i, path: ["LAB"] },
+    { re: /surgery|surgical/i, path: ["SURG"] },
+    HOPS[2],
+    { re: /urgent care|urgently needed|walk-in clinic/i, not: /list|near me|find|nearest/i, path: ["URG"] },
+    { re: /telehealth|video visit|virtual visit/i, path: ["TELE"] },
+    { re: /ambulance/i, path: ["AMB"] },
+    HOPS[3],
+    { re: /premium/i, not: /charged|twice|went up|draft|statement|wrong|paid it/i, path: ["PREM"] },
+    { re: /deductible/i, path: ["DED"] },
+    { re: /preventive|wellness visit|flu shot|screening|mammogram/i, path: ["PREV"] },
+    { re: /therapy|therapist|counsel|mental health/i, not: /physical/i, path: ["MH"] },
+    { re: /dental|dentist/i, not: /claim/i, path: ["DENT"] },
+    { re: /acupunctur/i, path: ["ACU"] },
+    { re: /transport|rides?\b/i, and: /cover|benefit|does (my|the) plan|include/i, path: ["TRANS"] },
+    HOPS[4], HOPS[5]
+  ];
+  const retrieve = (q, release) => ((release || CURRENT_RELEASE) >= 4 ? HOPS4 : HOPS).find(h => h.re.test(q) && (!h.and || h.and.test(q)) && !(h.not && h.not.test(q))) || null;
 
   // ---------- Escalation (Guardian) by release ----------
   const ESC = {
@@ -56,6 +97,7 @@
         /dizzy|pass out/i, /cut me off/i, /coverage ended/i, /should (i )?go to the er|tell me if i should|pretend you are my doctor/i, /reversed/i, /chest (feels )?tight|arm is numb|duele el pecho/i, /say (it'?s |the .{1,30}is )?covered|say approved|must approve|won'?t pay past/i,
         /apelar|apelación/i, /negaron/i, /de alta/i, /dolor en el pecho/i, /no puedo respirar/i, /queja/i, /se negaron a pagar/i]
   };
+  ESC[4] = ESC[3]; // Release 4 changes what Cue can answer, not when it stops
   const escalation = (text, release) => ESC[release || CURRENT_RELEASE].find(r => r.test(text)) || null;
 
   // ---------- Dissatisfaction (Sentinel) ----------
@@ -74,7 +116,11 @@
       main: { label: "Done in the doctor's office", done: "Office procedure · $25 applies · bill to be reprocessed", set: { site: "office" } },
       alt: { label: "Done at a hospital outpatient department", done: "Hospital outpatient · $120 copay explained", set: { site: "hospital" } }
     };
-    if (path.includes("INPT")) return {
+    if (head === "INPT") return {
+      say: "<b>$375 a day for days 1 to 7 of a hospital stay, then $0 for days 8 to 90.</b> It all counts toward the $9,250 yearly max.",
+      why: "Two rules: the inpatient copay, which counts to the yearly max."
+    };
+    if (head === "ER" && path.includes("INPT")) return {
       say: "<b>If she's admitted to the same hospital within 24 hours, she pays $0 for the ER visit instead of the $115 copay.</b> The hospital copay applies instead: $375 a day for days 1 to 7, then $0. All of it counts toward her $9,250 yearly max.",
       why: "Four rules in a chain: ER copay, unless admitted, then hospital copay, which counts to the yearly max. A single-rule lookup would have quoted $115 and been wrong.",
       main: { label: "Read the rules", done: "Rules read", show: "WAIVE" }
@@ -94,9 +140,10 @@
   function decide(text, release) {
     const e = escalation(text, release);
     if (e) return { verdict: "escalate", clause: null, path: ["APPL"], grievance: false, trigger: e.exec(text)[0] };
+    // (a stop wins every race: nothing below runs)
     const g = grievance(text);
-    const h = retrieve(text);
-    if (h) return { verdict: "answer", clause: GRAPH.nodes[h.path[0]].id, path: h.path, grievance: !!g, draft: draft(h.path), account: ACCOUNT.test(text) };
+    const h = retrieve(text, release);
+    if (h) return { verdict: "answer", clause: GRAPH.nodes[h.path[0]].id, path: h.path, grievance: !!g, draft: draft(h.path), account: ACCOUNT.test(text), entry: h.re.exec(text)[0] };
     if (ACCOUNT.test(text)) return { verdict: "human", clause: null, path: [], grievance: !!g, account: true };
     return { verdict: "human", clause: null, path: [], grievance: !!g };
   }
@@ -196,5 +243,5 @@
     return null;
   }
 
-  return { CURRENT_RELEASE, RELEASES: Object.keys(ESC).map(Number), SOURCES, GRAPH, HOPS, retrieve, escalation, grievance, ACCOUNT, draft, figures, figureCheck, decide, evaluate, metricsOf, sliceBy, score };
+  return { CURRENT_RELEASE, RELEASES: Object.keys(ESC).map(Number), ESC, SOURCES, GRAPH, HOPS, retrieve, escalation, grievance, ACCOUNT, draft, figures, figureCheck, decide, evaluate, metricsOf, sliceBy, score };
 });
