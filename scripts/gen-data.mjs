@@ -42,16 +42,16 @@ const claims = [
 
 // ---------- Cases (10): grievances and appeals with clocks. Grievance 30 days; appeal (reconsideration) 30 days here. ----------
 const cases = [
-  { id: "G-26-0388", member: "M-004", type: "grievance", opened: -26, days: 30, subject: "Discharge instructions not provided in writing", status: "open", owner: "Grievances team" },
-  { id: "G-26-0391", member: "M-003", type: "grievance", opened: -25, days: 30, subject: "Interpreter line wait over 20 minutes", status: "open", owner: "Grievances team" },
-  { id: "A-26-0142", member: "M-002", type: "appeal", opened: -20, days: 30, subject: "Physical therapy visits beyond 12", status: "open", owner: "Appeals team" },
-  { id: "G-26-0402", member: "M-006", type: "grievance", opened: -16, days: 30, subject: "Pharmacy delivery missed twice", status: "open", owner: "Grievances team" },
-  { id: "G-26-0405", member: "M-007", type: "grievance", opened: -12, days: 30, subject: "TTY call dropped", status: "open", owner: "Grievances team" },
-  { id: "A-26-0151", member: "M-005", type: "appeal", opened: -10, days: 30, subject: "Home health hours", status: "open", owner: "Appeals team" },
-  { id: "A-26-0409", member: "M-008", type: "appeal", opened: -5, days: 60, subject: "Payment appeal: ER copay charged on C-26-5612, member says he was admitted", status: "open", owner: "Appeals team" },
-  { id: "G-26-0351", member: "M-001", type: "grievance", opened: -58, days: 30, subject: "Dental claim from an out-of-network dentist paid late", status: "resolved", owner: "Grievances team" },
-  { id: "G-26-0372", member: "M-005", type: "grievance", opened: -40, days: 30, subject: "Callback promised, not made", status: "resolved", owner: "Grievances team" },
-  { id: "A-26-0120", member: "M-004", type: "appeal", opened: -44, days: 30, subject: "Skilled nursing days", status: "resolved", owner: "Appeals team" }
+  { id: "G-26-0388", member: "M-004", kind: "grievance", type: "grievance", opened: -26, days: 30, subject: "Discharge instructions not provided in writing", status: "open", owner: "Grievances team" },
+  { id: "G-26-0391", member: "M-003", kind: "grievance", type: "grievance", opened: -25, days: 30, subject: "Interpreter line wait over 20 minutes", status: "open", owner: "Grievances team" },
+  { id: "A-26-0142", member: "M-002", kind: "standard", type: "appeal", opened: -20, days: 30, subject: "Physical therapy visits beyond 12", status: "open", owner: "Appeals team" },
+  { id: "G-26-0402", member: "M-006", kind: "grievance", type: "grievance", opened: -16, days: 30, subject: "Pharmacy delivery missed twice", status: "open", owner: "Grievances team" },
+  { id: "G-26-0405", member: "M-007", kind: "grievance", type: "grievance", opened: -12, days: 30, subject: "TTY call dropped", status: "open", owner: "Grievances team" },
+  { id: "A-26-0151", member: "M-005", kind: "standard", type: "appeal", opened: -10, days: 30, subject: "Home health hours", status: "open", owner: "Appeals team" },
+  { id: "A-26-0409", member: "M-008", kind: "payment", type: "appeal", opened: -5, days: 60, subject: "Payment appeal: ER copay charged on C-26-5612, member says he was admitted", status: "open", owner: "Appeals team" },
+  { id: "G-26-0351", member: "M-001", kind: "grievance", type: "grievance", opened: -58, days: 30, subject: "Dental claim from an out-of-network dentist paid late", status: "resolved", owner: "Grievances team" },
+  { id: "G-26-0372", member: "M-005", kind: "grievance", type: "grievance", opened: -40, days: 30, subject: "Callback promised, not made", status: "resolved", owner: "Grievances team" },
+  { id: "A-26-0120", member: "M-004", kind: "standard", type: "appeal", opened: -44, days: 30, subject: "Skilled nursing days", status: "resolved", owner: "Appeals team" }
 ];
 
 // ---------- Contacts (30): prior calls, with reason, outcome, and whether a callback was promised. ----------
@@ -90,7 +90,7 @@ const shift = [
   { time: "08:04", member: "M-006", reason: "Pharmacy", minutes: 7, cues: { accepted: 1, declined: 0 }, qa: false },
   { time: "08:17", member: "M-007", reason: "Benefits and cost question", minutes: 6, cues: { accepted: 1, declined: 0 }, qa: false },
   { time: "08:31", member: "M-003", reason: "ID card", minutes: 4, cues: { accepted: 0, declined: 0 }, qa: false },
-  { time: "08:49", member: "M-004", reason: "Claims and billing", minutes: 12, cues: { accepted: 2, declined: 0 }, qa: true },
+  { time: "08:49", member: "M-004", reason: "Claims and billing", minutes: 12, cues: { accepted: 2, declined: 0 }, qa: true, note: "Walter N. called about the $1,125 inpatient bill (C-26-5633). Plan rule: $375 a day for days 1 to 7 (S-INPT); 3 days. ER copay $0 because he was admitted (S-ER-W, C-26-5629). Callback kept as promised. Grievance G-26-0388 (written discharge instructions) still open; due in 4 days.", elements: { identity: true, figuresSourced: true, grievance: true, appealRights: null, callbackDated: true, noteComplete: true } },
   { time: "09:12", member: "M-008", reason: "Provider lookup", minutes: 6, cues: { accepted: 1, declined: 1 }, qa: false },
   { time: "09:30", member: "M-002", reason: "Appeal status", minutes: 10, cues: { accepted: 1, declined: 0 }, qa: false },
   { time: "10:02", member: "M-005", reason: "Benefits and cost question", minutes: 8, cues: { accepted: 1, declined: 0 }, qa: false }

@@ -34,7 +34,8 @@ for (const [k, S] of Object.entries(R.SOURCES)) {
 }
 
 let quotes = 0;
-for (const n of Object.values(R.GRAPH.nodes)) for (const src of n.src || []) {
+const cited = [...Object.values(R.GRAPH.nodes), ...Object.entries(R.DEADLINES).map(([k, d]) => ({ id: "deadline:" + k, ...d }))]; // plan rules and case deadlines
+for (const n of cited) for (const src of n.src || []) {
   quotes++;
   const S = R.SOURCES[src.doc];
   const text = S.pages ? (pagesOf(src.doc)[src.page - 1] || "") : norm(readFileSync(path.join(root, S.file), "utf8"));

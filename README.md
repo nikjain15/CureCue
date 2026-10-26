@@ -59,6 +59,10 @@ The plan rules, and the right response for every test line that depends on the p
 
 Copies are kept in `sources/` with SHA-256 checksums. `eval/check-sources.mjs` runs first in CI: each PDF must match its checksum and every quoted line in `rules.js` must be found on its cited page (needs `pdftotext` from poppler-utils).
 
+## Operations screens
+
+`app/ops.js` adds the other roles. **Supervisor:** escalations waiting with what Cue heard and the deadline, "Join call", the team's status (only the advocate's row is live; the rest is demo data) and open cases by deadline. **QA review:** sampled calls (every grievance or escalation, plus a random sample) scored against the note checklist, with a recorded review. **Audit:** every suggestion Cue showed and every action a person took, with the rule ids, the PDF pages and the release, exportable as CSV or JSON; and every case with the deadline that applies and the Evidence of Coverage page that sets it (`DEADLINES` in `rules.js`, checked by `eval/check-sources.mjs`; case clocks checked by `eval/check-data.mjs`).
+
 ## Connections
 
 The desk's Connections screen (`app/connect.js`) lists the sources Cue reads. Live from the browser: the plan's documents (fetched from the publisher, SHA-256 compared with `sources/`, every quote found on its page with PDF.js), adding another plan by ID (reads its 2026 Summary of Benefits and compares the main rules), eCFR (the current grievance definition), the Federal Register (recent Medicare Advantage rules) and the microphone (speak as the member; Cue decides on each sentence). Salesforce Health Cloud and the claims platform run on the fictional records in `app/data.js`; Genesys Cloud CX, Amazon Connect, prior authorization, the Annual Notice of Change and the QIO directory are designed, not built. Product names identify the systems a deployment would use; no integration with them is implied.

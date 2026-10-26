@@ -12,9 +12,16 @@ const member = id => D.members.find(m => m.id === id);
 const relDay = off => off === 0 ? "today" : off === 1 ? "tomorrow" : off === -1 ? "yesterday" : off < 0 ? `${-off} days ago` : `in ${off} days`;
 function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on"); clearTimeout(toast.h); toast.h = setTimeout(() => e.classList.remove("on"), 2800); }
 
+// ---------- Audit log: every cue Cue shows and every action a person takes, with the rules and pages behind it ----------
+const AUDIT = [];
+const plain = h => String(h).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+// The demo runs on its own day (D.TODAY); events keep the real time of day.
+const demoNow = () => { const n = new Date(), d = new Date(D.TODAY + "T00:00:00"); d.setHours(n.getHours(), n.getMinutes(), n.getSeconds()); return d; };
+function audit(type, actor, summary, rules) { const ids = (rules || []).filter(k => G.nodes[k]); AUDIT.push({ at: demoNow(), type, actor, summary: plain(summary).slice(0, 220), rules: ids.map(k => G.nodes[k].id), sources: ids.flatMap(k => (G.nodes[k].src || []).map(x => ({ doc: x.doc, page: x.page }))), release: R.CURRENT_RELEASE, member: "M-001" }); if (window.CureCueOps) CureCueOps.changed(); }
+
 // ---------- Views ----------
-const TITLES = { home: ["Today", "Your briefing for Tue Oct 27"], desk: ["Live call", "Rosa M. · Medicare Advantage HMO-POS"], day: ["My day", "Calls, outcomes and QA for Tue Oct 27"], quality: ["Quality", "Every release tested before advocates use it"], loop: ["Improvement loop", "How Cue gets better, with two human sign-offs"], connect: ["Connections", "The sources Cue reads, and whether each is live"] };
-function show(v) { ["home", "desk", "day", "quality", "loop", "connect"].forEach(x => $("view-" + x).classList.toggle("on", x === v)); document.querySelectorAll(".rail button[data-view]").forEach(b => { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }); $("title").textContent = TITLES[v][0]; $("crumb").textContent = TITLES[v][1]; window.scrollTo({ top: 0 }); if (v === "day") renderDay(); if (v === "connect" && window.CureCueConnect) CureCueConnect.open(); try { history.replaceState(null, "", v === "quality" ? "#evals" : v === "connect" ? "#connect" : location.pathname + location.search); } catch (e) {} }
+const TITLES = { home: ["Today", "Your briefing for Tue Oct 27"], desk: ["Live call", "Rosa M. · Medicare Advantage HMO-POS"], day: ["My day", "Calls, outcomes and QA for Tue Oct 27"], quality: ["Quality", "Every release tested before advocates use it"], loop: ["Improvement loop", "How Cue gets better, with two human sign-offs"], connect: ["Connections", "The sources Cue reads, and whether each is live"], supervise: ["Supervisor", "Escalations waiting, your team, and open cases by deadline"], qa: ["QA review", "Sampled calls scored against the note checklist"], audit: ["Audit", "Every suggestion and action, with its rule, page and release"] };
+function show(v) { ["home", "desk", "day", "supervise", "qa", "audit", "quality", "loop", "connect"].forEach(x => $("view-" + x).classList.toggle("on", x === v)); document.querySelectorAll(".rail button[data-view]").forEach(b => { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }); $("title").textContent = TITLES[v][0]; $("crumb").textContent = TITLES[v][1]; window.scrollTo({ top: 0 }); if (v === "day") renderDay(); if (v === "connect" && window.CureCueConnect) CureCueConnect.open(); if (window.CureCueOps) CureCueOps.open(v); try { history.replaceState(null, "", v === "quality" ? "#evals" : ["connect", "supervise", "qa", "audit"].includes(v) ? "#" + v : location.pathname + location.search); } catch (e) {} }
 document.querySelectorAll(".rail button[data-view]").forEach(b => b.onclick = () => show(b.dataset.view));
 document.addEventListener("click", e => { const g = e.target.closest("[data-goto]"); if (g) { e.preventDefault(); show(g.dataset.goto); } });
 
@@ -53,6 +60,7 @@ renderHome();
     ["05:42", `Tested release ${R.CURRENT_RELEASE} on the test lines: ${R.score(GOLDEN, R.CURRENT_RELEASE).failed ? "it failed a check and is stopped" : "it passed every check"}. Nothing changed overnight.`],
     ["05:42", "Drafted nothing for any member. Nothing above was sent anywhere."]];
   $("log").innerHTML = rows.map(([t, l]) => `<li><span class="t">${t}</span><span>${l}</span></li>`).join("");
+  rows.forEach(([t, l]) => AUDIT.push({ at: new Date(D.TODAY + "T" + t + ":00"), type: "system", actor: "Cue (overnight run)", summary: plain(l), rules: [], sources: [], release: R.CURRENT_RELEASE }));
   $("logmeta").textContent = `Overnight run · release ${R.CURRENT_RELEASE} · ${D.members.length} made-up members`;
 })();
 
@@ -137,11 +145,11 @@ function openTab(t, h) { mtab = t; hot = h; renderM360(); }
 // ---------- Call state ----------
 const cues = () => $("cues"), quiet = () => $("quiet");
 const state = { grievance: null, grievanceHeard: false, escalated: false, figures: [], pathsSeen: [], asked: {}, site: null, callback: null, docSent: null, caseOpened: null, transferred: null, ended: false, accepted: 0, declined: 0 };
-function cue({ k, cls = "", say, main, alt, why, cite, trace }) { const el = document.createElement("div"); el.className = "cue " + cls; if (trace) { const lt = $("lasttrace"); if (lt) lt.innerHTML = `<b>${k}</b>` + trace; }
+function cue({ k, cls = "", say, main, alt, why, cite, trace, rules }) { const el = document.createElement("div"); el.className = "cue " + cls; audit("cue", "Cue", `${k}: ${say}`, rules); if (trace) { const lt = $("lasttrace"); if (lt) lt.innerHTML = `<b>${k}</b>` + trace; }
   el.innerHTML = `<div class="k">${k}</div><div class="say">${say}</div><div class="acts">${main ? `<button class="main">${main.label}</button>` : ""}${alt ? `<button class="alt">${alt.label}</button>` : ""}<button class="why">${trace ? "How Cue got this" : "Why?"}</button></div><div class="det">${trace || ""}${why ? `<div class="small" style="margin-top:4px">${why}</div>` : ""}</div>`;
   const m = el.querySelector(".main"), a = el.querySelector(".alt"), w = el.querySelector(".why");
-  if (m) m.onclick = () => { m.classList.add("done"); m.textContent = main.done; if (a) a.disabled = true; state.accepted++; if (main.fn) main.fn(); };
-  if (a) a.onclick = () => { a.classList.add("done"); a.textContent = alt.done; if (m) m.disabled = true; if (alt.choice) state.accepted++; else state.declined++; if (alt.fn) alt.fn(); };
+  if (m) m.onclick = () => { audit("action", "Nik J. (advocate)", `${k}: chose "${main.label}"`, rules); m.classList.add("done"); m.textContent = main.done; if (a) a.disabled = true; state.accepted++; if (main.fn) main.fn(); };
+  if (a) a.onclick = () => { audit("action", "Nik J. (advocate)", `${k}: chose "${alt.label}"`, rules); a.classList.add("done"); a.textContent = alt.done; if (m) m.disabled = true; if (alt.choice) state.accepted++; else state.declined++; if (alt.fn) alt.fn(); };
   w.onclick = () => el.querySelector(".det").classList.toggle("on");
   cues().insertBefore(el, quiet()); el.scrollIntoView({ block: "nearest" });
   if (state.auto && (main || alt)) { const pickAlt = alt && auto.preferAlt(k, say); const b = pickAlt ? a : m; setTimeout(() => { if (b && !b.disabled && !b.classList.contains("done")) { b.classList.add("pressed"); b.click(); } }, auto.beat); } }
@@ -149,24 +157,24 @@ function setQuiet(t) { quiet().querySelector("span:last-child").textContent = t;
 function onMember(text) {
   const d = R.decide(text, R.CURRENT_RELEASE);   // the desk always runs the current release
   if (d.verdict === "escalate") { if (state.escalated) return; state.escalated = true; // one stop per call: every other cue is already paused drawGraph(["APPL"]); showClause("APPL"); openTab("cases");
-    cue({ k: "Stop", cls: "stop", say: `<b>Bring a supervisor in now.</b> "${d.trigger}" signals a dispute about care or coverage. Don't quote a benefit or a decision for this.`, trace: buildTrace("escalate", text, d), main: { label: "Connect supervisor", done: "Supervisor joining", fn: () => { state.transferred = "Supervisor (Dana), discharge dispute"; markTool("transfer", "Supervisor joined"); if (state.callDone) playSupervisor(); } }, why: "A dispute about a care or coverage decision is never answered from a plan document. Cue drafts nothing and pauses every other cue for this topic." }); setQuiet("Paused on this topic. A supervisor is handling it."); return; }
+    cue({ k: "Stop", cls: "stop", say: `<b>Bring a supervisor in now.</b> "${d.trigger}" signals a dispute about care or coverage. Don't quote a benefit or a decision for this.`, trace: buildTrace("escalate", text, d), rules: ["APPL"], main: { label: "Connect supervisor", done: "Supervisor joining", fn: () => { state.transferred = "Supervisor (Dana), discharge dispute"; markTool("transfer", "Supervisor joined"); if (state.callDone) playSupervisor(); } }, why: "A dispute about a care or coverage decision is never answered from a plan document. Cue drafts nothing and pauses every other cue for this topic." }); setQuiet("Paused on this topic. A supervisor is handling it."); return; }
   if (d.grievance && !state.grievanceHeard) { state.grievanceHeard = true; drawGraph(["GRV"]); showClause("GRV"); openTab("contacts", "contacts"); const g = R.grievance(text);
-    cue({ k: "Heads up", cls: "flag", say: `She said "<mark>${g.exec(text)[0]}</mark>". That counts as a grievance, even without the word. Log it?`, trace: buildTrace("grievance", text, { phrase: g.exec(text)[0] }), main: { label: "Log grievance", done: "Logged · 30-day clock started", fn: () => { state.grievance = true; state.caseOpened = "G-26-0417"; markTool("case", "G-26-0417 opened"); openTab("cases"); } }, alt: { label: "Not a grievance", done: "Noted: not a grievance", fn: () => { state.grievance = false; } }, why: "If logged, a case opens with a due date 30 days out." }); }
+    cue({ k: "Heads up", cls: "flag", say: `She said "<mark>${g.exec(text)[0]}</mark>". That counts as a grievance, even without the word. Log it?`, trace: buildTrace("grievance", text, { phrase: g.exec(text)[0] }), rules: ["GRV"], main: { label: "Log grievance", done: "Logged · 30-day clock started", fn: () => { state.grievance = true; state.caseOpened = "G-26-0417"; markTool("case", "G-26-0417 opened"); openTab("cases"); } }, alt: { label: "Not a grievance", done: "Noted: not a grievance", fn: () => { state.grievance = false; } }, why: "If logged, a case opens with a due date 30 days out." }); }
   if (d.verdict === "answer") { const key = d.path.join(">"); if (state.pathsSeen.includes(key)) return; state.pathsSeen.push(key);
     drawGraph(d.path); showClause(d.path[0]); const dr = d.draft; R.figureCheck(dr.say, d.path).forEach(f => state.figures.push(f));
     if (d.path[0] === "SPEC") { state.asked.spec = true; openTab("claims", "C-26-5519"); } if (d.path.includes("INPT")) { state.asked.er = true; openTab("plan", "WAIVE"); }
     const main = dr.main ? { label: dr.main.label, done: dr.main.done, fn: () => { if (dr.main.set) Object.assign(state, dr.main.set); if (dr.main.show) showClause(dr.main.show); } } : null;
     const alt = dr.alt ? { label: dr.alt.label, done: dr.alt.done, choice: true, fn: () => { if (dr.alt.set) Object.assign(state, dr.alt.set); } } : null; // both options are answers, not a decline
-    cue({ k: "Suggested answer", say: dr.say, main, alt, trace: buildTrace("answer", text, d) }); setQuiet("Listening. Nothing to add yet."); return; }
+    cue({ k: "Suggested answer", say: dr.say, main, alt, trace: buildTrace("answer", text, d), rules: d.path }); setQuiet("Listening. Nothing to add yet."); return; }
   if (d.account) { cue({ k: "Check first", say: "That's about the account, not the plan rules. Open the claim before answering. No number suggested.", trace: buildTrace("account", text, { word: (R.ACCOUNT.exec(text) || [])[0] }) }); openTab("claims"); }
 }
 
 // ---------- Ask Cue: grounded in plan rules, refuses the rest ----------
 $("ask").onsubmit = e => { e.preventDefault(); const q = $("askq").value.trim(); if (!q) return; $("askq").value = "";
   const d = R.decide(q, R.CURRENT_RELEASE);
-  if (d.verdict === "escalate") { cue({ k: "Stop", cls: "stop", say: `<b>That needs a person.</b> "${d.trigger}" is a dispute or a decision. Cue won't draft an answer.`, trace: buildTrace("escalate", q, d) }); return; }
+  if (d.verdict === "escalate") { cue({ k: "Stop", cls: "stop", say: `<b>That needs a person.</b> "${d.trigger}" is a dispute or a decision. Cue won't draft an answer.`, trace: buildTrace("escalate", q, d), rules: ["APPL"] }); return; }
   if (d.verdict === "answer") { const dr = d.draft; drawGraph(d.path); showClause(d.path[0]); const fig = R.figureCheck(dr.say, d.path); fig.forEach(f => state.figures.push(f));
-    cue({ k: "You asked: " + q, say: dr.say, trace: buildTrace("answer", q, d) }); return; }
+    cue({ k: "You asked: " + q, say: dr.say, trace: buildTrace("answer", q, d), rules: d.path }); return; }
   cue({ k: "You asked: " + q, say: d.account ? "That's about the account, not the plan rules. Open the claim. No number suggested." : `<b>Not in the plan rules on file.</b> Cue has nothing to cite, so it says so rather than guess. It can answer questions like: ${["What's my ER copay?", "How much is an MRI?", "Is there a deductible?", "What does a skilled nursing stay cost?"].map(x => `<a href="#" class="tryq">${x}</a>`).join(" · ")}`, trace: buildTrace(d.account ? "account" : "refuse", q, { word: (R.ACCOUNT.exec(q) || [])[0] }) });
   document.querySelectorAll(".tryq").forEach(a => a.onclick = e => { e.preventDefault(); $("askq").value = a.textContent; $("ask").requestSubmit(); }); };
 
@@ -182,7 +190,7 @@ function suggestTool(t) { const b = document.querySelector(`#tools [data-tool=${
 function markTool(t, label) { const b = document.querySelector(`#tools [data-tool=${t}]`); if (b) { b.classList.add("done"); b.lastChild.textContent = label; b.style.borderColor = ""; } }
 function renderTool(t) { const T = TOOLS[t](); openTool = t; const box = $("tool"); box.className = "tool on";
   box.innerHTML = `<h4>${T.title} <span class="pre">· ${T.pre}</span></h4><div class="f">${T.fields.map(([l, k, v, sel], i) => `<div><label>${l}</label>${k === "select" ? `<select data-i="${i}">${v.map((o, j) => `<option ${j === sel ? "selected" : ""}>${o}</option>`).join("")}</select>` : `<input data-i="${i}" type="${k === "date" ? "date" : "text"}" value="${v}">`}</div>`).join("")}</div><div class="ctrl"><button class="btn sm primary" id="toolok">Confirm</button><button class="btn sm" id="toolx">Cancel</button><span class="small">Cue filled it; you confirm it. Nothing is sent until you do.</span></div>`;
-  $("toolok").onclick = () => { const vals = [...box.querySelectorAll("[data-i]")].map(e => e.value); const done = T.confirm(vals); markTool(t, done); box.className = "tool"; toast(done); };
+  $("toolok").onclick = () => { const vals = [...box.querySelectorAll("[data-i]")].map(e => e.value); const done = T.confirm(vals); audit("action", "Nik J. (advocate)", `${T.title}: ${done}`); markTool(t, done); box.className = "tool"; toast(done); };
   $("toolx").onclick = () => { box.className = "tool"; openTool = null; }; }
 document.querySelectorAll("#tools [data-tool]").forEach(b => b.onclick = () => renderTool(b.dataset.tool));
 
@@ -200,19 +208,19 @@ function answer() {
   const c = $("tr-verify"); player = CueVoice.play(VERIFY, { container: c, onStart: () => wave(true), onLine: (l) => { addLine(c, l.w, l.t); wave(false); if (l.h) $("h" + l.h[0]).innerHTML = `heard <b>${l.h[1]}</b>`; }, isPaused: () => false, onDone: () => { if (state.auto) auto.verify(); } }); }
 function chk() { $("verified").disabled = !(v1.checked && v2.checked && v3.checked); }
 ["v1", "v2", "v3"].forEach(id => $(id).onchange = chk);
-$("verified").onclick = () => { if (player) player.stop(); go(1); renderM360(); drawGraph(); const c = $("tr");
+$("verified").onclick = () => { audit("action", "Nik J. (advocate)", "Identity verified: name, date of birth and member ID last four"); if (player) player.stop(); go(1); renderM360(); drawGraph(); const c = $("tr");
   cue({ k: "Before you start", say: `She's called twice about this bill, ${rosaCalls()}. On ${rosaPromise()} she was promised a callback that never got scheduled.`, trace: buildTrace("record", "") });
   player = CueVoice.play(CALL, { container: c, onStart: () => wave(true), onLine: (l) => { addLine(c, l.w, l.t); wave(false); if (l.w === "Rosa") onMember(l.t); }, isPaused: () => paused || state.ended, onDone: () => { state.callDone = true; if (state.transferred) playSupervisor(); } }); };
 
 // ---------- The supervisor's part, then the advocate's close. Guidance follows the plan's EOC, Chapter 9, Section 8. ----------
 const EOC = R.SOURCES.EOC, eocLink = (p, t) => `<a href="../${EOC.file}#page=${p}" target="_blank" rel="noopener">${t}</a>`;
-function playSupervisor() { if (state.supStarted || state.ended) return; state.supStarted = true; const c = $("tr");
+function playSupervisor() { if (state.supStarted || state.ended) return; state.supStarted = true; audit("action", "Dana (supervisor)", "Joined Rosa M.\u2019s call for the discharge dispute"); const c = $("tr");
   setQuiet("Supervisor on the call. Cue shows process facts only.");
-  cue({ k: "For the supervisor · from the plan's documents", say: `Rehab is covered skilled nursing care. A <b>Notice of Medicare Non-Coverage</b> comes at least 2 days ahead; signing it is not agreeing. For a <b>fast-track appeal</b>, contact the Quality Improvement Organization by <b>noon the day before coverage ends</b>. It decides within one full day of having the information.`, trace: buildTrace("process", "They are sending her home on Thursday and she is not ready."), why: "Process facts, not a coverage decision." }); drawGraph(["GRV", "APPL"]);
+  cue({ k: "For the supervisor · from the plan's documents", say: `Rehab is covered skilled nursing care. A <b>Notice of Medicare Non-Coverage</b> comes at least 2 days ahead; signing it is not agreeing. For a <b>fast-track appeal</b>, contact the Quality Improvement Organization by <b>noon the day before coverage ends</b>. It decides within one full day of having the information.`, trace: buildTrace("process", "They are sending her home on Thursday and she is not ready."), rules: ["FAST"], why: "Process facts, not a coverage decision." }); drawGraph(["GRV", "APPL"]);
   toast("Elena Martinez is a member too; Rosa M. is on file as her authorized representative.");
   player = CueVoice.play(SCRIPT.SUPERVISOR, { container: c, onStart: () => wave(true), onLine: l => { addLine(c, l.w, l.t); wave(false); }, isPaused: () => paused || state.ended, onDone: offerAppealCase }); }
 function offerAppealCase() { if (state.ended) return;
-  cue({ k: "Pre-filled for you", say: `<b>Appeal support case for Elena Martinez</b>: fast-track appeal filed with the Quality Improvement Organization on this call; skilled nursing coverage set to end ${fmtOff(2)}; decision within one full day of the reviewers having her information. <b>Callback to Rosa</b> ${fmtOff(2)}, morning.`, main: { label: "Open case and schedule callback", done: `A-26-0418 opened · callback ${fmtOff(2)}, morning`, fn: () => { state.appealCase = "A-26-0418"; if (!state.callback) { state.callback = fmtOff(2) + ", morning"; markTool("callback", "Callback " + state.callback); } playClose(); } }, trace: buildTrace("prefill", "") }); }
+  cue({ k: "Pre-filled for you", say: `<b>Appeal support case for Elena Martinez</b>: fast-track appeal filed with the Quality Improvement Organization on this call; skilled nursing coverage set to end ${fmtOff(2)}; decision within one full day of the reviewers having her information. <b>Callback to Rosa</b> ${fmtOff(2)}, morning.`, main: { label: "Open case and schedule callback", done: `A-26-0418 opened · callback ${fmtOff(2)}, morning`, fn: () => { state.appealCase = "A-26-0418"; if (!state.callback) { state.callback = fmtOff(2) + ", morning"; markTool("callback", "Callback " + state.callback); } playClose(); } }, trace: buildTrace("prefill", ""), rules: ["FAST"] }); }
 function playClose() { if (state.closeStarted || state.ended) return; state.closeStarted = true; const C = SCRIPT.CLOSE, c = $("tr");
   const lines = [{ w: "Advocate", t: C.bill[state.site || "unknown"] }];
   if (state.grievance === true) { lines.push({ w: "Advocate", t: C.grievance.logged }); state.grievanceAnswered = true; } else if (state.grievance === false) lines.push({ w: "Advocate", t: C.grievance.declined });
@@ -255,14 +263,14 @@ function wrapup() {
   if (state.callback) rc.push(`We will call you back ${state.callback}.`); if (state.docSent) rc.push(`The plan rules we discussed are on their way to you.`);
   rc.push(`Reply to this text if anything doesn't match what you understood.`); $("recap").textContent = rc.join(" ");
   $("approve").onclick = () => { closedCall = { time: new Date().toTimeString().slice(0, 5), member: "M-001", reason: $("code").value, minutes: Math.max(1, Math.round((Date.now() - t0) / 60000)), cues: { accepted: state.accepted, declined: state.declined }, qa: !!state.grievance || state.escalated, now: true }; recordOutcomes(); $("approved").textContent = "Note approved. Call closed; its cases and callback are on Home and in My day."; $("sendrecap").disabled = false; $("next").disabled = false; state.closed = true; state.closedAt = new Date(); $("dot").className = "dot ready"; $("stt").textContent = "Ready"; $("timer").textContent = ""; };
-  $("sendrecap").onclick = e => { e.target.disabled = true; $("sent").textContent = "Sent by you."; if (outcomes) { outcomes.recap = true; renderHome(); } };
+  $("sendrecap").onclick = e => { e.target.disabled = true; $("sent").textContent = "Sent by you."; audit("action", "Nik J. (advocate)", "Recap texted to the member"); if (outcomes) { outcomes.recap = true; renderHome(); } };
   $("next").onclick = () => show("day");
   if (state.auto) auto.finish(); }
 
 // ---------- What the call leaves behind: cases, a contact, a callback. Home and the member record read these. ----------
-function recordOutcomes() { if (state.recorded) return; state.recorded = true; $("readynote").textContent = "Rosa's call is closed; its outcomes are below. The other callers in the queue are not scripted in this demo.";
-  if (state.grievance === true) { const k = D.cases.find(x => x.id === "G-26-0417"); const g = { id: "G-26-0417", member: "M-001", type: "grievance", opened: 0, days: 30, subject: "Repeat calls about a $120 biopsy bill" + (state.grievanceAnswered ? "; answered on the call" : ""), status: state.grievanceAnswered ? "resolved" : "open", owner: "Grievances team" }; if (k) Object.assign(k, g); else D.cases.push(g); }
-  if (state.appealCase) D.cases.push({ id: state.appealCase, member: "M-009", type: "appeal", opened: 0, days: 2, clock: `coverage ends ${fmtOff(2)}`, subject: `Fast-track appeal filed with the Quality Improvement Organization; skilled nursing coverage ending ${fmtOff(2)}`, status: "open", owner: "Appeals team" });
+function recordOutcomes() { if (state.recorded) return; state.recorded = true; audit("note", "Nik J. (advocate)", "Call note approved and call closed: " + $("note").value); $("readynote").textContent = "Rosa's call is closed; its outcomes are below. The other callers in the queue are not scripted in this demo.";
+  if (state.grievance === true) { const k = D.cases.find(x => x.id === "G-26-0417"); const g = { id: "G-26-0417", member: "M-001", kind: "grievance", type: "grievance", opened: 0, days: 30, subject: "Repeat calls about a $120 biopsy bill" + (state.grievanceAnswered ? "; answered on the call" : ""), status: state.grievanceAnswered ? "resolved" : "open", owner: "Grievances team" }; if (k) Object.assign(k, g); else D.cases.push(g); }
+  if (state.appealCase) D.cases.push({ id: state.appealCase, member: "M-009", kind: "fasttrack", type: "appeal", opened: 0, days: 2, clock: `coverage ends ${fmtOff(2)}`, subject: `Fast-track appeal filed with the Quality Improvement Organization; skilled nursing coverage ending ${fmtOff(2)}`, status: "open", owner: "Appeals team" });
   if (state.site === "office") { const cl = D.claims.find(x => x.id === "C-26-5519"); if (cl) cl.reason = "Sent back for reprocessing at the $25 office copay"; }
   D.contacts.push({ member: "M-001", day: 0, reason: "Claims and billing", note: `Biopsy bill ${state.site === "hospital" ? "explained: outpatient hospital copay" : state.site === "office" ? "sent for reprocessing" : "place of service still to confirm"}${state.appealCase ? "; mother's fast-track appeal filed with supervisor" : ""}`, callback: state.callback ? { promised: true, scheduled: true, day: 2 } : null, by: "Nik J." });
   outcomes = { site: state.site, grievance: state.grievance, answered: !!state.grievanceAnswered, appeal: state.appealCase, callback: state.callback, recap: false };
@@ -298,8 +306,8 @@ function renderDay() {
 }
 
 CueVoice.init().then(() => { $("mode").textContent = CueVoice.modeLabel(); $("voicenote").textContent = CueVoice.readyNote(); });
-const HASHVIEW = { "#evals": "quality", "#connect": "connect" };
+const HASHVIEW = { "#evals": "quality", "#connect": "connect", "#supervise": "supervise", "#qa": "qa", "#audit": "audit" };
 if (HASHVIEW[location.hash]) show(HASHVIEW[location.hash]);
 window.addEventListener("hashchange", () => { if (HASHVIEW[location.hash]) show(HASHVIEW[location.hash]); });
-window.CureCueDesk = { state, show, onMember, answer, buildTrace, cue };
+window.CureCueDesk = { state, show, onMember, answer, buildTrace, cue, audit, AUDIT, dayCalls, dayStats, nearClock: () => nearClock, member, fmtOff, srcHref };
 })();

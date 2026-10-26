@@ -16,6 +16,16 @@
     CFR: { title: "42 CFR § 422.561, Medicare Advantage definitions", code: "42 CFR 422.561", file: "sources/42-cfr-422-561-grievance.md", url: "https://www.law.cornell.edu/cfr/text/42/422.561", retrieved: "2026-10-25" }
   };
 
+  // ---------- Case deadlines, from the plan's Evidence of Coverage. Case clocks in the data are checked against these. ----------
+  const DEADLINES = {
+    grievance: { label: "Complaint (grievance)", days: 30, text: "Answered within 30 calendar days; up to 14 more if more information is needed.", src: [{ doc: "EOC", page: 154, quote: "Most complaints are answered within 30 calendar days." }] },
+    standard: { label: "Standard appeal, medical care", days: 30, text: "Answer within 30 calendar days of getting the appeal.", src: [{ doc: "EOC", page: 132, quote: "For standard appeals, we must give you our answer within 30 calendar days after we get your appeal." }] },
+    fast: { label: "Fast appeal", hours: 72, text: "Answer within 72 hours of getting the appeal.", src: [{ doc: "EOC", page: 132, quote: "For fast appeals, we must give you our answer within 72 hours after we get your appeal." }] },
+    payment: { label: "Payment appeal", days: 60, text: "Answer within 60 calendar days of getting the appeal.", src: [{ doc: "EOC", page: 135, quote: "We must give you our answer within 60 calendar days after we get your appeal." }] },
+    fasttrack: { label: "Fast-track appeal (Quality Improvement Organization)", days: 1, text: "Decision within one full day of the reviewers having the information.", src: [{ doc: "EOC", page: 148, quote: "Within one full day after they have all the information they need" }] },
+    filing: { label: "Time to file an appeal", days: 65, text: "The member has 65 calendar days from the written notice to appeal.", src: [{ doc: "EOC", page: 131, quote: "You must make your appeal request within 65 calendar days" }] }
+  };
+
   // ---------- Plan rules as a graph ----------
   const GRAPH = {
     plan: "2026 Medicare Advantage HMO-POS",
@@ -212,5 +222,5 @@
   }
 
 
-  return { CURRENT_RELEASE, RELEASES: Object.keys(ESC).map(Number), ESC, SOURCES, GRAPH, HOPS, retrieve, escalation, grievance, ACCOUNT, draft, figures, figureCheck, decide, evaluate, metricsOf, sliceBy, score };
+  return { CURRENT_RELEASE, RELEASES: Object.keys(ESC).map(Number), ESC, SOURCES, DEADLINES, GRAPH, HOPS, retrieve, escalation, grievance, ACCOUNT, draft, figures, figureCheck, decide, evaluate, metricsOf, sliceBy, score };
 });

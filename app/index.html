@@ -69,7 +69,7 @@ body{background:var(--bg-2)}
 section.scr{display:none}section.scr.on{display:block}
 .three{display:grid;gap:14px;grid-template-columns:1fr 1fr 1fr}
 @media (max-width:1100px){.three{grid-template-columns:1fr 1fr}.c3{grid-column:1/-1}}
-@media (max-width:720px){.three{grid-template-columns:1fr}.shell{grid-template-columns:1fr}.rail{flex-direction:row;height:auto;position:static;padding:8px 10px;border-right:0;border-bottom:1px solid var(--line);gap:2px}.rail .sp{display:none}.rail .mark{margin:0 4px 0 0;width:30px;height:30px}.rail button,.rail a{width:38px;height:38px}.rail .me{width:32px;height:32px;font-size:12px}.home{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}}
+@media (max-width:720px){.three{grid-template-columns:1fr}.shell{grid-template-columns:1fr}.rail{flex-direction:row;height:auto;position:static;padding:8px 10px;border-right:0;border-bottom:1px solid var(--line);gap:2px;overflow-x:auto;max-width:100vw;min-width:0}.rail button,.rail a{flex:0 0 auto}.main{min-width:0}.rail .sp{display:none}.rail .mark{margin:0 4px 0 0;width:30px;height:30px}.rail button,.rail a{width:38px;height:38px}.rail .me{width:32px;height:32px;font-size:12px}.home{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}}
 .col{min-width:0;display:flex;flex-direction:column;gap:14px}
 .phone{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--fg);color:#fff;flex-wrap:wrap}
 .phone .av{width:40px;height:40px;border-radius:50%;background:var(--brand);display:grid;place-items:center;font-weight:800;color:#1d2a0c}
@@ -89,6 +89,7 @@ section.scr{display:none}section.scr.on{display:block}
 .line{padding:10px 12px;border-radius:12px;background:var(--bg-2);max-width:92%;font-size:16px}
 .line.adv{background:var(--panel);border:1px solid var(--line);align-self:flex-end}
 .evhelp{margin:10px 0 14px;padding:10px 14px;border-radius:12px;background:var(--panel-2);font-size:15px}
+.qacall{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}.qahead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .cgroup{margin-bottom:22px}.cgroup h2{font-size:20px;margin:0 0 2px}
 .cgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));margin-top:10px}
 .ccard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
@@ -97,6 +98,7 @@ section.scr{display:none}section.scr.on{display:block}
 .ccard .btn{align-self:flex-start}
 .ccard:has(.cout:not(:empty)){grid-column:1/-1}
 .rail a{text-decoration:none}
+.adm dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:6px 0 0}.adm dt{color:var(--muted)}.adm dd{margin:0}
 .cout:empty{display:none}.cout{margin-top:6px;font-size:14px}
 .cout td.good,.cout .good{color:var(--good)}.cout td.bad,.cout .bad{color:var(--bad)}
 ul.checks{list-style:none;margin:0;padding:0}ul.checks li{padding:3px 0;font-weight:700}
@@ -261,6 +263,9 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
   <button data-view="home" aria-current="page" title="Today" aria-label="Today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><span class="n" id="homen"></span><span class="lbl">Today</span></button>
   <button data-view="desk" title="Live call" aria-label="Live call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><span class="lbl">Live call</span></button>
   <button data-view="day" title="My day" aria-label="My day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="lbl">My day</span></button>
+  <button data-view="supervise" title="Supervisor" aria-label="Supervisor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5A5 5 0 0 1 21 19"/></svg><span class="lbl">Supervisor</span></button>
+  <button data-view="qa" title="QA review" aria-label="QA review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4h6v3H9z"/><path d="M7 5H5v16h14V5h-2"/><path d="m9 14 2 2 4-4"/></svg><span class="lbl">QA review</span></button>
+  <button data-view="audit" title="Audit" aria-label="Audit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/><path d="M9 12h6M9 15h4"/></svg><span class="lbl">Audit</span></button>
   <button data-view="quality" title="Quality" aria-label="Quality"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19h16M7 16V9M12 16V5M17 16v-6"/></svg><span class="lbl">Quality</span></button>
   <button data-view="loop" title="Improvement loop" aria-label="Improvement loop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12a8 8 0 0 1 14-5l2 2M20 12a8 8 0 0 1-14 5l-2-2"/><path d="M20 4v5h-5M4 20v-5h5"/></svg><span class="lbl">Improve</span></button>
   <button data-view="connect" title="Connections" aria-label="Connections"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0z"/><path d="M12 16v5"/></svg><span class="lbl">Connect</span></button>
@@ -442,6 +447,28 @@ node eval/check-data.mjs             # the made-up records add up
 node eval/run.mjs                    # scores the current release on all test lines</pre></div></section>
   </div>
 
+  <!-- SUPERVISOR -->
+  <div class="view" id="view-supervise">
+    <div class="card"><h3>Needs you now</h3><div id="sup-queue" class="brief"></div></div>
+    <div class="card" style="margin-top:14px"><h3>Your team</h3><div id="sup-team"></div></div>
+    <div class="card" style="margin-top:14px"><h3>Open cases, by deadline</h3><div id="sup-cases"></div></div>
+  </div>
+
+  <!-- QA REVIEW -->
+  <div class="view" id="view-qa">
+    <div class="card"><h3>Sampled calls</h3><p class="small" id="qa-meta"></p><div id="qa-list"></div></div>
+  </div>
+
+  <!-- AUDIT -->
+  <div class="view" id="view-audit">
+    <div class="card"><div class="ctrl" style="justify-content:space-between;margin:0 0 10px"><h3 style="margin:0">Activity</h3><span><button class="btn sm" data-export="csv">Export CSV</button> <button class="btn sm" data-export="json">Export JSON</button></span></div>
+      <p class="small" style="margin:0 0 8px">Every suggestion Cue showed and every action a person took, with the plan rules and pages behind it and the release that produced it. Kept for this session in your browser.</p>
+      <div id="aud-filter" style="margin-bottom:8px"></div>
+      <div class="tscroll"><table class="slices fails"><thead><tr><th>When</th><th>Who</th><th>What</th><th>Rule and source</th><th>Release</th></tr></thead><tbody id="aud-body"></tbody></table></div></div>
+    <div class="card" style="margin-top:14px"><h3>Case deadlines</h3><p class="small" style="margin:0 0 8px">Each clock comes from the plan's Evidence of Coverage; the data check confirms every case uses the right one.</p>
+      <div class="tscroll"><table class="slices fails"><thead><tr><th>Case</th><th>Type</th><th>Opened</th><th>Due</th><th>Status</th><th>Rule</th></tr></thead><tbody id="aud-cases"></tbody></table></div></div>
+  </div>
+
   <!-- CONNECTIONS -->
   <div class="view" id="view-connect"><div id="connect"></div></div>
 
@@ -483,6 +510,7 @@ node eval/run.mjs                    # scores the current release on all test li
 <script src="script.js"></script>
 <script src="app.js"></script>
 <script src="connect.js"></script>
+<script src="ops.js"></script>
 <script src="evals.js"></script>
 </body>
 </html>

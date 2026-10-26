@@ -279,6 +279,7 @@
   {
    "id": "G-26-0388",
    "member": "M-004",
+   "kind": "grievance",
    "type": "grievance",
    "opened": -26,
    "days": 30,
@@ -289,6 +290,7 @@
   {
    "id": "G-26-0391",
    "member": "M-003",
+   "kind": "grievance",
    "type": "grievance",
    "opened": -25,
    "days": 30,
@@ -299,6 +301,7 @@
   {
    "id": "A-26-0142",
    "member": "M-002",
+   "kind": "standard",
    "type": "appeal",
    "opened": -20,
    "days": 30,
@@ -309,6 +312,7 @@
   {
    "id": "G-26-0402",
    "member": "M-006",
+   "kind": "grievance",
    "type": "grievance",
    "opened": -16,
    "days": 30,
@@ -319,6 +323,7 @@
   {
    "id": "G-26-0405",
    "member": "M-007",
+   "kind": "grievance",
    "type": "grievance",
    "opened": -12,
    "days": 30,
@@ -329,6 +334,7 @@
   {
    "id": "A-26-0151",
    "member": "M-005",
+   "kind": "standard",
    "type": "appeal",
    "opened": -10,
    "days": 30,
@@ -339,6 +345,7 @@
   {
    "id": "A-26-0409",
    "member": "M-008",
+   "kind": "payment",
    "type": "appeal",
    "opened": -5,
    "days": 60,
@@ -349,6 +356,7 @@
   {
    "id": "G-26-0351",
    "member": "M-001",
+   "kind": "grievance",
    "type": "grievance",
    "opened": -58,
    "days": 30,
@@ -359,6 +367,7 @@
   {
    "id": "G-26-0372",
    "member": "M-005",
+   "kind": "grievance",
    "type": "grievance",
    "opened": -40,
    "days": 30,
@@ -369,6 +378,7 @@
   {
    "id": "A-26-0120",
    "member": "M-004",
+   "kind": "standard",
    "type": "appeal",
    "opened": -44,
    "days": 30,
@@ -681,7 +691,16 @@
     "accepted": 2,
     "declined": 0
    },
-   "qa": true
+   "qa": true,
+   "note": "Walter N. called about the $1,125 inpatient bill (C-26-5633). Plan rule: $375 a day for days 1 to 7 (S-INPT); 3 days. ER copay $0 because he was admitted (S-ER-W, C-26-5629). Callback kept as promised. Grievance G-26-0388 (written discharge instructions) still open; due in 4 days.",
+   "elements": {
+    "identity": true,
+    "figuresSourced": true,
+    "grievance": true,
+    "appealRights": null,
+    "callbackDated": true,
+    "noteComplete": true
+   }
   },
   {
    "time": "09:12",

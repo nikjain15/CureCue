@@ -23,6 +23,10 @@ D.claims.forEach(c => {
   if (c.day > 0) errors.push(`claim ${c.id}: service date in the future`);
 });
 D.cases.forEach(k => {
+  const dl = R.DEADLINES[k.kind];
+  if (!dl) errors.push(`case ${k.id}: unknown kind ${k.kind}`);
+  else if (dl.days && k.days !== dl.days) errors.push(`case ${k.id}: clock ${k.days} days, but a ${dl.label.toLowerCase()} is ${dl.days} days (EOC p. ${dl.src[0].page})`);
+  if ((k.kind === "grievance") !== (k.type === "grievance")) errors.push(`case ${k.id}: kind ${k.kind} does not match type ${k.type}`);
   if (!ids.has(k.member)) errors.push(`case ${k.id}: member missing`);
   if (!["grievance", "appeal"].includes(k.type)) errors.push(`case ${k.id}: type ${k.type}`);
   if ((k.type === "grievance") !== k.id.startsWith("G-")) errors.push(`case ${k.id}: id prefix does not match type`);

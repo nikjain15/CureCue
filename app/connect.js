@@ -157,6 +157,25 @@ window.CureCueConnect = (function () {
       <p class="small" style="margin-top:8px">The place-of-service code is what settles Rosa's question: code 11 (office) means the $25 specialist copay; code 22 (outpatient hospital) means the $120 procedure copay. Codes are the standard CMS place-of-service codes; the claim itself is fictional.</p>`;
   }
 
+  // ---------- What a deployment's integration settings would show for each connection ----------
+  const ADMIN = {
+    docs: { Environment: "Public internet, production documents", "Sign-in": "None: public documents", Updates: "On demand here; nightly in a deployment", Reads: "PDF pages, page count, SHA-256", "Member data": "None" },
+    add: { Environment: "Public internet", "Sign-in": "None: public documents", Updates: "On demand", Reads: "One plan's 2026 Summary of Benefits", "Member data": "None" },
+    anoc: { Environment: "Not connected", "Sign-in": "None: public documents", Updates: "Yearly, at plan-year change", Reads: "Changes from last year; drug tiers", "Member data": "None" },
+    crm: { Environment: "Demo: fictional records in app/data.js", "Sign-in": "Designed: OAuth 2.0 JWT bearer, read-only integration user", Updates: "Designed: change events during the call", Reads: "Person account, authorized representatives, cases, tasks", "Member data": "PHI. Minimum necessary fields; business associate agreement required" },
+    claims: { Environment: "Demo: fictional records in app/data.js", "Sign-in": "Designed: service account through the plan's API gateway", Updates: "Designed: on request, per member", Reads: "Claim lines, place of service, allowed, paid, member owes", "Member data": "PHI. Read-only; no write-back" },
+    auth: { Environment: "Not connected", "Sign-in": "Designed: OAuth 2.0", Updates: "Designed: on request", Reads: "Authorization status by service and date", "Member data": "PHI" },
+    mic: { Environment: "This browser", "Sign-in": "Your browser's microphone permission", Updates: "Live while listening", Reads: "Speech, turned into text", "Member data": "Chrome sends the audio to Google's speech service to transcribe it. Do not speak real member details here; a deployment transcribes inside the plan's own environment." },
+    genesys: { Environment: "Not connected", "Sign-in": "Designed: OAuth client credentials", Updates: "Designed: real-time conversation events", Reads: "Transcript, IVR reason, queue and handle time", "Member data": "PHI" },
+    aconnect: { Environment: "Not connected", "Sign-in": "Designed: IAM role", Updates: "Designed: real-time stream", Reads: "Transcript segments as the call happens", "Member data": "PHI" },
+    ecfr: { Environment: "Public internet", "Sign-in": "None: public API", Updates: "On demand; daily in a deployment", Reads: "Section text and amendment dates", "Member data": "None" },
+    fedreg: { Environment: "Public internet", "Sign-in": "None: public API", Updates: "On demand; daily in a deployment", Reads: "Rule titles, types and dates", "Member data": "None" },
+    qio: { Environment: "Not connected", "Sign-in": "None: public list", Updates: "Designed: quarterly", Reads: "QIO name and phone by state", "Member data": "None" }
+  };
+  const lastRun = {}; const log = [];
+  function logCheck(i) { const out = $("o-" + i.id); const first = (out && out.innerText || "").split("\n").map(x => x.trim()).filter(Boolean)[0] || "done"; const when = new Date(); lastRun[i.id] = when; log.unshift({ when, name: i.name, result: first.slice(0, 160) }); renderLog(); const lr = document.querySelector(`#c-${i.id} [data-last]`); if (lr) lr.textContent = when.toTimeString().slice(0, 8); if (window.CureCueDesk) CureCueDesk.audit("check", "Nik J. (advocate)", `${i.name}: ${first}`); }
+  function renderLog() { const el = $("connlog"); if (!el) return; el.innerHTML = log.length ? `<div class="tscroll"><table class="slices fails"><thead><tr><th>Time</th><th>Connection</th><th>Result</th></tr></thead><tbody>${log.map(l => `<tr><td class="small">${l.when.toTimeString().slice(0, 8)}</td><td>${esc(l.name)}</td><td class="small">${esc(l.result)}</td></tr>`).join("")}</tbody></table></div>` : `<p class="small" style="margin:0">No checks run yet in this session. Each check you run is listed here and in the Audit log.</p>`; }
+
   // ---------- The catalog ----------
   const CATALOG = [
     ["Plan documents", "What the plan covers and costs. Every rule Cue cites comes from here.", [
@@ -178,17 +197,18 @@ window.CureCueConnect = (function () {
 
   function render() {
     const counts = { live: 0, demo: 0, designed: 0 }; CATALOG.forEach(([, , items]) => items.forEach(i => { if (counts[i.status] !== undefined) counts[i.status]++; }));
-    $("connect").innerHTML = `<p class="small" style="margin:0 0 14px">${counts.live} live · ${counts.demo} on demo data · ${counts.designed} designed. All connections are read-only: Cue never writes to a source system; the advocate does.</p>` +
+    $("connect").innerHTML = `<div class="ccard" style="margin-bottom:18px"><div class="ctop"><b>Connection health</b><span class="small">${counts.live} live · ${counts.demo} on demo data · ${counts.designed} designed</span></div><p class="small" style="margin:0">All connections are read-only: Cue never writes to a source system; the advocate does. Member data (PHI) only ever comes from systems marked PHI, and in this demo those are fictional records.</p><b class="small" style="margin-top:6px">Activity</b><div id="connlog"></div></div>` +
       CATALOG.map(([g, gsub, items]) => `<section class="cgroup"><h2>${g}</h2><p class="small">${gsub}</p><div class="cgrid">${items.map(i => `<div class="ccard" id="c-${i.id}"><div class="ctop"><b>${i.name}</b>${pill(i.status)}</div><div class="small">${i.sub}</div><ul>${i.reads.map(r => `<li>${r}</li>`).join("")}</ul>
         ${i.form ? `<form class="ctrl" data-add><input type="text" placeholder="Plan ID, e.g. H6622-025" value="H6622-025" style="max-width:200px"><button class="btn sm primary">Fetch and read</button></form>` : ""}
         ${i.mic && SR ? `<button class="btn sm primary" data-mic>Start listening</button>` : ""}
         ${i.act ? `<button class="btn sm primary" data-act="${i.id}">${i.act[0]}</button>` : ""}
-        ${i.status === "designed" ? `<details class="small"><summary style="cursor:pointer;font-weight:700">How it would connect</summary><p>Read-only service account, scoped to the fields above. Events stream to Cue during a call; nothing is written back. Not built in this prototype.</p></details>` : ""}
+        <details class="small adm"><summary style="cursor:pointer;font-weight:700">Settings</summary><dl>${Object.entries(ADMIN[i.id] || {}).map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}<dt>Access</dt><dd>Read-only</dd>${i.act || i.form || i.mic ? `<dt>Last check</dt><dd data-last>${lastRun[i.id] ? lastRun[i.id].toTimeString().slice(0, 8) : "not run this session"}</dd>` : ""}</dl></details>
         <div class="cout" id="o-${i.id}"></div></div>`).join("")}</div></section>`).join("") +
       `<p class="small" style="margin-top:16px">Product names identify the systems a deployment would use; no partnership or integration with them is implied. Live checks call the public source directly from your browser.</p>`;
-    CATALOG.forEach(([, , items]) => items.forEach(i => { if (!i.act) return; const b = document.querySelector(`[data-act="${i.id}"]`); b.onclick = async () => { b.disabled = true; await i.act[1]($("o-" + i.id)); b.disabled = false; }; }));
-    const f = document.querySelector("[data-add]"); if (f) f.onsubmit = async e => { e.preventDefault(); const b = f.querySelector("button"); b.disabled = true; await addPlan($("o-add"), f.querySelector("input").value); b.disabled = false; };
-    const m = document.querySelector("[data-mic]"); if (m) m.onclick = () => mic($("o-mic"), m);
+    CATALOG.forEach(([, , items]) => items.forEach(i => { if (!i.act) return; const b = document.querySelector(`[data-act="${i.id}"]`); b.onclick = async () => { b.disabled = true; await i.act[1]($("o-" + i.id)); b.disabled = false; logCheck(i); }; }));
+    const f = document.querySelector("[data-add]"); if (f) f.onsubmit = async e => { e.preventDefault(); const b = f.querySelector("button"); b.disabled = true; await addPlan($("o-add"), f.querySelector("input").value); b.disabled = false; logCheck(CATALOG[0][2][1]); };
+    const m = document.querySelector("[data-mic]"); if (m) m.onclick = () => { mic($("o-mic"), m); if (!rec) return; log.unshift({ when: new Date(), name: "This browser's microphone", result: "Listening started" }); renderLog(); };
+    renderLog();
   }
   let rendered = false;
   return { open() { if (!rendered) { render(); rendered = true; } }, addPlan, checkPlanDocs, checkEcfr, fedReg, heard };
