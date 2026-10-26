@@ -48,7 +48,7 @@ const cases = [
   { id: "G-26-0402", member: "M-006", type: "grievance", opened: -16, days: 30, subject: "Pharmacy delivery missed twice", status: "open", owner: "Grievances team" },
   { id: "G-26-0405", member: "M-007", type: "grievance", opened: -12, days: 30, subject: "TTY call dropped", status: "open", owner: "Grievances team" },
   { id: "A-26-0151", member: "M-005", type: "appeal", opened: -10, days: 30, subject: "Home health hours", status: "open", owner: "Appeals team" },
-  { id: "G-26-0409", member: "M-008", type: "grievance", opened: -5, days: 30, subject: "ER copay charged, member says admitted", status: "open", owner: "Grievances team" },
+  { id: "A-26-0409", member: "M-008", type: "appeal", opened: -5, days: 60, subject: "Payment appeal: ER copay charged on C-26-5612, member says he was admitted", status: "open", owner: "Appeals team" },
   { id: "G-26-0351", member: "M-001", type: "grievance", opened: -58, days: 30, subject: "Dental claim from an out-of-network dentist paid late", status: "resolved", owner: "Grievances team" },
   { id: "G-26-0372", member: "M-005", type: "grievance", opened: -40, days: 30, subject: "Callback promised, not made", status: "resolved", owner: "Grievances team" },
   { id: "A-26-0120", member: "M-004", type: "appeal", opened: -44, days: 30, subject: "Skilled nursing days", status: "resolved", owner: "Appeals team" }
@@ -72,14 +72,14 @@ const contacts = [
   { member: "M-006", day: -16, reason: "Pharmacy", note: "Delivery missed twice; G-26-0402 opened; Spanish line", callback: null, by: "R. Chen" },
   { member: "M-006", day: -4, reason: "Pharmacy", note: "Delivery rescheduled; confirmed by text", callback: null, by: "Nik J." },
   { member: "M-007", day: -12, reason: "Grievance", note: "TTY call dropped; G-26-0405 opened", callback: null, by: "J. Alvarez" },
-  { member: "M-008", day: -5, reason: "Claims and billing", note: "ER copay on C-26-5612; member says he was admitted; G-26-0409 opened", callback: { promised: true, scheduled: true, day: 0 }, by: "Nik J." },
+  { member: "M-008", day: -5, reason: "Claims and billing", note: "ER copay on C-26-5612; member says he was admitted; payment appeal A-26-0409 opened", callback: { promised: true, scheduled: true, day: 0 }, by: "Nik J." },
   { member: "M-008", day: -36, reason: "Provider lookup", note: "Asked for in-network podiatrist", callback: null, by: "T. Brooks" }
 ];
 // fill to 30 with routine contacts
 const routine = ["Benefits and cost question", "ID card", "Provider lookup", "Transportation", "Pharmacy"];
 while (contacts.length < 30) {
   let m = pick(members).id; if (m === "M-001") m = "M-005"; const day = -Math.floor(rnd() * 85 + 3); const reason = pick(routine);
-  contacts.push({ member: m, day, reason, note: ({ "Benefits and cost question": "Copay question answered from the plan", "ID card": "Card mailed", "Provider lookup": "Two in-network options given", "Transportation": "Ride booked", "Pharmacy": "Refill status given" })[reason], callback: null, by: pick(["Nik J.", "T. Brooks", "J. Alvarez", "R. Chen"]) });
+  contacts.push({ member: m, day, reason, note: ({ "Benefits and cost question": "Copay question answered from the plan", "ID card": "Card mailed", "Provider lookup": "Two in-network options given", "Transportation": "Told rides are not a plan benefit; gave local transit options", "Pharmacy": "Refill status given" })[reason], callback: null, by: pick(["Nik J.", "T. Brooks", "J. Alvarez", "R. Chen"]) });
 }
 contacts.sort((a, b) => a.day - b.day);
 // Rosa's mother, added after the random fill so the seeded contacts stay the same. She appears on the call when the supervisor joins.

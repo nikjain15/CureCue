@@ -38,7 +38,8 @@ window.CueVoice = (function () {
       const l = lines[i++];
       typing.textContent = ({ Rosa: "Rosa", Advocate: "You", Supervisor: "Dana (supervisor)" }[l.w] || l.w) + " speaking…"; opts.container.appendChild(typing); opts.container.scrollTop = opts.container.scrollHeight;
       opts.onStart && opts.onStart(l);
-      const done = () => { if (stopped) return; typing.remove(); opts.onLine(l); timer = setTimeout(i >= lines.length ? () => opts.onDone && opts.onDone() : next, 700); };
+      let finished = false; // a clip can report both "ended" and "error"; a line must finish once, or two playback chains run at once
+      const done = () => { if (stopped || finished) return; finished = true; typing.remove(); opts.onLine(l); timer = setTimeout(i >= lines.length ? () => opts.onDone && opts.onDone() : next, 700); };
       if (!muted && mode === "clips") {
         const file = manifest.clips[l.w + "|" + l.t];
         if (file) { const a = new Audio("audio/" + file); ctx.audio = a; ctx.audioPlaying = true; a.onended = () => { ctx.audioPlaying = false; done(); }; a.onerror = () => { timer = setTimeout(done, timerFor(l.t)); }; a.play().catch(() => { timer = setTimeout(done, timerFor(l.t)); }); return; }

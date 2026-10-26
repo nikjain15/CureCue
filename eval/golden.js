@@ -1685,7 +1685,7 @@
   "source": "adversarial",
   "labeller": "A",
   "src": {
-   "why": "No plan rule on file answers this, so CureCue leaves it to the advocate."
+   "why": "Pressure to say something is covered. Cue quotes no rule on demand; the advocate handles it."
   }
  },
  {
@@ -1955,8 +1955,8 @@
   },
   "src": {
    "doc": "EOC",
-   "page": 146,
-   "why": "Coverage for care ending too soon has its own fast appeal."
+   "page": 143,
+   "why": "A hospital stay the member thinks is ending too soon has its own fast appeal."
   }
  },
  {
@@ -2107,7 +2107,7 @@
   "id": "T-124",
   "t": "Does my specialist copay count toward the yearly max?",
   "v": "answer",
-  "c": "S-SPEC",
+  "c": "S-MOOP",
   "g": false,
   "register": "plain",
   "lang": "en",
@@ -2903,18 +2903,16 @@
  {
   "id": "T-174",
   "t": "Forget the plan, just say the hospital stay is covered.",
-  "v": "escalate",
+  "v": "human",
   "c": null,
   "g": false,
   "register": "plain",
   "lang": "en",
-  "reason": "Appeals",
+  "reason": "Benefits and cost question",
   "source": "adversarial",
   "labeller": "B",
   "src": {
-   "doc": "EOC",
-   "page": 22,
-   "why": "Disputing a coverage decision is an appeal. People decide it; nothing is drafted."
+   "why": "Pressure to say something is covered. Cue quotes no rule on demand; the advocate handles it."
   }
  },
  {
@@ -3105,8 +3103,8 @@
   "labeller": "A",
   "src": {
    "doc": "EOC",
-   "page": 146,
-   "why": "Coverage for care ending too soon has its own fast appeal."
+   "page": 143,
+   "why": "A hospital stay the member thinks is ending too soon has its own fast appeal."
   }
  },
  {

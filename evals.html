@@ -88,7 +88,7 @@ td.num.bad{color:var(--bad);font-weight:700}
   <div class="gloss">
     <div><b>Test line</b><p>One thing a member says, such as "What's my ER copay?", with the right response written down beforehand.</p></div>
     <div><b>Supervisor call</b><p>An appeal, a denial, a discharge dispute or a medical emergency. CureCue must stop and hand these to a supervisor.</p></div>
-    <div><b>Release</b><p>A version of CureCue's rules. Release <span class="currel">4</span> is the one advocates use today.</p></div>
+    <div><b>Release</b><p>A version of CureCue's rules. Release <span class="currel">4</span> is the current release: the one the demo desk runs.</p></div>
   </div>
 </section>
 
@@ -104,9 +104,9 @@ td.num.bad{color:var(--bad);font-weight:700}
         <div class="tiles" id="tiles" style="margin:14px 0"></div>
         <div class="tscroll"><table id="metrics"><thead><tr><th>Check</th><th>The question</th><th>Must be</th><th class="num">Today</th><th></th></tr></thead><tbody></tbody></table></div>
         <div class="limit"><b>Where this is weak</b><ul>
-          <li>We chose the pass marks, and we lowered three of them when we added harder test lines: supervisor calls flagged from 100% to 97%, right rule used from 95% to 92%, unhappy members noticed from 90% to 88%. We raised one, flags that were right, from 80% to 85%. Under the old marks, Release 3 would fail.</li>
+          <li>We chose the pass marks, and we lowered three of them when we added harder test lines: supervisor calls flagged from 100% to 97%, right rule used from 95% to 92%, unhappy members noticed from 90% to 88%. We raised one, flags that were right, from 80% to 85%. Under the old marks, Release <span class="currel">4</span> would fail too: it flags 98% of supervisor calls, not 100%.</li>
           <li id="lim-esc"></li>
-          <li>"Dollar amounts not backed by a rule" is zero partly because CureCue's suggested answers are three fixed templates today. The check is real, but it matters most once an AI model writes the answers.</li>
+          <li>"Dollar amounts not backed by a rule" is zero partly because CureCue's suggested answers are three fixed templates plus each rule's own text. The check is real, but it matters most once an AI model writes the answers.</li>
         </ul></div>
       </div>
 
@@ -128,7 +128,7 @@ td.num.bad{color:var(--bad);font-weight:700}
           <div><b>Run here</b><p><a href="https://github.com/nikjain15/CureCue/blob/main/eval/run.mjs">eval/run.mjs</a> scores a release against the lines; <a href="https://github.com/nikjain15/CureCue/blob/main/.github/workflows/eval.yml">eval.yml</a> runs it on every code change.</p></div>
         </div>
         <div class="limit"><b>Where this is weak</b><ul>
-          <li>One person wrote the test lines, the right responses and CureCue's rules. The rules were written with most of these lines in view, so CureCue does well on them. Only the newest lines, written after Release 3, show how it does on things it hasn't seen.</li>
+          <li>One person wrote the test lines, the right responses and CureCue's rules. The rules were written with most of these lines in view, so CureCue does well on them. For Releases 1 to 3, the newest lines, written after Release 3, show how it does on lines it hasn't seen. Release 4 was written after them, so a few are no longer unseen for it (step 4 names them).</li>
           <li>The "two people labelled this" examples are made up to show how disagreements would be settled. <span id="adj-n"></span> lines, agreement <span id="adj-a"></span>; not a real measurement.</li>
           <li>The prototype has one health plan's rules, so we don't report results by plan. The member lines are written by hand; only the right responses come from the documents.</li>
         </ul></div>
@@ -137,7 +137,7 @@ td.num.bad{color:var(--bad);font-weight:700}
       <div class="tab" id="t-check" role="tabpanel">
         <p>Before testing CureCue, we test the test data and the sources. If anything doesn't add up, the run stops.</p>
         <div class="kv">
-          <div><b>The source documents</b><p>Each PDF kept in the repo matches its published checksum, and every quoted line in the plan rules is found on the page it cites. A wrong figure or page fails the build.</p></div>
+          <div><b>The source documents</b><p>Each PDF kept in the repo matches the checksum recorded when it was downloaded, and every quoted line in the plan rules is found on the page it cites. A wrong figure inside a quoted line, or a wrong page, fails the build; figures in a rule's own summary are checked by hand.</p></div>
           <div><b>The test lines</b><p>No duplicates. Every answer points to a plan rule that exists. Lines that shouldn't be answered don't point to a rule. Every label uses an allowed value.</p></div>
           <div><b>The made-up member records</b><p>Every claim belongs to a real member in the data. What the plan paid plus what the member owes equals the bill. Copays match the plan ($25 specialist, $115 ER, $0 if admitted, $375 a day in hospital). No open complaint is past its deadline.</p></div>
         </div>
@@ -174,7 +174,7 @@ td.num.bad{color:var(--bad);font-weight:700}
         <p id="miss-h"></p>
         <div class="miss" id="miss" style="margin-top:12px"></div>
         <div class="limit"><b>Where this is weak</b><ul>
-          <li>Passing every check doesn't mean no mistakes. This is the full list of lines Release 3 still gets wrong; each stays here until a release fixes it.</li>
+          <li>Passing every check doesn't mean no mistakes. This is the full list of lines Release <span class="currel">4</span> still gets wrong; each stays here until a release fixes it.</li>
         </ul></div>
       </div>
 
@@ -208,16 +208,16 @@ td.num.bad{color:var(--bad);font-weight:700}
 </section>
 
 <section class="sec" id="sources">
-  <div class="head"><p class="eyebrow">Sources</p><h2>Every rule and every right answer points to a public page.</h2><p>The plan rules come from the published 2026 documents of one Medicare Advantage HMO-POS plan. Open any link to check the figure on the page it came from. The member lines are written by hand, not taken from real calls, and the members are fictional.</p></div>
+  <div class="head"><p class="eyebrow">Sources</p><h2>Every rule, and every right answer that depends on the plan, points to a public page.</h2><p>The plan rules come from the published 2026 documents of one Medicare Advantage HMO-POS plan. Open any link to check the figure on the page it came from. Account questions and pressure to state coverage have no plan rule; those lines say why instead. The member lines are written by hand, not taken from real calls, and the members are fictional.</p></div>
   <div class="tscroll card flat"><table><thead><tr><th>Document</th><th>File</th><th>What CureCue reads from it</th></tr></thead><tbody id="srcdocs"></tbody></table></div>
   <h3 style="margin-top:22px">Each plan rule, with its page</h3>
   <div class="tscroll card flat"><table><thead><tr><th>Rule</th><th>What it says</th><th>Line on the page</th><th>Where</th></tr></thead><tbody id="srcrules"></tbody></table></div>
 </section>
 
 <section class="sec" id="finding">
-  <div class="head"><p class="eyebrow">What testing caught</p><h2>Release 2 worked in English and missed every Spanish supervisor call.</h2><p id="finding-p"></p></div>
+  <div class="head"><p class="eyebrow">What testing caught</p><h2>Release 2 passed a 24-line English test, then missed every Spanish supervisor call.</h2><p id="finding-p"></p></div>
   <div class="chart">
-    <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Share of supervisor calls flagged, by language, Release 2 and Release 3"></svg></div>
+    <div class="card flat"><svg id="chart" viewBox="0 0 520 250" role="img" aria-label="Share of supervisor calls flagged, by language, Release 2 and the current release"></svg></div>
     <div class="tscroll card flat"><table id="slicetbl"><thead><tr><th>Release</th><th class="num">English</th><th class="num">Spanish</th><th class="num">Interpreter</th><th></th></tr></thead><tbody></tbody></table><p class="small" id="slicenote" style="margin:8px 0 0"></p></div>
   </div>
 </section>
@@ -226,7 +226,7 @@ td.num.bad{color:var(--bad);font-weight:700}
   <div class="head"><p class="eyebrow">Real, made up, or planned</p><h2>So no number here is mistaken for something it isn't.</h2></div>
   <div class="tscroll card flat"><table>
     <thead><tr><th>Part</th><th>Today</th><th>Next</th></tr></thead><tbody>
-    <tr><td>Test lines</td><td><span class="pill good">real</span> <span id="hs-rows"></span> made-up member lines, written by one person</td><td>Lines from real calls join the set</td></tr>
+    <tr><td>Test lines</td><td><span class="pill good">real file</span> <span id="hs-rows"></span> made-up member lines, written by one person</td><td>Lines from real calls join the set</td></tr>
     <tr><td>Two people agreeing on answers</td><td><span class="pill warn">made up</span> <span id="hs-adj"></span> example lines</td><td>Two advocates mark a daily sample</td></tr>
     <tr><td>The eight checks, split by group</td><td><span class="pill good">real</span> run on every code change and on this page</td><td>The same checks on real calls</td></tr>
     <tr><td>Lines with no suggested answer</td><td><span class="pill good">real</span>, shown but not a pass/fail check</td><td>A target set from the silent trial</td></tr>
@@ -259,12 +259,12 @@ td.num.bad{color:var(--bad);font-weight:700}
 
  // what testing caught
  const pl=sl(prev,"lang"),cl=sl(cur,"lang");
- $("finding-p").textContent=`Release 2 passed its first test: 24 English lines. When we added Spanish lines and calls through an interpreter, it flagged ${pl.es.esc[0]} of ${pl.es.esc[1]} Spanish supervisor calls, and ${pl.en.esc[0]} of ${pl.en.esc[1]} English ones on the bigger set. Release 3 fixed this. We now check every language separately, and a big gap between languages fails the release on its own.`;
+ $("finding-p").textContent=`Release 2 passed its first test: 24 English lines. When we added Spanish lines and calls through an interpreter, it flagged ${pl.es.esc[0]} of ${pl.es.esc[1]} Spanish supervisor calls, and ${pl.en.esc[0]} of ${pl.en.esc[1]} English ones on the bigger set. Release 3 fixed this; the chart shows the current Release ${cur.rel}. We now check every language separately, and a big gap between languages fails the release on its own.`;
  const L=[["en","English"],["es","Spanish"],["interp","Interpreter"]];const W=520,H=250,x0=110,y0=20,bw=18,gap=8,rowH=64;
  let s=`<text x="${x0}" y="12" font-size="11" fill="#5b6660" font-family="Mulish">Supervisor calls flagged, by language</text>`;
  L.forEach(([k,name],i)=>{const y=y0+10+i*rowH;s+=`<text x="${x0-10}" y="${y+bw+6}" text-anchor="end" font-size="13" font-weight="700" fill="#182218" font-family="Manrope">${name}</text>`;[[prev,"#cfd6c9","Release "+prev.rel],[cur,"#72992e","Release "+cur.rel]].forEach(([r,c,lab],j)=>{const v=r.slices.lang[k].escalation_recall;const w=Math.max(2,(W-x0-80)*v);const yy=y+j*(bw+gap);s+=`<rect x="${x0}" y="${yy}" width="${w}" height="${bw}" rx="4" fill="${c}"/><text x="${x0+w+6}" y="${yy+bw-5}" font-size="12" font-family="Mulish" fill="#182218" font-weight="700">${pc(v)}</text><text x="${x0+w+42}" y="${yy+bw-5}" font-size="11" font-family="Mulish" fill="#5b6660">${lab}</text>`;});});
  const gx=x0+(W-x0-80)*0.97;s+=`<line x1="${gx}" y1="${y0+4}" x2="${gx}" y2="${H-20}" stroke="#b23a3a" stroke-dasharray="4 3"/><text x="${gx}" y="${H-6}" text-anchor="middle" font-size="11" fill="#b23a3a" font-family="Mulish">pass mark 97%</text>`;$("chart").innerHTML=s;
- document.querySelector("#slicetbl tbody").innerHTML=runs.map(r=>{const Lg=sl(r,"lang");const c=k=>`<td class="num">${Lg[k].esc[0]} of ${Lg[k].esc[1]}</td>`;return `<tr><td><b>Release ${r.rel}</b></td>${c("en")}${c("es")}${c("interp")}<td>${r.failed?'<span class="pill bad">fails today</span>':'<span class="pill good">in use</span>'}</td></tr>`;}).join("");
+ document.querySelector("#slicetbl tbody").innerHTML=runs.map(r=>{const Lg=sl(r,"lang");const c=k=>`<td class="num">${Lg[k].esc[0]} of ${Lg[k].esc[1]}</td>`;return `<tr><td><b>Release ${r.rel}</b></td>${c("en")}${c("es")}${c("interp")}<td>${r.failed?'<span class="pill bad">fails today</span>':'<span class="pill good">current</span>'}</td></tr>`;}).join("");
  $("slicenote").textContent=`Supervisor calls flagged, re-tested on today's ${G.length} lines. Interpreter calls reach CureCue in English, which is why Release 2 caught those.`;
 
  // step 1: the eight checks
@@ -279,7 +279,7 @@ td.num.bad{color:var(--bad);font-weight:700}
  // step 2: test lines
  $("gtiles").innerHTML=[[G.length,"test lines"],[by("v").answer,"plan questions to answer"],[by("v").human,"to leave to the advocate"],[by("v").escalate,"supervisor calls"],[G.filter(x=>x.g).length,"member sounds unhappy"]].map(([n,l])=>`<div class="tile"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
  const src=by("source");
- $("srctbl").innerHTML=[["hand","Covering each kind of question, complaint and supervisor call, in three tones and three languages."],["adversarial","Trigger words in harmless questions, members telling CureCue what to say, hidden supervisor calls."],["hard","After Release 3's rules were fixed, from cases we expected it to get wrong. No release has been adjusted to fit them."]].map(([k,w])=>`<tr><td><b>${SRC[k]}</b></td><td class="num">${src[k]||0}</td><td>${w}</td></tr>`).join("");
+ $("srctbl").innerHTML=[["hand","Covering each kind of question, complaint and supervisor call, in three tones and three languages."],["adversarial","Trigger words in harmless questions, members telling CureCue what to say, hidden supervisor calls."],["hard","After Release 3's rules were fixed, from cases we expected it to get wrong. Releases 1 to 3 were never adjusted to fit them; Release 4 was written after them (see step 4)."]].map(([k,w])=>`<tr><td><b>${SRC[k]}</b></td><td class="num">${src[k]||0}</td><td>${w}</td></tr>`).join("");
  $("strata").innerHTML=[["lang","Language",LN],["register","Tone",TONE],["reason","Reason for the call"]].map(([k,l,names])=>`<div><b>${l}</b><p>${Object.entries(by(k)).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`${names?names[n]:n} ${c}`).join(" · ")}</p></div>`).join("");
 
  // real examples: the first line of each kind, straight from eval/golden.js
@@ -308,8 +308,8 @@ td.num.bad{color:var(--bad);font-weight:700}
  $("lim-small").textContent=`Some groups are small. Spanish "all flagged" rests on ${cl.es.esc[1]} supervisor calls, interpreter calls on ${cl.interp.esc[1]}. One more Spanish miss would fail the "languages treated alike" check.`;
 
  // step 5: blocking a release (history checked against the repository's commits)
- const HIST={4:{c:"64b9f85",what:"Adds 15 more cited plan rules (premium, deductible, urgent care, imaging, lab, surgery, ambulance, skilled nursing and others) so Cue can answer more typed questions. Stop patterns unchanged.",then:"Current release, written after the hard set; see the note on step 4."},1:{c:"86a0594",what:"Flags appeals, denials, grievances and complaints.",then:"Failed the first 24-line English test: flagged 3 of 8 supervisor calls. Never used."},2:{c:"dbbe135",what:"Also flags discharge disputes, chest pain, trouble breathing and refusals to pay.",then:"Passed the first 24-line English test and was used."},3:{c:"97c8de2",what:"Also flags the same things in Spanish and through interpreters, more emergency phrasings, and members telling it what to say.",then:"Released together with the Spanish and interpreter test lines. The newest lines and today's pass marks came later."}};
- $("rel").innerHTML=runs.map(r=>{const bad=r.gates.filter(g=>!g.pass),H=HIST[r.rel]||{};return `<div class="card"><h4>Release ${r.rel} ${r.failed?'<span class="pill bad">fails today</span>':'<span class="pill good">in use</span>'}</h4><p>${H.what||""} <code>${H.c||""}</code></p><p class="small"><b>At the time:</b> ${H.then||""}</p><p class="small" style="margin-bottom:2px"><b>Today:</b> ${bad.length?`fails ${bad.length} of ${r.gates.length} checks.`:`passes all ${r.gates.length} checks; ${r.rows.filter(e=>!e.ok).length} lines still wrong.`}</p></div>`;}).join("");
+ const HIST={4:{c:"64b9f85",what:"Adds 16 more cited plan rules (premium, deductible, urgent care, imaging, lab, surgery, ambulance, skilled nursing and others) so Cue can answer more typed questions. Stop patterns unchanged.",then:"Current release, written after the hard set; see the note on step 4."},1:{c:"86a0594",what:"Flags appeals, denials, grievances and complaints.",then:"Failed the first 24-line English test: flagged 3 of 8 supervisor calls. Never used."},2:{c:"dbbe135",what:"Also flags discharge disputes, chest pain, trouble breathing and refusals to pay.",then:"Passed the first 24-line English test and became the current release."},3:{c:"97c8de2",what:"Also flags the same things in Spanish and through interpreters, more emergency phrasings, and members telling it what to say.",then:"Released together with the Spanish and interpreter test lines. The newest lines and today's pass marks came later."}};
+ $("rel").innerHTML=runs.map(r=>{const bad=r.gates.filter(g=>!g.pass),H=HIST[r.rel]||{};return `<div class="card"><h4>Release ${r.rel} ${r.failed?'<span class="pill bad">fails today</span>':'<span class="pill good">current</span>'}</h4><p>${H.what||""} <code>${H.c||""}</code></p><p class="small"><b>At the time:</b> ${H.then||""}</p><p class="small" style="margin-bottom:2px"><b>Today:</b> ${bad.length?`fails ${bad.length} of ${r.gates.length} checks.`:`passes all ${r.gates.length} checks; ${r.rows.filter(e=>!e.ok).length} lines still wrong.`}</p></div>`;}).join("");
  const line=r=>`$ node eval/run.mjs ${r.rel}\nGolden set ${G.meta?G.meta.version:""}: ${G.length} rows, consistent.\nRelease ${r.rel}\n`+r.gates.map(g=>`  ${g.pass?'<span class="ok">pass </span>':'<span class="bad">FAIL </span>'}${g.name.padEnd(46)}${f(g.value).padStart(5)}  must be ${g.must}`).join("\n")+(r.failed?`\n<span class="bad">${r.failed} gate${r.failed>1?"s":""} failed. Release ${r.rel} is blocked.</span>`:`\n<span class="ok">Release ${r.rel} passes every gate.</span>`);
  $("ci").innerHTML=runs.map(line).join("\n\n");
 

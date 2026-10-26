@@ -337,14 +337,14 @@
    "owner": "Appeals team"
   },
   {
-   "id": "G-26-0409",
+   "id": "A-26-0409",
    "member": "M-008",
-   "type": "grievance",
+   "type": "appeal",
    "opened": -5,
-   "days": 30,
-   "subject": "ER copay charged, member says admitted",
+   "days": 60,
+   "subject": "Payment appeal: ER copay charged on C-26-5612, member says he was admitted",
    "status": "open",
-   "owner": "Grievances team"
+   "owner": "Appeals team"
   },
   {
    "id": "G-26-0351",
@@ -589,7 +589,7 @@
    "member": "M-008",
    "day": -5,
    "reason": "Claims and billing",
-   "note": "ER copay on C-26-5612; member says he was admitted; G-26-0409 opened",
+   "note": "ER copay on C-26-5612; member says he was admitted; payment appeal A-26-0409 opened",
    "callback": {
     "promised": true,
     "scheduled": true,
