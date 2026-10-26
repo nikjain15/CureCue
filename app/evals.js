@@ -4,7 +4,7 @@ const R = window.CureCueRules, G = window.CureCueGolden, J = window.CureCueJudge
 const $ = id => document.getElementById(id);
 const pct = x => Math.round(x * 100) + "%";
 const RUNS = R.RELEASES.map(rel => ({ rel, ...R.score(G, rel) }));
-const COMMIT = { 1: "86a0594", 2: "dbbe135", 3: "97c8de2", 4: "this change" }; // the commit each release landed in
+const COMMIT = { 1: "86a0594", 2: "dbbe135", 3: "97c8de2", 4: "64b9f85" }; // the commit each release landed in
 const NOTE = { 4: "Adds 15 more cited plan rules from the Summary of Benefits so Cue can answer more typed questions. Stop patterns unchanged.", 1: "Flags appeals, denials, grievances and complaints.", 2: "Also flags discharge disputes, chest pain, trouble breathing and refusals to pay.", 3: "Also flags the same things in Spanish and through interpreters, more emergency phrasings, and members telling it what to say." };
 // Plain names for the eight checks, the groups, the responses and the kinds of mistake
 const CHECK = { escalation_recall: "Supervisor calls flagged", escalation_precision: "Flags that were right", hallucination_rate: "Unbacked dollar amounts", citation_accuracy: "Right plan rule used", routing_accuracy: "Sent to the right place", grievance_recall_min_register: "Unhappy members noticed (worst tone)", recall_gap_lang: "Gap between languages", verdicts_outside_enum: "Responses outside the three allowed" };
