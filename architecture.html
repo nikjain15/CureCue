@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CureCue · How it works</title>
+<title>CureCue · Architecture</title>
 <meta name="description" content="Walk one call turn by turn: which responsibility fires, what it reads, what it produces. Then the ten layers, the graph, safety, governance and the questions this design gets asked.">
 <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Mulish:wght@400;600;700;800&display=swap">
@@ -79,7 +79,7 @@ ul.tight{margin:6px 0 0;padding-left:18px;font-size:15px}ul.tight li{margin:6px 
 <div class="wrap">
 <nav class="nav">
   <a class="logo" href="./"><img src="assets/mark.svg" alt="">CureCue</a>
-  <div class="links"><a href="approach.html">Approach</a><a href="architecture.html" aria-current="page">How it works</a><a href="evals.html">Evals</a><a class="btn primary sm" href="app/">Open the desk</a></div>
+  <div class="links"><a href="./">Overview</a><a href="approach.html">Approach</a><a href="architecture.html" aria-current="page">Architecture</a><a href="evals.html">Evaluation</a><a class="btn primary sm" href="app/">Open the desk</a></div>
 </nav>
 
 <section class="hero">
@@ -150,6 +150,7 @@ ul.tight{margin:6px 0 0;padding-left:18px;font-size:15px}ul.tight li{margin:6px 
       <li><b>Extract:</b> <code>pdftotext</code>, page by page, in layout and reading order, so a cost-sharing table and a wrapped sentence are both findable.</li>
       <li><b>Propose:</b> by hand. 11 rules, each with its plain text, figures and the exact line it was read from (15 quotes).</li>
       <li><b>Verify:</b> <code>eval/check-sources.mjs</code> runs on every code change: each PDF matches its checksum and each quote is found on its cited page. A planted wrong figure fails the build.</li>
+      <li><b>Try it live:</b> in the desk, <a href="app/#connect">Connections</a> re-fetches the plan's PDFs, compares their checksums and finds each quote on its page in your browser; <i>Add another plan</i> reads any plan's 2026 Summary of Benefits and compares its rules with the plan on file.</li>
       <li><b>Serve:</b> phrase patterns find the entry rule; the walk follows typed edges (unless, then, counts to); every figure in a draft must sit on a rule on that path.</li>
     </ul></div>
     <div class="card flat"><p class="eyebrow">Designed for production</p><ul class="tight">

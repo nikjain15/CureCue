@@ -13,8 +13,8 @@ const relDay = off => off === 0 ? "today" : off === 1 ? "tomorrow" : off === -1 
 function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on"); clearTimeout(toast.h); toast.h = setTimeout(() => e.classList.remove("on"), 2800); }
 
 // ---------- Views ----------
-const TITLES = { home: ["Home", "Member Services · Medicare · Mon Oct 27"], desk: ["Call", "Rosa M. · Medicare Advantage HMO-POS"], day: ["My day", "Mon Oct 27"], quality: ["Evals", "Releases, checks, mistakes, test lines"], loop: ["How it learns", "Two human gates"] };
-function show(v) { ["home", "desk", "day", "quality", "loop"].forEach(x => $("view-" + x).classList.toggle("on", x === v)); document.querySelectorAll(".rail button[data-view]").forEach(b => { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }); $("title").textContent = TITLES[v][0]; $("crumb").textContent = TITLES[v][1]; window.scrollTo({ top: 0 }); if (v === "day") renderDay(); try { history.replaceState(null, "", v === "quality" ? "#evals" : location.pathname + location.search); } catch (e) {} }
+const TITLES = { home: ["Today", "Your briefing for Mon Oct 27"], desk: ["Live call", "Rosa M. · Medicare Advantage HMO-POS"], day: ["My day", "Calls, outcomes and QA for Mon Oct 27"], quality: ["Quality", "Every release tested before advocates use it"], loop: ["Improvement loop", "How Cue gets better, with two human sign-offs"], connect: ["Connections", "The sources Cue reads, and whether each is live"] };
+function show(v) { ["home", "desk", "day", "quality", "loop", "connect"].forEach(x => $("view-" + x).classList.toggle("on", x === v)); document.querySelectorAll(".rail button[data-view]").forEach(b => { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }); $("title").textContent = TITLES[v][0]; $("crumb").textContent = TITLES[v][1]; window.scrollTo({ top: 0 }); if (v === "day") renderDay(); if (v === "connect" && window.CureCueConnect) CureCueConnect.open(); try { history.replaceState(null, "", v === "quality" ? "#evals" : v === "connect" ? "#connect" : location.pathname + location.search); } catch (e) {} }
 document.querySelectorAll(".rail button[data-view]").forEach(b => b.onclick = () => show(b.dataset.view));
 
 // ---------- Home: Cue's briefing, computed from the data ----------
@@ -290,7 +290,8 @@ function renderDay() {
 }
 
 CueVoice.init().then(() => { $("mode").textContent = CueVoice.modeLabel(); $("voicenote").textContent = CueVoice.readyNote(); });
-if (location.hash === "#evals") show("quality");
-window.addEventListener("hashchange", () => { if (location.hash === "#evals") show("quality"); });
-window.CureCueDesk = { state, show, onMember, answer };
+const HASHVIEW = { "#evals": "quality", "#connect": "connect" };
+if (HASHVIEW[location.hash]) show(HASHVIEW[location.hash]);
+window.addEventListener("hashchange", () => { if (HASHVIEW[location.hash]) show(HASHVIEW[location.hash]); });
+window.CureCueDesk = { state, show, onMember, answer, buildTrace, cue };
 })();

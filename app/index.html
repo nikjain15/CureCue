@@ -10,16 +10,17 @@
 <style>
 /* The desk: rail, top bar, one working area. Home is Cue's briefing. In a call: softphone and transcript left, Cue centre, member 360 right. */
 body{background:var(--bg-2)}
-.shell{display:grid;grid-template-columns:64px 1fr;min-height:100vh}
+.shell{display:grid;grid-template-columns:76px 1fr;min-height:100vh}
 .rail{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:6px;position:sticky;top:0;height:100vh}
 .rail .mark{width:34px;height:34px;margin-bottom:10px}
-.rail button,.rail a{width:44px;height:44px;border-radius:12px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;position:relative}
+.rail button,.rail a{width:62px;min-height:50px;border-radius:12px;border:0;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;position:relative;padding:6px 2px;font:inherit}
+.rail .lbl{font-size:10.5px;font-weight:700;line-height:1.1;text-align:center}
 .rail svg{width:22px;height:22px}
 .rail button[aria-current="page"]{background:var(--panel-2);color:var(--green)}
 .rail button:hover,.rail a:hover{background:var(--bg-2)}
 .rail .sp{flex:1}
 .rail .me{width:36px;height:36px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
-.rail .n{position:absolute;top:6px;right:6px;min-width:16px;height:16px;border-radius:8px;background:var(--bad);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;padding:0 4px}
+.rail .n{position:absolute;top:4px;right:10px;min-width:16px;height:16px;border-radius:8px;background:var(--bad);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;padding:0 4px}
 .main{min-width:0;display:flex;flex-direction:column}
 .top{display:flex;align-items:center;gap:14px;padding:10px 20px;background:var(--panel);border-bottom:1px solid var(--line);min-height:58px;flex-wrap:wrap}
 .top h1{font-size:17px;margin:0;font-weight:800}
@@ -88,6 +89,19 @@ section.scr{display:none}section.scr.on{display:block}
 .line{padding:10px 12px;border-radius:12px;background:var(--bg-2);max-width:92%;font-size:16px}
 .line.adv{background:var(--panel);border:1px solid var(--line);align-self:flex-end}
 .evhelp{margin:10px 0 14px;padding:10px 14px;border-radius:12px;background:var(--panel-2);font-size:15px}
+.cgroup{margin-bottom:22px}.cgroup h2{font-size:20px;margin:0 0 2px}
+.cgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));margin-top:10px}
+.ccard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.ccard .ctop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.ccard ul{margin:2px 0 6px;padding-left:18px;font-size:14px;color:var(--muted)}
+.ccard .btn{align-self:flex-start}
+.ccard:has(.cout:not(:empty)){grid-column:1/-1}
+.rail a{text-decoration:none}
+.cout:empty{display:none}.cout{margin-top:6px;font-size:14px}
+.cout td.good,.cout .good{color:var(--good)}.cout td.bad,.cout .bad{color:var(--bad)}
+ul.checks{list-style:none;margin:0;padding:0}ul.checks li{padding:3px 0;font-weight:700}
+ul.feed{margin:0;padding-left:18px}ul.feed li{margin:4px 0}
+.miclive{display:flex;align-items:center;gap:8px;font-weight:700}
 .line.sup{background:var(--warn-bg);border:1px solid transparent}
 .cue button.pressed{outline:3px solid var(--mint);outline-offset:2px}
 .line .w{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;font-weight:700}
@@ -230,18 +244,19 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
 <div class="shell">
 <nav class="rail" aria-label="Desk">
   <img class="mark" src="../assets/mark.svg" alt="CureCue">
-  <button data-view="home" aria-current="page" title="Home" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><span class="n" id="homen"></span></button>
-  <button data-view="desk" title="Call" aria-label="Call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></button>
-  <button data-view="day" title="My day" aria-label="My day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button>
-  <button data-view="quality" title="Evals" aria-label="Evals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19h16M7 16V9M12 16V5M17 16v-6"/></svg></button>
-  <button data-view="loop" title="How it learns" aria-label="How it learns"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12a8 8 0 0 1 14-5l2 2M20 12a8 8 0 0 1-14 5l-2-2"/><path d="M20 4v5h-5M4 20v-5h5"/></svg></button>
+  <button data-view="home" aria-current="page" title="Today" aria-label="Today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><span class="n" id="homen"></span><span class="lbl">Today</span></button>
+  <button data-view="desk" title="Live call" aria-label="Live call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><span class="lbl">Live call</span></button>
+  <button data-view="day" title="My day" aria-label="My day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="lbl">My day</span></button>
+  <button data-view="quality" title="Quality" aria-label="Quality"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19h16M7 16V9M12 16V5M17 16v-6"/></svg><span class="lbl">Quality</span></button>
+  <button data-view="loop" title="Improvement loop" aria-label="Improvement loop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12a8 8 0 0 1 14-5l2 2M20 12a8 8 0 0 1-14 5l-2-2"/><path d="M20 4v5h-5M4 20v-5h5"/></svg><span class="lbl">Improve</span></button>
+  <button data-view="connect" title="Connections" aria-label="Connections"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0z"/><path d="M12 16v5"/></svg><span class="lbl">Connect</span></button>
   <span class="sp"></span>
-  <a href="../" title="About CureCue" aria-label="About CureCue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></a>
+  <a href="../" title="About CureCue" aria-label="About CureCue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span class="lbl">About</span></a>
   <span class="me" title="Nik J.">NJ</span>
 </nav>
 <div class="main">
   <header class="top">
-    <h1 id="title">Home</h1><span class="crumb" id="crumb">Member Services · Medicare · Mon Oct 27</span>
+    <h1 id="title">Today</h1><span class="crumb" id="crumb">Your briefing for Mon Oct 27</span>
     <div class="stats"><span>Handled today <b id="handled">7</b></span><span>In queue <b id="qn">1</b></span><span>Avg handle <b id="aht">6:00</b></span></div>
     <div class="status"><span class="dot" id="dot"></span><span id="stt">Not ready</span><span class="t" id="timer"></span></div>
   </header>
@@ -360,7 +375,7 @@ ul.turns{list-style:none;margin:0;padding:0;font-size:14px}ul.turns li{padding:5
 
   <!-- EVALS CONSOLE -->
   <div class="view" id="view-quality">
-    <div class="evhead"><div><h2 style="margin:0">Test console</h2><p class="small" style="margin:4px 0 0">Every version of CureCue, tested on made-up lines a member might say, each with the right response written down in advance. Computed in this page from the same files the automatic test runs on every code change. <a href="../evals.html">How the testing works</a></p></div>
+    <div class="evhead"><div><h2 style="margin:0">Release testing</h2><p class="small" style="margin:4px 0 0">Every version of CureCue, tested on made-up lines a member might say, each with the right response written down in advance. Computed in this page from the same files the automatic test runs on every code change. <a href="../evals.html">How the testing works</a></p></div>
       <div class="tabs" id="evtabs" role="tablist"><button role="tab" aria-selected="true" data-ev="runs">Releases</button><button role="tab" aria-selected="false" data-ev="detail">Release detail</button><button role="tab" aria-selected="false" data-ev="compare">Compare</button><button role="tab" aria-selected="false" data-ev="failures">Mistakes</button><button role="tab" aria-selected="false" data-ev="dataset">Test lines</button><button role="tab" aria-selected="false" data-ev="judge">Auto-grader</button><button role="tab" aria-selected="false" data-ev="files">Files</button></div></div>
     <p class="evhelp" id="ev-help"></p>
 
@@ -413,6 +428,9 @@ node eval/check-data.mjs             # the made-up records add up
 node eval/run.mjs                    # scores the current release on all test lines</pre></div></section>
   </div>
 
+  <!-- CONNECTIONS -->
+  <div class="view" id="view-connect"><div id="connect"></div></div>
+
   <!-- LOOP -->
   <div class="view" id="view-loop">
     <div class="card"><h2>How Cue gets better every week, with a person at both gates</h2>
@@ -442,6 +460,7 @@ node eval/run.mjs                    # scores the current release on all test li
 <script src="voice.js"></script>
 <script src="script.js"></script>
 <script src="app.js"></script>
+<script src="connect.js"></script>
 <script src="evals.js"></script>
 </body>
 </html>

@@ -61,6 +61,10 @@ The plan rules and the right response for every test line come from public docum
 
 Copies are kept in `sources/` with SHA-256 checksums. `eval/check-sources.mjs` runs first in CI: each PDF must match its checksum and every quoted line in `rules.js` must be found on its cited page (needs `pdftotext` from poppler-utils).
 
+## Connections
+
+The desk's Connections screen (`app/connect.js`) lists the sources Cue reads. Live from the browser: the plan's documents (fetched from the publisher, SHA-256 compared with `sources/`, every quote found on its page with PDF.js), adding another plan by ID (reads its 2026 Summary of Benefits and compares the main rules), eCFR (the current grievance definition), the Federal Register (recent Medicare Advantage rules) and the microphone (speak as the member; Cue decides on each sentence). Salesforce Health Cloud and the claims platform run on the fictional records in `app/data.js`; Genesys Cloud CX, Amazon Connect, prior authorization, the Annual Notice of Change and the QIO directory are designed, not built. Product names identify the systems a deployment would use; no integration with them is implied.
+
 ## The call
 
 `app/script.js` holds every spoken line: Rosa, the advocate, and Dana the supervisor, who explains the fast-track appeal from the plan's Evidence of Coverage (pp. 146 to 148) and files it with the Quality Improvement Organization on the call. `scripts/make-voices.mjs` records each line with three distinct macOS voices (Samantha, Daniel, Moira) into `app/audio/`; the desk falls back to the browser's voices when a clip is missing. "Watch the full call" on Home plays the call end to end, presses each suggested action, and returns to Home with the cases it created.
