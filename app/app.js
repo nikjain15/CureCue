@@ -13,7 +13,7 @@ const relDay = off => off === 0 ? "today" : off === 1 ? "tomorrow" : off === -1 
 function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on"); clearTimeout(toast.h); toast.h = setTimeout(() => e.classList.remove("on"), 2800); }
 
 // ---------- Views ----------
-const TITLES = { home: ["Today", "Your briefing for Mon Oct 27"], desk: ["Live call", "Rosa M. · Medicare Advantage HMO-POS"], day: ["My day", "Calls, outcomes and QA for Mon Oct 27"], quality: ["Quality", "Every release tested before advocates use it"], loop: ["Improvement loop", "How Cue gets better, with two human sign-offs"], connect: ["Connections", "The sources Cue reads, and whether each is live"] };
+const TITLES = { home: ["Today", "Your briefing for Tue Oct 27"], desk: ["Live call", "Rosa M. · Medicare Advantage HMO-POS"], day: ["My day", "Calls, outcomes and QA for Tue Oct 27"], quality: ["Quality", "Every release tested before advocates use it"], loop: ["Improvement loop", "How Cue gets better, with two human sign-offs"], connect: ["Connections", "The sources Cue reads, and whether each is live"] };
 function show(v) { ["home", "desk", "day", "quality", "loop", "connect"].forEach(x => $("view-" + x).classList.toggle("on", x === v)); document.querySelectorAll(".rail button[data-view]").forEach(b => { if (b.dataset.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }); $("title").textContent = TITLES[v][0]; $("crumb").textContent = TITLES[v][1]; window.scrollTo({ top: 0 }); if (v === "day") renderDay(); if (v === "connect" && window.CureCueConnect) CureCueConnect.open(); try { history.replaceState(null, "", v === "quality" ? "#evals" : v === "connect" ? "#connect" : location.pathname + location.search); } catch (e) {} }
 document.querySelectorAll(".rail button[data-view]").forEach(b => b.onclick = () => show(b.dataset.view));
 
@@ -69,6 +69,10 @@ function drawGraph(path = []) { const svg = $("graph"); let s = "";
 function showClause(k) { const n = G.nodes[k]; $("clause").innerHTML = n.text ? `<b>${n.label}</b> (${n.id}): ${n.text}${n.src ? `<br><span class="small">Source: ${srcLinks(n)}</span>` : ""}` : `<b>${n.label}</b>`; }
 // Links to the public document and PDF page each plan rule was read from
 function srcHref(S, page) { return /\.pdf$/.test(S.file) ? `../${S.file}${page ? "#page=" + page : ""}` : S.url; }
+// Rosa's earlier calls about the bill, read from her contact records rather than typed in
+const rosaBill = () => D.contacts.filter(c => c.member === "M-001" && c.reason === "Claims and billing" && c.day < 0).sort((a, b) => a.day - b.day);
+const rosaCalls = () => rosaBill().map(c => fmtOff(c.day)).join(" and ");
+const rosaPromise = () => { const c = rosaBill().find(x => x.callback && x.callback.promised && !x.callback.scheduled); return c ? fmtOff(c.day) : "an earlier call"; };
 // ---------- How Cue got this: the steps behind each suggestion, with the rule cards and the pages ----------
 const escH = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 function hl(text, phrases) { let h = escH(text); (phrases || []).filter(Boolean).forEach(p => { const i = h.toLowerCase().indexOf(escH(p).toLowerCase()); if (i >= 0) h = h.slice(0, i) + "<mark>" + h.slice(i, i + escH(p).length) + "</mark>" + h.slice(i + escH(p).length); }); return h; }
@@ -95,7 +99,7 @@ function buildTrace(kind, text, d = {}) {
   } else if (kind === "refuse") {
     steps = [heard([]), safe, st("No rule matched", `None of the ${RULES_ON_FILE} plan rules on file covers this.`), st("Nothing drafted", "Cue says it has nothing to cite rather than guess. You answer, or look it up.")];
   } else if (kind === "record") {
-    steps = [st("Read", "The member record: her contacts from the last 90 days."), st("Found", "Two calls about this bill (Oct 3 and Oct 14). On Oct 14 a callback was promised and never scheduled."), st("You decide", "Acknowledge both calls before she has to raise them.")];
+    steps = [st("Read", "The member record: her contacts from the last 90 days."), st("Found", `Two calls about this bill (${rosaCalls()}). On ${rosaPromise()} a callback was promised and never scheduled.`), st("You decide", "Acknowledge both calls before she has to raise them.")];
   } else if (kind === "prefill") {
     steps = [st("From this call", "What the supervisor and the Quality Improvement Organization confirmed: appeal filed, coverage end date, decision timing."), st("Rule", nodeCard("FAST")), st("You decide", "Confirm the case and the callback. Nothing is filed until you do.")];
   }
@@ -192,14 +196,14 @@ function answer() {
 function chk() { $("verified").disabled = !(v1.checked && v2.checked && v3.checked); }
 ["v1", "v2", "v3"].forEach(id => $(id).onchange = chk);
 $("verified").onclick = () => { if (player) player.stop(); go(1); renderM360(); drawGraph(); const c = $("tr");
-  cue({ k: "Before you start", say: "She's called twice about this bill, Oct 3 and Oct 14. On Oct 14 she was promised a callback that never got scheduled.", trace: buildTrace("record", "") });
+  cue({ k: "Before you start", say: `She's called twice about this bill, ${rosaCalls()}. On ${rosaPromise()} she was promised a callback that never got scheduled.`, trace: buildTrace("record", "") });
   player = CueVoice.play(CALL, { container: c, onStart: () => wave(true), onLine: (l) => { addLine(c, l.w, l.t); wave(false); if (l.w === "Rosa") onMember(l.t); }, isPaused: () => paused || state.ended, onDone: () => { state.callDone = true; if (state.transferred) playSupervisor(); } }); };
 
 // ---------- The supervisor's part, then the advocate's close. Guidance follows the plan's EOC, Chapter 9, Section 8. ----------
 const EOC = R.SOURCES.EOC, eocLink = (p, t) => `<a href="../${EOC.file}#page=${p}" target="_blank" rel="noopener">${t}</a>`;
 function playSupervisor() { if (state.supStarted || state.ended) return; state.supStarted = true; const c = $("tr");
   setQuiet("Supervisor on the call. Cue shows process facts only.");
-  cue({ k: "For the supervisor · from the plan's documents", say: `Rehab is covered skilled nursing care. A <b>Notice of Medicare Non-Coverage</b> comes at least 2 days ahead; signing it is not agreeing. For a <b>fast-track appeal</b>, contact the Quality Improvement Organization by <b>noon the day before coverage ends</b>. It decides within one full day of having the information.`, trace: buildTrace("process", "They are sending her home on Wednesday and she is not ready."), why: "Process facts, not a coverage decision." }); drawGraph(["GRV", "APPL"]);
+  cue({ k: "For the supervisor · from the plan's documents", say: `Rehab is covered skilled nursing care. A <b>Notice of Medicare Non-Coverage</b> comes at least 2 days ahead; signing it is not agreeing. For a <b>fast-track appeal</b>, contact the Quality Improvement Organization by <b>noon the day before coverage ends</b>. It decides within one full day of having the information.`, trace: buildTrace("process", "They are sending her home on Thursday and she is not ready."), why: "Process facts, not a coverage decision." }); drawGraph(["GRV", "APPL"]);
   toast("Elena Martinez's record opened: Rosa M. is her authorized representative.");
   player = CueVoice.play(SCRIPT.SUPERVISOR, { container: c, onStart: () => wave(true), onLine: l => { addLine(c, l.w, l.t); wave(false); }, isPaused: () => paused || state.ended, onDone: offerAppealCase }); }
 function offerAppealCase() { if (state.ended) return;

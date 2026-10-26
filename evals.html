@@ -88,12 +88,12 @@ td.num.bad{color:var(--bad);font-weight:700}
   <div class="gloss">
     <div><b>Test line</b><p>One thing a member says, such as "What's my ER copay?", with the right response written down beforehand.</p></div>
     <div><b>Supervisor call</b><p>An appeal, a denial, a discharge dispute or a medical emergency. CureCue must stop and hand these to a supervisor.</p></div>
-    <div><b>Release</b><p>A version of CureCue's rules. Release 3 is the one advocates use today.</p></div>
+    <div><b>Release</b><p>A version of CureCue's rules. Release <span class="currel">4</span> is the one advocates use today.</p></div>
   </div>
 </section>
 
 <section class="sec" id="method">
-  <div class="head"><p>Pick a step. Each one shows what we do, today's results, and where it falls short. Steps 1 to 7 work today; step 8 is a plan. <a href="app/#evals">Open the test console</a> to see every test line.</p></div>
+  <div class="head"><p>Pick a step. Each one shows what we do, today's results, and where it falls short. Steps 1 to 7 work today; step 8 is a plan. <a href="app/#evals">Open the Quality console</a> to see every test line.</p></div>
   <div class="steps" role="tablist" aria-label="Testing steps" id="steps"></div>
   <div class="panel">
     <div class="ph-head"><h3 id="ph-title"></h3><span id="ph-pill"></span></div>
@@ -118,7 +118,7 @@ td.num.bad{color:var(--bad);font-weight:700}
         <h4>What they cover</h4>
         <div class="kv" id="strata"></div>
         <h4>Examples, read live from the test file</h4>
-        <p class="small" style="margin:0 0 8px">One line of each kind, exactly as stored, with the page that sets its right response. All <span id="ex-n"></span> are in the <a href="app/#evals">test console</a>, under Test lines.</p>
+        <p class="small" style="margin:0 0 8px">One line of each kind, exactly as stored, with the page that sets its right response. All <span id="ex-n"></span> are in the <a href="app/#evals">Quality console</a>, under Test lines.</p>
         <div class="tscroll"><table><thead><tr><th>What the member says</th><th>Right response</th><th>Source</th><th>Group</th></tr></thead><tbody id="extbl"></tbody></table></div>
         <details class="qa" style="margin-top:14px"><summary>How one line is stored</summary><div class="ci" id="exjson" style="margin-top:10px"></div><p class="small" style="margin-top:8px"><b>v</b> is the right response (answer, human for the advocate, escalate for a supervisor). <b>c</b> is the plan rule an answer must use. <b>g</b> marks an unhappy member. <b>register</b> is the tone, <b>lang</b> the language, <b>source</b> how it was written, <b>reason</b> why the member called. <b>src</b> is the document and page that set the right response. <b>labeller</b> alternates by row and is not used in any result.</p></details>
         <h4>Where it is set up</h4>
@@ -253,7 +253,7 @@ td.num.bad{color:var(--bad);font-weight:700}
  const frac=([a,b])=>b?`<td class="num${a<b?" bad":""}">${a} of ${b}</td>`:`<td class="num">none</td>`;
  const LN={en:"English",es:"Spanish",interp:"Through an interpreter"},TONE={plain:"Calm",implicit:"Indirect",angry:"Angry"},SRC={hand:"Written with the rules",adversarial:"Written to trick it",hard:"New, written after Release 3"};
  const VERB={answer:"answer from a plan rule",human:"leave to the advocate",escalate:"hand to a supervisor"};
- $("h-rows").textContent=G.length;$("hs-rows").textContent=G.length;
+ $("h-rows").textContent=G.length;document.querySelectorAll(".currel").forEach(e=>e.textContent=R.CURRENT_RELEASE);$("hs-rows").textContent=G.length;
  const adj=G.filter(r=>r.labels),agree=adj.filter(r=>r.labels.A.v===r.labels.B.v&&!!r.labels.A.g===!!r.labels.B.g).length;
  $("adj-n").textContent=adj.length;$("adj-a").textContent=pc(agree/adj.length);$("hs-adj").textContent=adj.length;
 

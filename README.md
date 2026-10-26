@@ -2,7 +2,7 @@
 
 An ambient assistant for member-service advocates at a Medicare Advantage plan. The assistant, **Cue**, listens alongside the advocate on a live call, speaks only when it has something useful, and never speaks to the member. The advocate stays accountable for every word.
 
-**Site:** `index.html` (what it is). **Advocate desk:** `app/` (the demo call, with voice). **Product approach:** `approach.html`. **How it works, one turn at a time:** `architecture.html`. **Evaluation:** `evals.html`. **The rules both run on:** `rules.js`. **The eval:** `eval/`.
+**Site:** `index.html` (what it is). **Advocate desk:** `app/` (the demo call, with voice). **Product approach:** `approach.html`. **Architecture, one turn at a time:** `architecture.html`. **Evaluation:** `evals.html`. **The rules both run on:** `rules.js`. **The eval:** `eval/`.
 
 ## Voice
 

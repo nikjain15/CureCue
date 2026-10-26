@@ -17,7 +17,7 @@
     { w: "Rosa", t: "They billed me $120 for the skin doctor and I thought I only pay $25." },
     { w: "Advocate", t: "Let me check where the biopsy on September 30th was done." },
     { w: "Rosa", t: "While I have you, if I go to the ER and they admit me, what do I owe?" },
-    { w: "Rosa", t: "And my mother is in rehab. They are sending her home on Wednesday and she is not ready." },
+    { w: "Rosa", t: "And my mother is in rehab. They are sending her home on Thursday and she is not ready." },
     { w: "Advocate", t: "I'm bringing a supervisor onto the call for that right now." }];
   // Plays once the advocate connects the supervisor.
   const SUPERVISOR = [
@@ -25,7 +25,7 @@
     { w: "Rosa", t: "Yes, Elena Martinez. I'm her authorized representative." },
     { w: "Supervisor", t: "I can see that on her record. Did the rehab facility give her a written notice called the Notice of Medicare Non-Coverage?" },
     { w: "Rosa", t: "They had her sign something this morning. Does that mean she agreed to leave?" },
-    { w: "Supervisor", t: "No. Signing only shows she received it. Her coverage ends on Wednesday, so she can ask for a fast-track appeal. The deadline is noon tomorrow." },
+    { w: "Supervisor", t: "No. Signing only shows she received it. Her coverage ends on Thursday, so she can ask for a fast-track appeal. The deadline is noon tomorrow." },
     { w: "Rosa", t: "Who decides? You?" },
     { w: "Supervisor", t: "No. The Quality Improvement Organization decides. They're independent doctors paid by the federal government, not part of the plan, and they decide within one full day of having her information." },
     { w: "Rosa", t: "Can we do it right now?" },
@@ -42,7 +42,7 @@
       logged: "I've logged your repeat calls as a complaint, and noted that we answered it on today's call.",
       declined: "I've noted your repeat calls on your record."
     },
-    wrap: "I'm scheduling a callback for Wednesday morning to check the decision on your mother's appeal, and texting you a recap.",
+    wrap: "I'm scheduling a callback for Thursday morning to check the decision on your mother's appeal, and texting you a recap.",
     thanks: "Thank you both. That finally makes sense."
   };
   // Every line that can be spoken, for the recorder.

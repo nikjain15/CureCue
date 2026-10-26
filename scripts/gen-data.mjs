@@ -1,6 +1,6 @@
 // Generates app/data.js: fictional members, contacts, cases, claims and callbacks on one real 2026 HMO-POS plan's rules (see SOURCES in rules.js).
 // Deterministic (seeded), so every number on the desk traces to a row here. Run: node scripts/gen-data.mjs
-// Dates are day offsets from the demo's "today" (a Monday), so clocks and due dates stay consistent on any real day.
+// Dates are day offsets from the demo's "today" (a Tuesday), so clocks and due dates stay consistent on any real day.
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -9,7 +9,7 @@ let seed = 20261027;
 const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
 const pick = a => a[Math.floor(rnd() * a.length)];
 
-const TODAY = "2026-10-27"; // demo day, a Monday
+const TODAY = "2026-10-27"; // demo day, a Tuesday
 
 // ---------- Members (8). Rosa M. is the scripted call; the others fill the briefing and the queue. ----------
 const members = [
